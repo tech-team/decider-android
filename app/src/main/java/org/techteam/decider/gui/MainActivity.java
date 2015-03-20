@@ -1,9 +1,11 @@
-package org.techteam.decider;
+package org.techteam.decider.gui;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import org.techteam.decider.R;
 
 
 public class MainActivity extends ActionBarActivity {

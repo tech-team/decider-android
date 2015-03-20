@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Decider</string>
+    <string name="action_settings">Настройки</string>
+    <string name="email">Почта</string>
+    <string name="forgot_password">Забыли пароль?</string>
+    <string name="hello_world">Здравствуй, мир!</string>
+    <string name="login">Войти</string>
+    <string name="login_via_social_network">Войти через социальную сеть:</string>
+    <string name="or">или</string>
+    <string name="password">Пароль</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="vk">VK</string>
+    <string name="open_context_menu">Open context menu</string>
+    <string name="ellipsize_hint">Press to show full text</string>
+    <string name="post_like">Liek</string>
+    <string name="post_comments">Comments</string>
+</resources>
