@@ -15,4 +15,10 @@
     <string name="ellipsize_hint">Press to show full text</string>
     <string name="post_like">Liek</string>
     <string name="post_comments">Comments</string>
+    <string name="pref_main">Main</string>
+    <string name="report_abuse">Report abuse</string>
+    <string name="loading">Loading...</string>
+    <string name="pref_shorten_long_posts_title">Shorten long posts</string>
+    <string name="pref_shorten_long_posts_summ">Press on post to unfold...</string>
+    <string name="pref_text_size_title">Font size</string>
 </resources>

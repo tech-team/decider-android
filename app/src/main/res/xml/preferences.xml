@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_main"
+        android:key="@string/pref_main_key">
+
+        <CheckBoxPreference
+            android:key="@string/pref_shorten_long_posts_key"
+            android:title="@string/pref_shorten_long_posts_title"
+            android:summary="@string/pref_shorten_long_posts_summ"
+            android:defaultValue="false" />
+
+        <ListPreference
+            android:key="@string/pref_text_size_key"
+            android:title="@string/pref_text_size_title"
+            android:entries="@array/text_size"
+            android:entryValues="@array/text_size_alias"
+            android:defaultValue="small"
+            />
+
+    </PreferenceCategory>
+</PreferenceScreen>

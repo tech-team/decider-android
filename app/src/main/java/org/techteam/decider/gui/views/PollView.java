@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import org.techteam.decider.R;
 
-//
-//public class PollView extends FrameLayout {
+
+public class PollView extends FrameLayout {
 //
 //    public interface Listener {
 //        void ratingViewStateChanged(PollView pollView, State oldState, State newState);
@@ -36,8 +36,9 @@ import org.techteam.decider.R;
 //            new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
 //
 //
-//    public PollView(Context context, AttributeSet attrs) {
-//        super(context, attrs);
+    public PollView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 //
 //        init(context);
 //
@@ -149,5 +150,4 @@ import org.techteam.decider.R;
 //            getChildAt(i).layout(0, 0, r - l, b - t);
 //        }
 //    }
-//}
-
+}
