@@ -7,8 +7,8 @@ import java.util.List;
 
 //TODO: ContentProvider
 public class ContentProvider {
-    private static Section section;
-    private static List<Category> categories;
+    private static ContentSection contentSection;
+    private static List<ContentCategory> categories;
 
     public static PostEntry getCurrentEntry(Cursor cursor) {
         return new PostEntry() {
@@ -16,15 +16,15 @@ public class ContentProvider {
         };
     }
 
-    public static Cursor getCursor(Section section, List<Category> categories, Context context) {
+    public static Cursor getCursor(ContentSection contentSection, List<ContentCategory> categories, Context context) {
         return null;
     }
 
-    public static Section getSection() {
-        return section;
+    public static ContentSection getContentSection() {
+        return contentSection;
     }
 
-    public static List<Category> getCategories() {
+    public static List<ContentCategory> getCategories() {
         return categories;
     }
 }

@@ -4,16 +4,16 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 
-import org.techteam.decider.content.Category;
-import org.techteam.decider.content.Section;
+import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.ContentProvider;
 
 import java.util.List;
 
 public class ContentLoader extends CursorLoader {
 
-    private Section section;
-    private final List<Category> categories;
+    private ContentSection contentSection;
+    private final List<ContentCategory> categories;
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
@@ -28,9 +28,9 @@ public class ContentLoader extends CursorLoader {
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
     }
 
-    public ContentLoader(Context context, Section section, List<Category> categories, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public ContentLoader(Context context, ContentSection contentSection, List<ContentCategory> categories, Integer entryPosition, Integer insertedCount, int loadIntention) {
         super(context);
-        this.section = section;
+        this.contentSection = contentSection;
         this.categories = categories;
         this.entryPosition = entryPosition;
         this.insertedCount = insertedCount;
@@ -39,7 +39,7 @@ public class ContentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        return ContentProvider.getCursor(section, categories, getContext());
+        return ContentProvider.getCursor(contentSection, categories, getContext());
     }
 
     public Integer getEntryPosition() {

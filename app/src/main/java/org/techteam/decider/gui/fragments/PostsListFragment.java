@@ -29,13 +29,9 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
-import org.techteam.decider.content.PostEntry;
-import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
-import org.techteam.decider.gui.fragments.OnPostEventCallback;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.Queue;
 
 public class PostsListFragment
@@ -85,7 +81,7 @@ public class PostsListFragment
                 }
 
                 //TODO: you may ask: why don't just store section and categories here, as field? idk
-                return new ContentLoader(getActivity(), ContentProvider.getSection(), ContentProvider.getCategories(), entryPos, insertedCount, loadIntention);
+                return new ContentLoader(getActivity(), ContentProvider.getContentSection(), ContentProvider.getCategories(), entryPos, insertedCount, loadIntention);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }
