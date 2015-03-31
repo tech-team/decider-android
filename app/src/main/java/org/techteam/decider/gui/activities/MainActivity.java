@@ -1,5 +1,6 @@
 package org.techteam.decider.gui.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
@@ -13,9 +14,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.VKSdkListener;
+import com.vk.sdk.VKUIHelper;
+import com.vk.sdk.api.VKError;
+
 import org.techteam.decider.R;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.gui.fragments.PostsListFragment;
+import org.techteam.decider.util.Toaster;
 
 import java.util.List;
 
@@ -34,6 +42,23 @@ public class MainActivity extends ActionBarActivity {
             getFragmentManager().beginTransaction()
                     .add(R.id.content_frame, new MainFragment()).commit();
         }
+
+        VKSdk.initialize(new VKSdkListener() {
+            @Override
+            public void onCaptchaError(VKError vkError) {
+                Toaster.toast(MainActivity.this, vkError.errorMessage);
+            }
+
+            @Override
+            public void onTokenExpired(VKAccessToken vkAccessToken) {
+                Toaster.toast(MainActivity.this, "Token expired");
+            }
+
+            @Override
+            public void onAccessDenied(VKError vkError) {
+                Toaster.toast(MainActivity.this, vkError.errorMessage);
+            }
+        }, "4855698");
     }
 
 //
@@ -58,4 +83,22 @@ public class MainActivity extends ActionBarActivity {
 //
 //        return super.onOptionsItemSelected(item);
 //    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        VKUIHelper.onResume(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VKUIHelper.onDestroy(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
+    }
 }
