@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.processors.GetQuestionsProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
@@ -26,18 +29,20 @@ public class DeciderService extends IntentService {
         public static final String REQUEST_ID = "REQUEST_ID";
         public static final String OPERATION = "OPERATION";
 
-        public class GetPostsOperation {
-            public static final String CONTENT_SOURCE = "CONTENT_SOURCE";
+        public class GetQuestionsOperation {
+            public static final String CONTENT_SECTION = "CONTENT_SECTION";
+            public static final String LIMIT = "LIMIT";
+            public static final String OFFSET = "OFFSET";
             public static final String LOAD_INTENTION = "LOAD_INTENTION";
         }
 
-        public class BashVoteOperation {
-            public static final String ENTRY_ID = "ENTRY_ID";
-            public static final String RATING = "rating";
-            public static final String DIRECTION = "direction";
-            public static final String ENTRY_POSITION = "entryPosition";
-            public static final String BAYAN = "bayan";
-        }
+//        public class BashVoteOperation {
+//            public static final String ENTRY_ID = "ENTRY_ID";
+//            public static final String RATING = "rating";
+//            public static final String DIRECTION = "direction";
+//            public static final String ENTRY_POSITION = "entryPosition";
+//            public static final String BAYAN = "bayan";
+//        }
     }
 
     public class CallbackIntentExtras {
@@ -71,13 +76,11 @@ public class DeciderService extends IntentService {
         Processor processor = null;
 
 
-//        if (operation == OperationType.GET_POSTS) {
-//
-//            ContentSource contentSource = extras.getParcelable(IntentExtras.GetPostsOperation.CONTENT_SOURCE);
-//            int loadIntention = extras.getInt(IntentExtras.GetPostsOperation.LOAD_INTENTION);
-//
-//            processor = new GetPostsProcessor(getBaseContext(), contentSource, loadIntention);
-//
+        if (operation == OperationType.GET_QUESETIONS) {
+            GetQuestionsRequest request = GetQuestionsRequest.fromBundle(extras);
+            processor = new GetQuestionsProcessor(getBaseContext(), request);
+        }
+
 //        } else if (operation == OperationType.BASH_VOTE) {
 //
 //            int entryPosition = intent.getIntExtra(IntentExtras.BashVoteOperation.ENTRY_POSITION, -1);

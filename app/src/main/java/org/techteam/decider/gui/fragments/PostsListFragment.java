@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentProvider;
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.PostEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.PostsListAdapter;
@@ -43,6 +44,11 @@ public class PostsListFragment
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TAG = PostsListFragment.class.toString();
+
+
+    private static final int QUESTIONS_LIMIT = 30;
+    private int questionsOffset = 0;
+    private ContentSection currentSection = ContentSection.NEW;
 
     private static final class BundleKeys {
         public static final String FACTORY = "FACTORY";
@@ -194,7 +200,7 @@ public class PostsListFragment
 
         this.activity = (MainActivity) activity;
         serviceHelper = new ServiceHelper(activity);
-        callbacksKeeper.addCallback(OperationType.GET_POSTS, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.GET_QUESETIONS, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -301,7 +307,7 @@ public class PostsListFragment
         //TODO: TODO TODO TODO
         //content = factory.buildContent(activity.getSection().getContentSection(), true);
 
-        //serviceHelper.getPosts(content, LoadIntention.REFRESH, callbacksKeeper.getCallback(OperationType.GET_POSTS));
+        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, LoadIntention.REFRESH, callbacksKeeper.getCallback(OperationType.GET_QUESETIONS));
     }
 
     @Override
@@ -316,7 +322,7 @@ public class PostsListFragment
             intention = LoadIntention.APPEND;
         }
         //TODO
-        //serviceHelper.getPosts(content, intention, callbacksKeeper.getCallback(OperationType.GET_POSTS));
+//        serviceHelper.getPosts(content, intention, callbacksKeeper.getCallback(OperationType.GET_QUESETIONS));
     }
 
     @Override

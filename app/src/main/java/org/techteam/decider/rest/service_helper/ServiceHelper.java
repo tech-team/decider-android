@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.PendingOperation;
@@ -30,6 +31,20 @@ public class ServiceHelper {
         this.context = context;
     }
 
+    public void getQuestions(ContentSection contentSection, int limit, int offset, int loadIntention, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.GET_QUESETIONS + "_" + limit + "_" + offset;
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, requestId, contentSection, limit, offset, loadIntention);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_QUESETIONS, requestId));
+    }
+
     public void saveOperationsState(Bundle outState, String key) {
         outState.putParcelableArrayList(key, new ArrayList<>(pendingOperations.values()));
     }
@@ -48,7 +63,7 @@ public class ServiceHelper {
         // callbacks are subscribed again to restored pending operations
         for (String opId : pendingOperations.keySet()) {
             PendingOperation op = pendingOperations.get(opId);
-            if (op.getOperationType() == OperationType.GET_POSTS)
+            if (op.getOperationType() == OperationType.GET_QUESETIONS)
                 isRefreshing = true;
 
             addCallback(op.getOperationId(), callbacksKeeper.getCallback(op.getOperationType()));
