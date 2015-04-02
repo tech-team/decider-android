@@ -36,11 +36,12 @@
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:ems="10"
-            android:id="@+id/email" />
+            android:id="@+id/email_text" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/password"
             android:id="@+id/textView2" />
@@ -50,12 +51,13 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
-            android:id="@+id/password" />
+            android:id="@+id/password_text" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
 
             <Button
                 android:layout_width="0dp"
@@ -89,17 +91,20 @@
             android:minHeight="40dp"/>
 
         <TextView
+            android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/login_via_social_network"
-            android:id="@+id/textView4" />
+            android:text="@string/login_via_social_network" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/login_via_vk_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/vk"
-            android:id="@+id/login_via_vk_button" />
+            android:src="@drawable/vk"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/vk" />
 
         </LinearLayout>
 </LinearLayout>

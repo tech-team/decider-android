@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKSdk;
@@ -30,9 +32,12 @@ public class AuthFragment
     private static final String VK_AUTH_SCOPE = "";
 
     // controls
+    private EditText emailText;
+    private EditText passwordText;
+
     private Button registerButton;
     private Button loginButton;
-    private Button loginViaVKButton;
+    private ImageButton loginViaVKButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,11 +51,28 @@ public class AuthFragment
         super.onViewCreated(view, savedInstanceState);
 
         // find controls
+        emailText = (EditText) view.findViewById(R.id.email_text);
+        passwordText = (EditText) view.findViewById(R.id.password_text);
+
         registerButton = (Button) view.findViewById(R.id.register_button);
         loginButton = (Button) view.findViewById(R.id.login_button);
-        loginViaVKButton = (Button) view.findViewById(R.id.login_via_vk_button);
+        loginViaVKButton = (ImageButton) view.findViewById(R.id.login_via_vk_button);
 
         // attach callbacks
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                register();
+            }
+        });
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login();
+            }
+        });
+
         loginViaVKButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,6 +106,20 @@ public class AuthFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    private void register() {
+        String email = emailText.getText().toString();
+        String password = passwordText.getText().toString();
+
+        Toaster.toast(activity.getBaseContext(), email + " : " + password);
+    }
+
+    private void login() {
+        String email = emailText.getText().toString();
+        String password = passwordText.getText().toString();
+
+        Toaster.toast(activity.getBaseContext(), email + " : " + password);
     }
 
     private void loginViaVK() {
