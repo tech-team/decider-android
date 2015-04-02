@@ -1,4 +1,4 @@
-package org.techteam.decider.net;
+package org.techteam.decider.net2;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,6 +23,11 @@ public class UrlParams implements Iterable<UrlParams.UrlParam> {
         public String getValue() {
             return value;
         }
+
+        @Override
+        public String toString() {
+            return getKey() + ": " + getValue();
+        }
     }
 
     public UrlParams() {
@@ -43,6 +48,11 @@ public class UrlParams implements Iterable<UrlParams.UrlParam> {
         return this;
     }
 
+    public UrlParams add(String key, double value) {
+        params.add(new UrlParam(key, Double.toString(value)));
+        return this;
+    }
+
     public UrlParams add(UrlParam p) {
         params.add(p);
         return this;
@@ -51,4 +61,5 @@ public class UrlParams implements Iterable<UrlParams.UrlParam> {
     public boolean isEmpty() {
         return params.isEmpty();
     }
+
 }

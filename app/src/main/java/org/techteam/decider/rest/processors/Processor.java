@@ -8,14 +8,17 @@ import org.techteam.decider.db.resolvers.AbstractContentResolver;
 import org.techteam.decider.db.resolvers.ExtraResolver;
 import org.techteam.decider.db.resolvers.TransactionsResolver;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.ApiUI;
 
 public abstract class Processor {
 
     private final Context context;
     private final TransactionsResolver transactioner;
+    protected final ApiUI apiUI;
 
     public Processor(Context context) {
         this.context = context;
+        apiUI = new ApiUI(context);
         transactioner = (TransactionsResolver) AbstractContentResolver.getResolver(ExtraResolver.TRANSACTIONS);
     }
 

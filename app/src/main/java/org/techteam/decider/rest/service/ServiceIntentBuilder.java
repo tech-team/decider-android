@@ -3,17 +3,22 @@ package org.techteam.decider.rest.service;
 import android.content.Context;
 import android.content.Intent;
 
+import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.rest.OperationType;
+
 public final class ServiceIntentBuilder {
 
-//    public static Intent getPostsIntent(Context context, String requestId, ContentSource contentSource, int loadIntention) {
-//        Intent intent = new Intent(context, DeciderService.class);
-//        intent.putExtra(DeciderService.IntentExtras.REQUEST_ID, requestId);
-//        intent.putExtra(DeciderService.IntentExtras.OPERATION, OperationType.GET_POSTS.toString());
-//
-//        intent.putExtra(DeciderService.IntentExtras.GetPostsOperation.CONTENT_SOURCE, contentSource);
-//        intent.putExtra(DeciderService.IntentExtras.GetPostsOperation.LOAD_INTENTION, loadIntention);
-//        return intent;
-//    }
+    public static Intent getQuestionsIntent(Context context, String requestId, ContentSection contentSection, int limit, int offset, int loadIntention) {
+        Intent intent = new Intent(context, DeciderService.class);
+        intent.putExtra(DeciderService.IntentExtras.REQUEST_ID, requestId);
+        intent.putExtra(DeciderService.IntentExtras.OPERATION, OperationType.GET_QUESETIONS.toString());
+
+        intent.putExtra(DeciderService.IntentExtras.GetQuestionsOperation.CONTENT_SECTION, contentSection.toInt());
+        intent.putExtra(DeciderService.IntentExtras.GetQuestionsOperation.LIMIT, limit);
+        intent.putExtra(DeciderService.IntentExtras.GetQuestionsOperation.OFFSET, offset);
+        intent.putExtra(DeciderService.IntentExtras.GetQuestionsOperation.LOAD_INTENTION, loadIntention);
+        return intent;
+    }
 //
 //    public static Intent voteBashIntent(Context context, String requestId, int entryPosition, String entryId, String rating, int direction) {
 //        Intent intent = new Intent(context, DeciderService.class);
