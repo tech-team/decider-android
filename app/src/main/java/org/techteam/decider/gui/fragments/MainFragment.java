@@ -2,19 +2,9 @@ package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.Loader;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,25 +14,12 @@ import android.widget.ListView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentCategory;
-import org.techteam.decider.content.ContentProvider;
-import org.techteam.decider.content.PostEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.Category;
-import org.techteam.decider.gui.adapters.PostsListAdapter;
-import org.techteam.decider.gui.loaders.ContentLoader;
-import org.techteam.decider.gui.loaders.LoadIntention;
-import org.techteam.decider.gui.loaders.LoaderIds;
-import org.techteam.decider.rest.CallbacksKeeper;
-import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.service_helper.ServiceCallback;
-import org.techteam.decider.rest.service_helper.ServiceHelper;
-import org.techteam.decider.util.Toaster;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class MainFragment
         extends Fragment {
@@ -74,7 +51,7 @@ public class MainFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Toolbar toolbar = (Toolbar) this.activity.findViewById(R.id.toolbar_actionbar);
+        Toolbar toolbar = (Toolbar) this.activity.findViewById(R.id.main_toolbar);
         this.activity.setSupportActionBar(toolbar);
 
 //        ActionBar actionBar = this.activity.getSupportActionBar();

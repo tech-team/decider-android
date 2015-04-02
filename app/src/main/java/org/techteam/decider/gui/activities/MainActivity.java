@@ -21,6 +21,7 @@ import com.vk.sdk.VKUIHelper;
 import com.vk.sdk.api.VKError;
 
 import org.techteam.decider.R;
+import org.techteam.decider.gui.fragments.AuthFragment;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.gui.fragments.PostsListFragment;
 import org.techteam.decider.util.Toaster;
@@ -29,6 +30,8 @@ import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
+    public static final String TOKEN_PREF_KEY = "token";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,26 +42,17 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.content_frame, new MainFragment()).commit();
+            // show main fragment if user has token
+            // or auth fragment otherwise
+            String token = sharedPrefs.getString(TOKEN_PREF_KEY, null);
+            if (token != null) {
+                getFragmentManager().beginTransaction()
+                        .add(R.id.content_frame, new MainFragment()).commit();
+            } else {
+                getFragmentManager().beginTransaction()
+                        .add(R.id.content_frame, new AuthFragment()).commit();
+            }
         }
-
-        VKSdk.initialize(new VKSdkListener() {
-            @Override
-            public void onCaptchaError(VKError vkError) {
-                Toaster.toast(MainActivity.this, vkError.errorMessage);
-            }
-
-            @Override
-            public void onTokenExpired(VKAccessToken vkAccessToken) {
-                Toaster.toast(MainActivity.this, "Token expired");
-            }
-
-            @Override
-            public void onAccessDenied(VKError vkError) {
-                Toaster.toast(MainActivity.this, vkError.errorMessage);
-            }
-        }, "4855698");
     }
 
 //
