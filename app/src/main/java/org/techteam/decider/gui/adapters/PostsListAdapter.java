@@ -11,7 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -21,11 +23,6 @@ import org.techteam.decider.content.PostEntry;
 import org.techteam.decider.gui.fragments.OnPostEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.views.EllipsizingTextView;
-import org.techteam.decider.gui.views.PostToolbarView;
-import org.techteam.decider.gui.views.PollView;
-import org.techteam.decider.util.Clipboard;
-import org.techteam.decider.util.Toaster;
-import org.techteam.decider.content.PostEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,32 +59,40 @@ public class PostsListAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        //header
-        public TextView id;
-        public TextView date;
-        public ImageButton overflow;
+        // header
+        public TextView authorText;
+        public TextView dateText;
+        public ImageView avatarImage;
+        public ImageButton overflowButton;
 
-        //content
-        public EllipsizingTextView text;
+        // content
+        public EllipsizingTextView postText;
+        public TextView ellipsizeHintText;
 
-        public TextView ellipsizeHint;
-
-        //bottom buttons panel
-        public PostToolbarView toolbarView;
+        // footer
+        public Button likeButton;
+        public Button commentsButton;
 
 
         public ViewHolder(View v) {
             super(v);
 
-            id = (TextView) v.findViewById(R.id.post_id);
-            date = (TextView) v.findViewById(R.id.post_date);
-            overflow = (ImageButton) v.findViewById(R.id.overflow_button);
+            // header
+            authorText = (TextView) v.findViewById(R.id.author_text);
+            dateText = (TextView) v.findViewById(R.id.date_text);
+            avatarImage = (ImageView) v.findViewById(R.id.avatar_image);
+            overflowButton = (ImageButton) v.findViewById(R.id.overflow_button);
 
-            text = (EllipsizingTextView) v.findViewById(R.id.post_text);
+            // content
+            postText = (EllipsizingTextView) v.findViewById(R.id.post_text);
+            ellipsizeHintText = (TextView) v.findViewById(R.id.post_ellipsize_hint);
 
-            ellipsizeHint = (TextView) v.findViewById(R.id.post_ellipsize_hint);
+            //TODO: images
+            //TODO: poll
 
-            toolbarView = (PostToolbarView) v.findViewById(R.id.post_toolbar_view);
+            // footer
+            likeButton = (Button) v.findViewById(R.id.like_button);
+            commentsButton = (Button) v.findViewById(R.id.comments_button);
         }
     }
 
@@ -134,25 +139,26 @@ public class PostsListAdapter
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs.getBoolean(context.getString(R.string.pref_shorten_long_posts_key), true))
-            holder.text.setMaxLines(POST_TEXT_MAX_LINES);
+            holder.postText.setMaxLines(POST_TEXT_MAX_LINES);
         else
-            holder.text.setMaxLines(Integer.MAX_VALUE);
+            holder.postText.setMaxLines(Integer.MAX_VALUE);
 
         String textSize = prefs.getString(context.getString(R.string.pref_text_size_key), "small");
+        assert textSize != null;  // suppress inspection
         switch (textSize) {
             case "small":
-                holder.text.setTextAppearance(context, android.R.style.TextAppearance_Small);
+                holder.postText.setTextAppearance(context, android.R.style.TextAppearance_Small);
                 break;
 
             case "medium":
-                holder.text.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+                holder.postText.setTextAppearance(context, android.R.style.TextAppearance_Medium);
                 break;
 
             case "large":
-                holder.text.setTextAppearance(context, android.R.style.TextAppearance_Large);
+                holder.postText.setTextAppearance(context, android.R.style.TextAppearance_Large);
                 break;
         }
-        holder.text.setTextColor(context.getResources().getColor(android.R.color.black));
+        holder.postText.setTextColor(context.getResources().getColor(android.R.color.black));
 
         //TODO: text justification, see:
         //http://stackoverflow.com/questions/1292575/android-textview-justify-text
@@ -165,29 +171,29 @@ public class PostsListAdapter
 
         //TODO: set handlers
 
-        holder.text.addEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
+        holder.postText.addEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
             @Override
             public void ellipsizeStateChanged(boolean ellipsized) {
-                holder.ellipsizeHint.setVisibility(ellipsized ? View.VISIBLE : View.GONE);
+                holder.ellipsizeHintText.setVisibility(ellipsized ? View.VISIBLE : View.GONE);
             }
         });
 
         //set expand function both for text and hint controls
-        holder.ellipsizeHint.setOnClickListener(new View.OnClickListener() {
+        holder.ellipsizeHintText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.text.setMaxLines(Integer.MAX_VALUE);
+                holder.postText.setMaxLines(Integer.MAX_VALUE);
             }
         });
 
-        holder.text.setOnClickListener(new View.OnClickListener() {
+        holder.postText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.text.setMaxLines(Integer.MAX_VALUE);
+                holder.postText.setMaxLines(Integer.MAX_VALUE);
             }
         });
 
-        holder.overflow.setOnClickListener(new View.OnClickListener() {
+        holder.overflowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Context context = v.getContext();

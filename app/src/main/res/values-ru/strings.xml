@@ -25,4 +25,5 @@
     <string name="drawer_close">Close categories list</string>
     <string name="categories_label">Categories</string>
     <string name="auth_title">Desider: authorization</string>
+    <string name="avatar">avatar</string>
 </resources>

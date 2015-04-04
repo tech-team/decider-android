@@ -13,6 +13,7 @@
     android:layout_marginTop="3dp"
     android:layout_marginBottom="3dp"
     tools:context="org.techteam.decider.gui.fragments.PostsListFragment" >
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,12 +23,33 @@
         android:paddingBottom="10dp"
         >
 
-        <TextView
-            android:id="@+id/post_id"
+        <ImageView
+            android:id="@+id/avatar_image"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:contentDescription="@string/avatar" />
+
+        <TextView
+            android:id="@+id/author_text"
+            android:layout_toRightOf="@id/avatar_image"
+            android:layout_toEndOf="@id/avatar_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            tools:text="Vasja Pupkin" />
+
+        <TextView
+            android:id="@+id/date_text"
+            android:layout_toRightOf="@id/avatar_image"
+            android:layout_toEndOf="@id/avatar_image"
+            android:layout_below="@id/author_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="yesterday"
             style="@style/post_header" />
 
         <ImageButton
@@ -46,19 +68,21 @@
             android:background="@android:color/transparent"
             android:contentDescription="@string/open_context_menu" />
 
-        <TextView
-            android:id="@+id/post_date"
-            android:layout_toLeftOf="@id/overflow_button"
-            android:layout_toStartOf="@id/overflow_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/post_header" />
+        <View
+            android:id="@+id/header_hr"
+            android:layout_width="fill_parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            android:layout_height="1dp"
+            android:background="#DDDDDD"
+            android:layout_below="@id/avatar_image" />
 
-        <org.techteam.bashhappens.gui.views.EllipsizingTextView
+        <org.techteam.decider.gui.views.EllipsizingTextView
             android:id="@+id/post_text"
-            android:layout_below="@id/post_id"
+            android:layout_below="@id/header_hr"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            tools:text="Some text here"
             />
 
         <TextView
@@ -71,7 +95,7 @@
             android:text="@string/ellipsize_hint"/>
 
         <View
-            android:id="@+id/hr"
+            android:id="@+id/footer_hr"
             android:layout_width="fill_parent"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="4dp"
@@ -79,11 +103,41 @@
             android:background="#DDDDDD"
             android:layout_below="@id/post_ellipsize_hint" />
 
-        <org.techteam.decider.gui.views.PostToolbarView
-            android:id="@+id/post_toolbar_view"
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/hr"
-            />
+            android:orientation="horizontal"
+            android:layout_below="@id/footer_hr"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/like_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@android:drawable/ic_input_add"
+                android:drawableStart="@android:drawable/ic_input_add"
+                tools:text="+10"
+                style="?android:attr/borderlessButtonStyle"
+                />
+
+            <View
+                android:layout_width="64dp"
+                android:layout_height="0dp">
+
+            </View>
+
+            <Button
+                android:id="@+id/comments_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@android:drawable/ic_dialog_email"
+                android:drawableStart="@android:drawable/ic_dialog_email"
+                tools:text="+10"
+                style="?android:attr/borderlessButtonStyle"
+                />
+
+        </LinearLayout>
+
+
     </RelativeLayout>
 </android.support.v7.widget.CardView>

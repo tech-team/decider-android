@@ -29,5 +29,8 @@
         <!-- Want to style this? Be smart - use selector -->
     </style>
 
+    <style name="ToolbarButton">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
 
 </resources>
