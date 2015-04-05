@@ -7,41 +7,30 @@ import android.util.Log;
 import org.techteam.decider.db.DatabaseHelper;
 import org.techteam.decider.db.ITable;
 
+import java.util.ArrayList;
+
 import static org.techteam.decider.db.DataTypes.*;
 
-public class Transactions implements ITable {
+public class Transactions extends AbstractTable {
+    public static final String TABLE_NAME = "transactions";
 
     public static final String ID = "id";
     public static final String STATUS = "status";
     public static final String TYPE = "type";
 
-    public static final String TABLE_NAME = "transactions";
+    public static final Uri CONTENT_ID_URI_BASE = generateContentIdUriBase(TABLE_NAME);
+    public static final String CONTENT_TYPE = generateContentType(TABLE_NAME);
 
-    public static final Uri CONTENT_ID_URI_BASE
-            = Uri.parse("content://" + DatabaseHelper.AUTHORITY + "/transactions/");
-    public static final String CONTENT_TYPE
-            = "org.techteam.bashhappens.db.tables.transactions/org.techteam.bashhappens.db";
-
-    public Transactions() {}
-
-    private static final String TABLE_CREATE = "CREATE TABLE "
-            + TABLE_NAME + "(" + COLUMN_ID + TYPE_SERIAL + SEPARATOR
-            + ID + TYPE_TEXT + SEPARATOR
-            + STATUS + TYPE_INTEGER + SEPARATOR
-            + TYPE + TYPE_INTEGER + ");";
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CREATE);
+    public Transactions() {
+        super(TABLE_NAME);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase database, int oldVersion,
-                          int newVersion) {
-        Log.w(Transactions.class.getName(), "Upgrading database from version "
-                + oldVersion + " to " + newVersion
-                + ", which will destroy all old data");
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(database);
+    protected String createTableQuery(String tableName) {
+        ArrayList<TableTuple> tuples = new ArrayList<>();
+        tuples.add(new TableTuple(COLUMN_ID, TYPE_SERIAL));
+        tuples.add(new TableTuple(ID, TYPE_TEXT));
+        tuples.add(new TableTuple(STATUS, TYPE_INTEGER));
+        return super.createTableQuery(tableName, tuples);
     }
 }

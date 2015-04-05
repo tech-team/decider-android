@@ -20,7 +20,7 @@ public abstract class DbProvider extends ContentProvider {
     protected UriMatcher mUriMatcher;
     protected HashMap<String, String> mProjectionMap;
 
-    protected static final String AUTHORITY = "org.techteam.bashhappens.db.providers.";
+    protected static final String AUTHORITY = "org.techteam.decider.db.providers.";
 
     protected DbProvider() {
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
