@@ -5,16 +5,14 @@ import android.os.Bundle;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.db.resolvers.AbstractContentResolver;
 import org.techteam.decider.db.resolvers.ContentResolver;
 import org.techteam.decider.gui.loaders.LoadIntention;
-import org.techteam.decider.net.HttpDownloader;
-import org.techteam.decider.net.UrlParams;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.InvalidAccessTokenException;
+import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
-import org.techteam.decider.content.ContentSection;
 
 import java.io.IOException;
 
@@ -33,21 +31,31 @@ public class GetQuestionsProcessor extends Processor {
 
         transactionStarted(operationType, requestId);
 
+        Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getQuestionsRequest(request);
+            JSONObject response = apiUI.getQuestions(request);
+            System.out.println(response);
+
+            ContentResolver resolver = AbstractContentResolver.getResolver(request.getContentSection());
+
+//            int insertedCount = list.getEntries().size();
+            if (resolver != null) {
+                if (request.getLoadIntention() == LoadIntention.REFRESH) {
+                    resolver.deleteAllEntries(getContext());
+                }
+
+                // writing to db
+//                insertedCount = resolver.insertEntries(getContext(), list).size();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (InvalidAccessTokenException e) {
+            e.printStackTrace();
+        } catch (TokenRefreshFailException e) {
+            e.printStackTrace();
         }
-//        try {
-//            UrlParams params = new UrlParams();
-//            params.add("limit", limit);
-//            params.add("offset", offset);
-//            HttpDownloader.httpGet(URL_PATH);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
 
 //        ContentList list = null;
@@ -90,16 +98,15 @@ public class GetQuestionsProcessor extends Processor {
             // finishing up a transaction
             transactionFinished(operationType, requestId);
 
-            Bundle data = getInitialBundle();
+//
 //            data.putInt(ServiceCallback.GetPostsExtras.INSERTED_COUNT, insertedCount);
-            cb.onSuccess(data);
+//            cb.onSuccess(data);
 //        }
     }
 
     private Bundle getInitialBundle() {
         Bundle data = new Bundle();
-//        data.putParcelable(ServiceCallback.GetPostsExtras.NEW_CONTENT_SOURCE, contentSource);
-//        data.putInt(ServiceCallback.GetPostsExtras.LOAD_INTENTION, loadIntention);
+        data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, request.getLoadIntention());
         return data;
     }
 }

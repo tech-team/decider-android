@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.Entry;
 
 public abstract class AbstractContentResolver {
@@ -24,21 +25,19 @@ public abstract class AbstractContentResolver {
 //        return contentValues;
 //    }
 //
-//    public static ContentResolver getResolver(ContentSection section) {
-//        switch (section) {
-//            case BASH_ORG_NEWEST:
-//                return new BashNewestResolver();
-//            case BASH_ORG_FAVS:
-//                return new BashFavsResolver();
-//            case BASH_ORG_BEST:
-//                return new BashBestResolver();
-//            case IT_HAPPENS_NEWEST:
-//                //TODO: ItHappensNewest resolver
-//                return null;
-//            default:
-//                return null;
-//        }
-//    }
+    public static ContentResolver getResolver(ContentSection section) {
+        switch (section) {
+            case NEW:
+//                return new
+            case POPULAR:
+                break;
+            case MY:
+                break;
+            default:
+                return null;
+        }
+        return null;
+    }
 
     public static AbstractContentResolver getResolver(ExtraResolver resolver) {
         switch (resolver) {
@@ -99,7 +98,7 @@ public abstract class AbstractContentResolver {
         }
     }
 
-    public  int insertEntry(Context context, Entry entry) {
+    public int insertEntry(Context context, Entry entry) {
         return Integer.valueOf(context
                                .getContentResolver()
                                .insert(_getUri(), convertToContentValues(entry))

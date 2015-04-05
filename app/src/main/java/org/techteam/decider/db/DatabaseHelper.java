@@ -7,11 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String LOG = "DatabaseHelper";
-    private static final int DATABASE_VERSION = 13;
-    private static final String DATABASE_NAME = "bashhappens";
+    private static final String LOG = DatabaseHelper.class.toString();
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "decider";
 
-    public static final String AUTHORITY = "org.techteam.bashhappens.db.DatabaseHelper";
+    public static final String AUTHORITY = "org.techteam.decider.db.DatabaseHelper";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

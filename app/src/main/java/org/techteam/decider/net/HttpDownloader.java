@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
 public class HttpDownloader {
 
     private static final String DEFAULT_ENCODING = "UTF-8";
-    private static final String USER_AGENT = "BashHappens v0.1a";
+    private static final String USER_AGENT = "Decider v0.1";
 
     public static class Request {
         private String url;

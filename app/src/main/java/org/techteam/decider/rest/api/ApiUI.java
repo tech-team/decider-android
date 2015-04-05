@@ -45,10 +45,14 @@ public class ApiUI {
         return null;
     }
 
-    public HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException {
+    public HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
 
-        params.add("access_token", getAccessToken());
+        String accessToken = getAccessToken();
+        if (accessToken == null) {
+            throw new InvalidAccessTokenException();
+        }
+        params.add("access_token", accessToken);
         httpRequest.setParams(params);
 
         HttpResponse httpResponse = HttpDownloader.httpGet(httpRequest);
@@ -61,13 +65,13 @@ public class ApiUI {
             if (code != HttpURLConnection.HTTP_FORBIDDEN) {
                 return httpResponse;
             }
-            return null; // TODO: add exception
+            throw new InvalidAccessTokenException();
         }
 
         return httpResponse;
     }
 
-    public JSONObject getQuestionsRequest(GetQuestionsRequest request) throws IOException, JSONException {
+    public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         UrlParams params = new UrlParams();
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
@@ -80,7 +84,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    private void refreshToken() throws IOException, JSONException {
+    private void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(AuthRequest.REFRESH_TOKEN_URL));
         UrlParams params = new UrlParams();
         params.add("refresh_token", getRefreshToken());
@@ -92,9 +96,9 @@ public class ApiUI {
             editor.putString("access_token", resp.getString("access_token"));
             editor.putString("expires", resp.getString("expires"));
             editor.putString("refresh_token", resp.getString("refresh_token"));
-            editor.commit();
+            editor.apply();
         }
-        throw new RuntimeException("Refresh failed");
+        throw new TokenRefreshFailException();
     }
 
     private String resolveApiUrl(String path) {

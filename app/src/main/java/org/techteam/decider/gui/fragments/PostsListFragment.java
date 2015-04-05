@@ -207,9 +207,9 @@ public class PostsListFragment
 
                 //TODO
                 //content = data.getParcelable(GetPostsExtras.NEW_CONTENT_SOURCE);
-                boolean isFeedFinished = data.getBoolean(GetPostsExtras.FEED_FINISHED, false);
-                int insertedCount = data.getInt(GetPostsExtras.INSERTED_COUNT, -1);
-                int loadIntention = data.getInt(GetPostsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
+                boolean isFeedFinished = data.getBoolean(GetQuestionsExtras.FEED_FINISHED, false);
+                int insertedCount = data.getInt(GetQuestionsExtras.COUNT, -1);
+                int loadIntention = data.getInt(GetQuestionsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
 
                 String msg;
                 if (isFeedFinished) {
@@ -235,30 +235,30 @@ public class PostsListFragment
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.BASH_VOTE, new ServiceCallback() {
-            @Override
-            public void onSuccess(String operationId, Bundle data) {
-                String entryId = data.getString(ServiceCallback.BashVoteExtras.ENTRY_ID);
-                int entryPosition = data.getInt(BashVoteExtras.ENTRY_POSITION);
-
-                String msg = "Voted for entry: " + entryId;
+//        callbacksKeeper.addCallback(OperationType.BASH_VOTE, new ServiceCallback() {
+//            @Override
+//            public void onSuccess(String operationId, Bundle data) {
+//                String entryId = data.getString(ServiceCallback.BashVoteExtras.ENTRY_ID);
+//                int entryPosition = data.getInt(BashVoteExtras.ENTRY_POSITION);
+//
+//                String msg = "Voted for entry: " + entryId;
+////                Toaster.toast(getActivity().getApplicationContext(), msg);
+//                System.out.println(msg);
+//
+//                Bundle args = new Bundle();
+//                args.putInt(ContentLoader.BundleKeys.ENTRY_POSITION, entryPosition);
+//                getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
+//            }
+//
+//            @Override
+//            public void onError(String operationId, Bundle data, String message) {
+//                String entryId = data.getString(ServiceCallback.BashVoteExtras.ENTRY_ID);
+//
+//                String msg = "Vote failed for entry: " + entryId + ". " + message;
 //                Toaster.toast(getActivity().getApplicationContext(), msg);
-                System.out.println(msg);
-
-                Bundle args = new Bundle();
-                args.putInt(ContentLoader.BundleKeys.ENTRY_POSITION, entryPosition);
-                getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
-            }
-
-            @Override
-            public void onError(String operationId, Bundle data, String message) {
-                String entryId = data.getString(ServiceCallback.BashVoteExtras.ENTRY_ID);
-
-                String msg = "Vote failed for entry: " + entryId + ". " + message;
-                Toaster.toast(getActivity().getApplicationContext(), msg);
-                System.out.println(msg);
-            }
-        });
+//                System.out.println(msg);
+//            }
+//        });
     }
 
     @Override
