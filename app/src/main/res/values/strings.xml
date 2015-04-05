@@ -13,17 +13,17 @@
     <string name="or">or</string>
     <string name="vk">VK</string>
     <string name="open_context_menu">Open context menu</string>
-    <string name="ellipsize_hint">Press to show full text</string>
-    <string name="post_like">Liek</string>
+    <string name="ellipsize_hint">Press to show full question</string>
+    <string name="post_like">Like</string>
     <string name="post_comments">Comments</string>
-    <string name="pref_main">Main</string>
-    <string name="pref_main_key">pref_main_key</string>
+    <string name="pref_main" translatable="false">Main</string>
+    <string name="pref_main_key" translatable="false">pref_main_key</string>
     <string name="report_abuse">Report abuse</string>
     <string name="loading">Loading...</string>
-    <string name="pref_shorten_long_posts_key">pref_shorten_long_posts_key</string>
-    <string name="pref_text_size_key">pref_text_size_key</string>
+    <string name="pref_shorten_long_posts_key" translatable="false">pref_shorten_long_posts_key</string>
+    <string name="pref_text_size_key" translatable="false">pref_text_size_key</string>
     <string name="pref_shorten_long_posts_title">Shorten long posts</string>
-    <string name="pref_shorten_long_posts_summ">Press on post to unfold...</string>
+    <string name="pref_shorten_long_posts_summ">Press to show full question</string>
     <string name="pref_text_size_title">Font size</string>
     <string name="drawer_open">Open categories list</string>
     <string name="drawer_close">Close categories list</string>
@@ -37,11 +37,11 @@
     <string name="post_text_label">Question:</string>
     <string name="post_text_placeholder">To be or not to be...</string>
     <string name="post_category_label">Category:</string>
-    <string name="images">Images</string>
     <string name="text_type">Text</string>
     <string name="images_type">Images</string>
     <string name="yes">Yes</string>
-    <string name="option1">First option</string>
+    <string name="no">No</string>
+    <string name="option1">First option:</string>
     <string name="option2">Second option:</string>
     <string name="anonymously">Anonymously</string>
 
