@@ -26,4 +26,15 @@
     <string name="categories_label">Categories</string>
     <string name="auth_title">Desider: authorization</string>
     <string name="avatar">avatar</string>
+    <string name="send_post">Send post</string>
+    <string name="post_text_label">Question:</string>
+    <string name="post_text_placeholder">To be or not to be...</string>
+    <string name="post_category_label">Category:</string>
+    <string name="images">Images</string>
+    <string name="text_type">Text</string>
+    <string name="images_type">Images</string>
+    <string name="yes">Yes</string>
+    <string name="option1">First option</string>
+    <string name="option2">Second option:</string>
+    <string name="anonymously">Anonymously</string>
 </resources>

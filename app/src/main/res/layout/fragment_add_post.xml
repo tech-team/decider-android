@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/post_add_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        style="@style/HeaderBar"
+        app:theme="@style/ActionBarThemeOverlay"
+        app:popupTheme="@style/ActionBarPopupThemeOverlay">
+
+        <ImageButton
+            android:id="@+id/post_send_button"
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_ab_done"
+            android:contentDescription="@string/send_post" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/post_text_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_text_label"
+            android:textAppearance="@android:style/TextAppearance.Medium"/>
+
+        <EditText
+            android:id="@+id/post_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_text_label"
+            android:singleLine="false"
+            android:lines="5"
+            android:hint="@string/post_text_placeholder"/>
+
+        <TextView
+            android:id="@+id/post_category_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_text"
+            android:text="@string/post_category_label"
+            android:textAppearance="@android:style/TextAppearance.Medium"/>
+
+        <Spinner
+            android:id="@+id/post_category_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_category_label"/>
+
+        <TabHost
+            android:id="@+id/type_tab_host"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/post_category_spinner">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </TabWidget>
+
+                <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/images_tab"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/text_tab"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/option1" />
+
+                        <EditText
+                            android:id="@+id/option1_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/yes"
+                            android:inputType="text" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/option2" />
+
+                        <EditText
+                            android:id="@+id/option2_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/yes"
+                            android:inputType="text" />
+
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </TabHost>
+
+        <CheckBox
+            android:id="@+id/anonymity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:checked="false"
+            android:text="@string/anonymously"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
