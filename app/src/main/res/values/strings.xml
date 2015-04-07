@@ -44,5 +44,8 @@
     <string name="option1">First option:</string>
     <string name="option2">Second option:</string>
     <string name="anonymously">Anonymously</string>
+    <string name="popular_tab">Popular</string>
+    <string name="new_tab">New</string>
+    <string name="my_tab">My</string>
 
 </resources>

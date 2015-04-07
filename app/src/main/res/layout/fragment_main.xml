@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    style="AppTheme"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -22,11 +23,24 @@
         android:layout_height="match_parent">
 
         <!-- The main content view -->
-        <TextView
-            android:id="@+id/container"
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/hello_world"/>
+            android:orientation="vertical">
+
+            <org.techteam.decider.gui.widget.SlidingTabLayout
+                android:id="@+id/sections_pager_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/sections_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </android.support.v4.view.ViewPager>
+
+        </LinearLayout>
 
         <!-- The navigation drawer -->
         <LinearLayout
@@ -36,7 +50,7 @@
             android:orientation="vertical"
             android:layout_gravity="start"
             android:background="@android:color/white"
-            android:padding="10dp">
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"

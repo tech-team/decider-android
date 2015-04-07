@@ -2,7 +2,10 @@ package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -14,9 +17,11 @@ import android.widget.ListView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.Category;
+import org.techteam.decider.gui.widget.SlidingTabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +37,10 @@ public class MainFragment
     private ListView mDrawerList;
 
     private CategoriesListAdapter categoriesListAdapter;
+
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
+    private SlidingTabLayout mSlidingTabLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,6 +107,25 @@ public class MainFragment
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+
+        // sections
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) this.activity.findViewById(R.id.sections_pager);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
+        // it's PagerAdapter set.
+        mSlidingTabLayout = (SlidingTabLayout) this.activity.findViewById(R.id.sections_pager_tabs);
+        mSlidingTabLayout.setDistributeEvenly(true);
+        mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return R.color.primary;
+            }
+        });
     }
 
     @Override
@@ -109,6 +137,29 @@ public class MainFragment
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             //selectItem(position);
+        }
+    }
+
+    private class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // TODO: static create() method with section arg
+            return new PostsListFragment();
+        }
+
+        @Override
+        public int getCount() {
+            return ContentSection.values().length;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            int resId = ContentSection.fromInt(position).getResId();
+            return getString(resId);
         }
     }
 }

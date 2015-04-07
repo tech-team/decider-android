@@ -36,4 +36,7 @@
     <string name="option1">Первый вариант:</string>
     <string name="option2">Второй вариант:</string>
     <string name="anonymously">Анонимно</string>
+    <string name="popular_tab">Popular</string>
+    <string name="new_tab">New</string>
+    <string name="my_tab">My</string>
 </resources>

@@ -1,18 +1,24 @@
 package org.techteam.decider.content;
 
+import org.techteam.decider.R;
+
 public enum ContentSection {
-    NEW, POPULAR, MY;
+    NEW(R.string.new_tab, 0), POPULAR(R.string.popular_tab, 1), MY(R.string.my_tab, 2);
+
+    int resId;
+    int sectionId;
+
+    ContentSection(int resId, int sectionId) {
+        this.resId = resId;
+        this.sectionId = sectionId;
+    }
+
+    public int getResId() {
+        return resId;
+    }
 
     public int toInt() {
-        switch (this) {
-            case NEW:
-                return 0;
-            case POPULAR:
-                return 1;
-            case MY:
-                return 2;
-        }
-        return -1;
+        return this.sectionId;
     }
 
     public static ContentSection fromInt(int v) {
