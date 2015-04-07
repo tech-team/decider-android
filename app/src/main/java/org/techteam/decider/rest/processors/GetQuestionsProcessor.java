@@ -3,6 +3,7 @@ package org.techteam.decider.rest.processors;
 import android.content.Context;
 import android.os.Bundle;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.db.resolvers.AbstractContentResolver;
@@ -44,9 +45,22 @@ public class GetQuestionsProcessor extends Processor {
                     resolver.deleteAllEntries(getContext());
                 }
 
+                if (!response.getString("status").equalsIgnoreCase("ok")) {
+                    System.err.println("not ok!");
+                    return;
+                }
+
+                JSONArray data = response.getJSONArray("data");
+                for (int i = 0; i < data.length(); ++i) {
+                    JSONObject q = data.getJSONObject(i);
+                    resolver.insert(getContext(), q);
+                }
+
                 // writing to db
 //                insertedCount = resolver.insertEntries(getContext(), list).size();
             }
+
+            cb.onSuccess(result);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
