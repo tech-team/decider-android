@@ -20,7 +20,7 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="0dp"
         >
 
         <ImageView
@@ -110,29 +110,43 @@
             android:layout_below="@id/footer_hr"
             android:gravity="center">
 
-            <Button
-                android:id="@+id/like_button"
+            <ImageButton
+                android:id="@+id/share_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@android:drawable/ic_input_add"
-                android:drawableStart="@android:drawable/ic_input_add"
-                tools:text="+10"
+                android:src="@drawable/ic_action_share"
                 style="?android:attr/borderlessButtonStyle"
-                />
+                android:contentDescription="@string/share" />
 
             <View
-                android:layout_width="64dp"
+                android:layout_width="32dp"
                 android:layout_height="0dp">
-
             </View>
 
             <Button
                 android:id="@+id/comments_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@android:drawable/ic_dialog_email"
-                android:drawableStart="@android:drawable/ic_dialog_email"
+                android:drawableLeft="@drawable/ic_action_chat"
+                android:drawableStart="@drawable/ic_action_chat"
                 tools:text="+10"
+                android:gravity="fill"
+                style="?android:attr/borderlessButtonStyle"
+                />
+
+            <View
+                android:layout_width="32dp"
+                android:layout_height="0dp">
+            </View>
+
+            <Button
+                android:id="@+id/like_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_action_favorite"
+                android:drawableStart="@drawable/ic_action_favorite"
+                tools:text="+10"
+                android:gravity="fill"
                 style="?android:attr/borderlessButtonStyle"
                 />
 
