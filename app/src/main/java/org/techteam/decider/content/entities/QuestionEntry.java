@@ -15,7 +15,7 @@ import org.techteam.decider.content.Entry;
 
 @Table(name = "QuestionsNew", id = BaseColumns._ID)
 public class QuestionEntry extends Model {
-    @Column(name="qid", unique=true, onUniqueConflict=Column.ConflictAction.REPLACE)
+    @Column(name="qid", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
     public int qid;
 
     @Column(name="q_text")
@@ -27,7 +27,7 @@ public class QuestionEntry extends Model {
     @Column(name="category_id")
     public int categoryId;
 
-    @Column(name="author", onUpdate=Column.ForeignKeyAction.CASCADE, onDelete=Column.ForeignKeyAction.CASCADE)
+    @Column(name="author", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     public UserEntry author;
 
     @Column(name="likes_count")

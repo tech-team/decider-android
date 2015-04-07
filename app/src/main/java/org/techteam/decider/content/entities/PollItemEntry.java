@@ -12,7 +12,7 @@ import org.techteam.decider.content.Entry;
 
 @Table(name="PollItems", id = BaseColumns._ID)
 public class PollItemEntry extends Model {
-    @Column(name="pid", unique=true, onUniqueConflict=Column.ConflictAction.REPLACE)
+    @Column(name="pid", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
     public int pid;
 
     @Column(name="poll_item_text")
