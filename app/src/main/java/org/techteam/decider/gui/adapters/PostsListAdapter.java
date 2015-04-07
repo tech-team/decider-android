@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentProvider;
-import org.techteam.decider.content.PostEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnPostEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.views.EllipsizingTextView;
@@ -31,7 +31,7 @@ public class PostsListAdapter
         extends CursorRecyclerViewAdapter<PostsListAdapter.ViewHolder> {
     private final OnPostEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private List<PostEntry> dataset;
+    private List<QuestionEntry> dataset;
 
     private Context context;
 
@@ -40,12 +40,12 @@ public class PostsListAdapter
 
     private static final int POST_TEXT_MAX_LINES = 5;
 
-    public void setAll(ArrayList<PostEntry> entries) {
+    public void setAll(ArrayList<QuestionEntry> entries) {
         dataset.clear();
         dataset.addAll(entries);
     }
 
-    public void addAll(ArrayList<PostEntry> entries) {
+    public void addAll(ArrayList<QuestionEntry> entries) {
         dataset.addAll(entries);
     }
 
@@ -129,12 +129,12 @@ public class PostsListAdapter
             return;
         }
 
-        final PostEntry entry = ContentProvider.getCurrentEntry(cursor);
+        QuestionEntry entry = QuestionEntry.fromCursor(cursor);
 
         //TODO: set data
-//        holder.id.setText(entry.getId());
-//        holder.date.setText(entry.getCreationDate());
-//        holder.text.setText(entry.getText());
+//        holder.id.setText(entry.getQId());
+        holder.dateText.setText(entry.getCreationDate());
+        holder.postText.setText(entry.getText());
 
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -218,7 +218,7 @@ public class PostsListAdapter
         });
     }
 
-    private void share(Context context, PostEntry entry) {
+    private void share(Context context, QuestionEntry entry) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, formatEntryForSharing(context, entry));
@@ -226,11 +226,11 @@ public class PostsListAdapter
         context.startActivity(sendIntent);
     }
 
-    public PostEntry get(int position) {
+    public QuestionEntry get(int position) {
         return dataset.get(position);
     }
 
-    private String formatEntryForSharing(Context context, PostEntry entry) {
+    private String formatEntryForSharing(Context context, QuestionEntry entry) {
         StringBuilder sb = new StringBuilder();
 
         String delimiter = "\n";

@@ -31,6 +31,7 @@ public class Transactions extends AbstractTable {
         tuples.add(new TableTuple(COLUMN_ID, TYPE_SERIAL));
         tuples.add(new TableTuple(ID, TYPE_TEXT));
         tuples.add(new TableTuple(STATUS, TYPE_INTEGER));
+        tuples.add(new TableTuple(TYPE, TYPE_INTEGER));
         return super.createTableQuery(tableName, tuples);
     }
 }

@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentProvider;
 import org.techteam.decider.content.ContentSection;
-import org.techteam.decider.content.PostEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.PostsListAdapter;
 import org.techteam.decider.gui.loaders.ContentLoader;
@@ -119,7 +119,7 @@ public class PostsListFragment
     };
 
     @Deprecated
-    private void setPosts(ArrayList<PostEntry> entries) {
+    private void setPosts(ArrayList<QuestionEntry> entries) {
         adapter.setAll(entries);
         if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
             adapter.notifyDataSetChanged();
@@ -134,7 +134,7 @@ public class PostsListFragment
     }
 
     @Deprecated
-    private void addPosts(ArrayList<PostEntry> entries) {
+    private void addPosts(ArrayList<QuestionEntry> entries) {
         final int oldCount = adapter.getItemCount() - 1; //minus "Loading..." item
         final int addedCount = entries.size();
 
@@ -326,12 +326,12 @@ public class PostsListFragment
     }
 
     @Override
-    public void onLike(PostEntry post) {
+    public void onLike(QuestionEntry post) {
 
     }
 
     @Override
-    public void onVote(PostEntry post, int voteId) {
+    public void onVote(QuestionEntry post, int voteId) {
 
     }
 

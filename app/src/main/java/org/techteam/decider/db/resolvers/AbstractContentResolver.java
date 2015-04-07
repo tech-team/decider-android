@@ -8,6 +8,7 @@ import android.net.Uri;
 import org.json.JSONObject;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.Entry;
+import org.techteam.decider.db.resolvers.questions.QuestionsNewResolver;
 
 public abstract class AbstractContentResolver {
 
@@ -29,7 +30,7 @@ public abstract class AbstractContentResolver {
     public static ContentResolver getResolver(ContentSection section) {
         switch (section) {
             case NEW:
-//                return new
+                return new QuestionsNewResolver();
             case POPULAR:
                 break;
             case MY:
@@ -97,20 +98,6 @@ public abstract class AbstractContentResolver {
         else {
             return insertEntry(context, entry);
         }
-    }
-
-    public int insert(Context context, JSONObject obj) {
-//        QueryField field = getQueryField(entry);
-//        Cursor cur = getCursor(context, null, field.where, field.whereArgs, null);
-//        int rows = cur.getCount();
-//        cur.close();
-//        if (rows != 0) {
-//            return updateEntry(context, entry);
-//        }
-//        else {
-//            return insertEntry(context, entry);
-//        }
-        return -1;
     }
 
     public int insertEntry(Context context, Entry entry) {

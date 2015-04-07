@@ -17,7 +17,7 @@ import static org.techteam.decider.db.DataTypes.TYPE_TEXT;
 
 public abstract class AbstractTable implements BaseColumns, ITable {
 
-    protected static class TableTuple {
+    public static class TableTuple {
         public String name;
         public String type;
 
@@ -51,7 +51,7 @@ public abstract class AbstractTable implements BaseColumns, ITable {
         for (int i = 0; i < definition.size(); ++i) {
             TableTuple def = definition.get(i);
             s += def.name + " " + def.type;
-            if (i < definition.size()) {
+            if (i < definition.size() - 1) {
                 s += SEPARATOR;
             }
         }

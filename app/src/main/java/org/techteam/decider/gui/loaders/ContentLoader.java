@@ -3,10 +3,13 @@ package org.techteam.decider.gui.loaders;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
+import android.net.Uri;
+
+import com.activeandroid.content.ContentProvider;
 
 import org.techteam.decider.content.ContentCategory;
 import org.techteam.decider.content.ContentSection;
-import org.techteam.decider.content.ContentProvider;
+import org.techteam.decider.content.entities.QuestionEntry;
 
 import java.util.List;
 
@@ -39,7 +42,8 @@ public class ContentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        return ContentProvider.getCursor(contentSection, categories, getContext());
+        Uri uri = ContentProvider.createUri(QuestionEntry.class, null);
+        return getContext().getContentResolver().query(uri, null, null, null, null);
     }
 
     public Integer getEntryPosition() {

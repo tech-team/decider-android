@@ -20,7 +20,8 @@ public class ApiUI {
     private Context context;
     private SharedPreferences prefs;
 
-    private static final String API_URL = "http://localhost:8888/api/v1";
+//    private static final String API_URL = "http://localhost:8888/api/v1";
+    private static final String API_URL = "http://private-3225b-decider.apiary-mock.com/";
 
     public ApiUI(Context context) {
         String prefName = "TOKENS_PREFS"; // TODO
@@ -30,7 +31,7 @@ public class ApiUI {
 
     public String getAccessToken() {
         String key = "access_token"; // TODO
-        return prefs.getString(key, null);
+        return prefs.getString(key, "ACCESS_TOKEN");
     }
 
     public String getRefreshToken() {

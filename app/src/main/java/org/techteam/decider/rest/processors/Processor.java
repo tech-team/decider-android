@@ -13,13 +13,13 @@ import org.techteam.decider.rest.api.ApiUI;
 public abstract class Processor {
 
     private final Context context;
-    private final TransactionsResolver transactioner;
+//    private final TransactionsResolver transactioner;
     protected final ApiUI apiUI;
 
     public Processor(Context context) {
         this.context = context;
         apiUI = new ApiUI(context);
-        transactioner = (TransactionsResolver) AbstractContentResolver.getResolver(ExtraResolver.TRANSACTIONS);
+//        transactioner = (TransactionsResolver) AbstractContentResolver.getResolver(ExtraResolver.TRANSACTIONS);
     }
 
     public Context getContext() {
@@ -32,20 +32,20 @@ public abstract class Processor {
         TransactionEntry trx = new TransactionEntry().setId(requestId)
                                                      .setOperationType(operationType)
                                                      .setStatus(TransactionStatus.STARTED);
-        transactioner.insert(getContext(), trx);
+//        transactioner.insert(getContext(), trx);
     }
 
     protected void transactionFinished(OperationType operationType, String requestId) {
         TransactionEntry trx = new TransactionEntry().setId(requestId)
                                                      .setOperationType(operationType)
                                                      .setStatus(TransactionStatus.FINISHED);
-        transactioner.insert(getContext(), trx);
+//        transactioner.insert(getContext(), trx);
     }
 
     protected void transactionError(OperationType operationType, String requestId) {
         TransactionEntry trx = new TransactionEntry().setId(requestId)
                                                      .setOperationType(operationType)
                                                      .setStatus(TransactionStatus.ERROR);
-        transactioner.insert(getContext(), trx);
+//        transactioner.insert(getContext(), trx);
     }
 }

@@ -1,4 +1,4 @@
 package org.techteam.decider.content;
 
-public abstract class Entry {
+public interface Entry {
 }

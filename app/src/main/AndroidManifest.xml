@@ -5,10 +5,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name="com.activeandroid.app.Application"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <meta-data android:name="AA_DB_NAME" android:value="Decider.db" />
+        <meta-data android:name="AA_DB_VERSION" android:value="1" />
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="org.techteam.decider.content.entities.UserEntry, org.techteam.decider.content.entities.PollItemEntry, org.techteam.decider.content.entities.QuestionEntry" />
+
         <activity
             android:name=".gui.activities.MainActivity"
             android:label="@string/app_name" >
@@ -24,6 +32,19 @@
             android:name=".rest.service.DeciderService"
             android:exported="false" >
         </service>
+
+        <provider android:authorities="org.techteam.decider" android:exported="false" android:name="com.activeandroid.content.ContentProvider" />
+
+        <!--<provider-->
+            <!--android:authorities="org.techteam.decider.db.providers.DeciderDbProvider"-->
+            <!--android:name=".db.providers.DeciderDbProvider"-->
+            <!--android:exported="false">-->
+        <!--</provider>-->
+        <!--<provider-->
+            <!--android:authorities="org.techteam.decider.db.providers.TransactionProvider"-->
+            <!--android:name=".db.providers.TransactionProvider"-->
+            <!--android:exported="false">-->
+        <!--</provider>-->
     </application>
 
 </manifest>

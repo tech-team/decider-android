@@ -1,8 +1,8 @@
 package org.techteam.decider.gui.fragments;
 
-import org.techteam.decider.content.PostEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 
 public interface OnPostEventCallback {
-    void onLike(PostEntry post);
-    void onVote(PostEntry post, int voteId);
+    void onLike(QuestionEntry post);
+    void onVote(QuestionEntry post, int voteId);
 }

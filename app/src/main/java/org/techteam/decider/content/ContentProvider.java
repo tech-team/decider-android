@@ -3,6 +3,8 @@ package org.techteam.decider.content;
 import android.content.Context;
 import android.database.Cursor;
 
+import org.techteam.decider.content.entities.QuestionEntry;
+
 import java.util.List;
 
 //TODO: ContentProvider
@@ -10,8 +12,8 @@ public class ContentProvider {
     private static ContentSection contentSection;
     private static List<ContentCategory> categories;
 
-    public static PostEntry getCurrentEntry(Cursor cursor) {
-        return new PostEntry() {
+    public static QuestionEntry getCurrentEntry(Cursor cursor) {
+        return new QuestionEntry() {
 
         };
     }

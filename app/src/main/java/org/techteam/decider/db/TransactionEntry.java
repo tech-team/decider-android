@@ -3,7 +3,7 @@ package org.techteam.decider.db;
 import org.techteam.decider.content.Entry;
 import org.techteam.decider.rest.OperationType;
 
-public class TransactionEntry extends Entry {
+public class TransactionEntry implements Entry {
     private String id;
     private OperationType operationType;
     private TransactionStatus status;

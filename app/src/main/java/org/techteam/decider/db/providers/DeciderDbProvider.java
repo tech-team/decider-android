@@ -23,7 +23,7 @@ public class DeciderDbProvider extends DbProvider {
 
         mUriMatcher.addURI(AUTHORITY, QuestionsNewTable.TABLE_NAME, QUESTIONS_NEW);
 
-        for (String item : new String[] {AbstractTable._ID, QuestionsAbstractTable.TEXT}) {
+        for (String item : new String[] {AbstractTable._ID, QuestionsAbstractTable.TEXT.name}) {
             mProjectionMap.put(item, item);
         }
     }
