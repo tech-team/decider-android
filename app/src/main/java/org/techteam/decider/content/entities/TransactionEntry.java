@@ -1,12 +1,14 @@
 package org.techteam.decider.content.entities;
 
+import android.provider.BaseColumns;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 import org.techteam.decider.rest.OperationType;
 
-@Table(name="Transactions")
+@Table(name="Transactions", id = BaseColumns._ID)
 public class TransactionEntry extends Model {
 
     @Column(name="requestId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)

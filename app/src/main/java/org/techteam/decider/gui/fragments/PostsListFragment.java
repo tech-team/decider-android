@@ -53,11 +53,6 @@ public class PostsListFragment
     private ContentSection currentSection = ContentSection.NEW;
     private List<ContentCategory> chosenCategories = new LinkedList<>();
 
-    private static final class BundleKeys {
-        public static final String FACTORY = "FACTORY";
-        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
-    }
-
     //see comment in onCreateView()
     private Queue<Runnable> delayedAdapterNotifications = new LinkedList<Runnable>();
 
@@ -66,14 +61,12 @@ public class PostsListFragment
     private RecyclerView recyclerView;
     private PostsListAdapter adapter;
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
-    private ServiceHelper serviceHelper;
+
 
     private MainActivity activity;
     private boolean initialized = false;
 
-    private LoaderManager.LoaderCallbacks<Cursor> contentDataLoaderCallbacks
-            = new LoaderCallbacksImpl();
+    private LoaderManager.LoaderCallbacks<Cursor> contentDataLoaderCallbacks = new LoaderCallbacksImpl();
 
     @Deprecated
     private void setPosts(ArrayList<QuestionEntry> entries) {
@@ -156,8 +149,7 @@ public class PostsListFragment
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
-        serviceHelper = new ServiceHelper(activity);
-        callbacksKeeper.addCallback(OperationType.GET_QUESTIONS, new ServiceCallback() {
+        this.activity.getCallbacksKeeper().addCallback(OperationType.GET_QUESTIONS, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -229,12 +221,9 @@ public class PostsListFragment
             //factory = new ContentFactory(Locale.getDefault().toString());
         } else {
             //factory = savedInstanceState.getParcelable(BundleKeys.FACTORY);
-            boolean isRefreshing = serviceHelper.restoreOperationsState(
-                    savedInstanceState,
-                    BundleKeys.PENDING_OPERATIONS,
-                    callbacksKeeper);
 
-            if (isRefreshing) {
+
+            if (activity.isRefreshing()) {
                 // TODO: it is not working
                 mSwipeRefreshLayout.setRefreshing(true);
             } else {
@@ -253,7 +242,7 @@ public class PostsListFragment
         super.onSaveInstanceState(outState);
         //TODO
         //outState.putParcelable(BundleKeys.FACTORY, factory);
-        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+
     }
 
     @Override
@@ -261,10 +250,13 @@ public class PostsListFragment
         mSwipeRefreshLayout.setRefreshing(true);
 
 //        Toaster.toast(getActivity().getBaseContext(), R.string.loading);
-        //TODO: TODO TODO TODO
-        //content = factory.buildContent(activity.getSection().getContentSection(), true);
 
-        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, LoadIntention.REFRESH, callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
+        activity.getServiceHelper().getQuestions(currentSection,
+                QUESTIONS_LIMIT,
+                questionsOffset,
+                chosenCategories,
+                LoadIntention.REFRESH,
+                activity.getCallbacksKeeper().getCallback(OperationType.GET_QUESTIONS));
     }
 
     @Override
@@ -296,18 +288,12 @@ public class PostsListFragment
     public void onResume() {
         super.onResume();
         System.out.println("onResume");
-        serviceHelper.init();
-        //TODO
-        //content = activity.getContentSourceFromPrefs(content);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         System.out.println("onPause");
-        serviceHelper.release();
-        //TODO
-        //activity.saveContentSource(content);
     }
 
     @Override
@@ -328,6 +314,7 @@ public class PostsListFragment
             }
 
             //cause posts to re-render
+
             getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, null, contentDataLoaderCallbacks);
         }
     }

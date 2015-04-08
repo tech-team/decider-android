@@ -1,6 +1,8 @@
 package org.techteam.decider.gui.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,50 +12,48 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.util.Toaster;
 
 import java.util.List;
 
-//TODO: change source to CursorLoader and all that things
 public class CategoriesListAdapter
-        extends ArrayAdapter<Category> {
+        extends CursorRecyclerViewAdapter<CategoriesListAdapter.ViewHolder> {
 
-    public CategoriesListAdapter(Context context, List<Category> categories) {
-        super(context, 0, categories);
+    private Context context;
+
+    public CategoriesListAdapter(Cursor contentCursor,
+                                 Context context) {
+        super(contentCursor);
+        this.context = context;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Log.i("ADAPTER", Integer.toString(position));
-
-        final Category category = getItem(position);
-
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.category_entry, parent, false);
-
-            viewHolder = new ViewHolder();
-            viewHolder.name = (CheckBox) convertView.findViewById(R.id.category_checkbox);
-
-            viewHolder.name.setOnClickListener( new View.OnClickListener() {
-                public void onClick(View v) {
-                    CheckBox cb = (CheckBox) v;
-
-                    category.setSelected(cb.isChecked());
-                }
-            });
-
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
+    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor, int position) {
+        ContentCategory category = ContentCategory.fromCursor(cursor);
+        viewHolder.name.setText(category.getLocalizedLabel());
         viewHolder.name.setChecked(category.isSelected());
-        viewHolder.name.setText(category.getLabel());
-
-        return convertView;
+        viewHolder.name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toaster.toast(context, "Selected");
+            }
+        });
     }
 
-    private class ViewHolder {
+    @Override
+    public CategoriesListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                               .inflate(R.layout.category_entry, parent, false);
+        return new ViewHolder(v);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public CheckBox name;
+
+        public ViewHolder(View v) {
+            super(v);
+            name = (CheckBox) v.findViewById(R.id.category_checkbox);
+        }
     }
 }

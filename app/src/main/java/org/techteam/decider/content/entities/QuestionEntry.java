@@ -7,6 +7,7 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,6 +88,10 @@ public class QuestionEntry extends Model {
         pollItem1.save();
         pollItem2.save();
         return save();
+    }
+
+    public static QuestionEntry byQId(int qid) {
+        return new Select().from(QuestionEntry.class).where("qid = ?", qid).executeSingle();
     }
 
     public static QuestionEntry fromJson(JSONObject obj) throws JSONException {

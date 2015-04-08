@@ -2,6 +2,7 @@ package org.techteam.decider.gui.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -24,6 +25,8 @@ import org.techteam.decider.R;
 import org.techteam.decider.gui.fragments.AuthFragment;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.gui.fragments.PostsListFragment;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 import java.util.List;
@@ -32,9 +35,18 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
     public static final String TOKEN_PREF_KEY = "token";
 
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ServiceHelper serviceHelper;
+    private boolean refreshing = false;
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        serviceHelper = new ServiceHelper(this);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -52,10 +64,20 @@ public class MainActivity extends ActionBarActivity {
                 getFragmentManager().beginTransaction()
                         .add(R.id.content_frame, new AuthFragment()).commit();
             }
+        } else {
+            refreshing = serviceHelper.restoreOperationsState(savedInstanceState,
+                    BundleKeys.PENDING_OPERATIONS,
+                    callbacksKeeper);
         }
     }
 
-//
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+    }
+
+    //
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        // Inflate the menu; this adds items to the action bar if it is present.
@@ -78,16 +100,31 @@ public class MainActivity extends ActionBarActivity {
 //        return super.onOptionsItemSelected(item);
 //    }
 
+
+    public CallbacksKeeper getCallbacksKeeper() {
+        return callbacksKeeper;
+    }
+
+    public ServiceHelper getServiceHelper() {
+        return serviceHelper;
+    }
+
+    public boolean isRefreshing() {
+        return refreshing;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         VKUIHelper.onResume(this);
+        serviceHelper.init();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         VKUIHelper.onDestroy(this);
+        serviceHelper.release();
     }
 
     @Override

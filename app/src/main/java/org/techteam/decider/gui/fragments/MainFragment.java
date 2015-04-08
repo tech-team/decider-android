@@ -3,11 +3,18 @@ package org.techteam.decider.gui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.LoaderManager;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.content.IntentCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +30,12 @@ import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.Category;
+import org.techteam.decider.gui.loaders.CategoriesLoader;
+import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
+import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.util.Toaster;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +48,7 @@ public class MainFragment
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private ListView mDrawerList;
+//    private ListView mDrawerList;
 
     private CategoriesListAdapter categoriesListAdapter;
 
@@ -45,6 +57,11 @@ public class MainFragment
     private SlidingTabLayout mSlidingTabLayout;
 
     private FloatingActionButton createPostButton;
+
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView recyclerView;
+
+    private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +75,20 @@ public class MainFragment
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
+
+        this.activity.getCallbacksKeeper().addCallback(OperationType.GET_CATEGORIES, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                String msg = "Error. " + message;
+                Toaster.toast(getActivity().getApplicationContext(), msg);
+                System.out.println(msg);
+            }
+        });
     }
 
     @Override
@@ -75,19 +106,22 @@ public class MainFragment
 
         // setup drawer
         mDrawerLayout = (DrawerLayout) this.activity.findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) this.activity.findViewById(R.id.categories_list);
+//        mDrawerList = (ListView) this.activity.findViewById(R.id.categories_list);
+        recyclerView = (RecyclerView) this.activity.findViewById(R.id.categories_recycler);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
 
         // Set the adapter for the list view
         //TODO: load categories via CursorLoader from server
-        List<Category> categories = new ArrayList<>();
-        categories.add(new Category(new ContentCategory(1, "Test 1"), false));
-        categories.add(new Category(new ContentCategory(2, "Test 2"), false));
+//        List<Category> categories = new ArrayList<>();
+//        categories.add(new Category(new ContentCategory(1, "Test 1"), false));
+//        categories.add(new Category(new ContentCategory(2, "Test 2"), false));
 
-        categoriesListAdapter = new CategoriesListAdapter(this.activity.getBaseContext(), categories);
-        mDrawerList.setAdapter(categoriesListAdapter);
+        categoriesListAdapter = new CategoriesListAdapter(null, this.activity.getBaseContext());
+        recyclerView.setAdapter(categoriesListAdapter);
 
         // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this.activity,                  /* host Activity */
@@ -127,7 +161,7 @@ public class MainFragment
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-            return R.color.primary;
+                return R.color.primary;
             }
         });
 
@@ -139,21 +173,17 @@ public class MainFragment
                 getFragmentManager().beginTransaction()
                         .add(R.id.content_frame, new AddPostFragment())
                         .addToBackStack("mainFragment")
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit();
             }
         });
+
+        this.activity.getServiceHelper().getCategories(getResources().getConfiguration().locale.toLanguageTag(), activity.getCallbacksKeeper().getCallback(OperationType.GET_CATEGORIES));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-    }
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            //selectItem(position);
-        }
     }
 
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter {
@@ -176,6 +206,32 @@ public class MainFragment
         public CharSequence getPageTitle(int position) {
             int resId = ContentSection.fromInt(position).getResId();
             return getString(resId);
+        }
+    }
+
+
+    private class LoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            if  (id == LoaderIds.CATEGORIES_LOADER) {
+
+                if (args != null) {
+                }
+
+                return new CategoriesLoader(getActivity());
+            }
+            throw new IllegalArgumentException("Loader with given id is not found");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+            CategoriesLoader contentLoader = (CategoriesLoader) loader;
+            categoriesListAdapter.swapCursor(newCursor);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            categoriesListAdapter.swapCursor(null);
         }
     }
 }
