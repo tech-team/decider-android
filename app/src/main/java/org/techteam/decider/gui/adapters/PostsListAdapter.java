@@ -1,5 +1,6 @@
 package org.techteam.decider.gui.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,7 +25,10 @@ import org.techteam.decider.gui.fragments.OnPostEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.views.EllipsizingTextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PostsListAdapter
@@ -35,8 +39,16 @@ public class PostsListAdapter
 
     private Context context;
 
-    private int VIEW_TYPE_ENTRY = 0;
-    private int VIEW_TYPE_FOOTER = 1;
+    @SuppressLint("SimpleDateFormat")
+    private SimpleDateFormat sourceDateFormat =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+    @SuppressLint("SimpleDateFormat")
+    private SimpleDateFormat uiDateFormat =
+            new SimpleDateFormat("d MMM, hh:mm");
+
+    private static final int VIEW_TYPE_ENTRY = 0;
+    private static final int VIEW_TYPE_FOOTER = 1;
 
     private static final int POST_TEXT_MAX_LINES = 5;
 
@@ -133,8 +145,11 @@ public class PostsListAdapter
 
         //TODO: set data
 //        holder.id.setText(entry.getQId());
-        holder.dateText.setText(entry.getCreationDate());
+        holder.authorText.setText(entry.getAuthor().getUsername());
+        holder.dateText.setText(getDateString(entry.getCreationDate()));
         holder.postText.setText(entry.getText());
+        holder.likeButton.setText("+" + entry.getLikesCount());
+        holder.commentsButton.setText(Integer.toString(entry.getCommentsCount()));
 
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -263,5 +278,18 @@ public class PostsListAdapter
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
+    }
+
+    private String getDateString(String raw) {
+        String result;
+
+        try {
+            Date date = sourceDateFormat.parse(raw);
+            result = uiDateFormat.format(date);
+        } catch (ParseException e) {
+            result = "";
+        }
+
+        return result;
     }
 }

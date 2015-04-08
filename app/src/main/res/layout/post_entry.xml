@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="yesterday"
-            style="@style/post_header" />
+            android:textColor="@color/button_material_dark" />
 
         <ImageButton
             android:id="@+id/overflow_button"
@@ -119,7 +119,7 @@
                 android:contentDescription="@string/share" />
 
             <View
-                android:layout_width="32dp"
+                android:layout_width="40dp"
                 android:layout_height="0dp">
             </View>
 

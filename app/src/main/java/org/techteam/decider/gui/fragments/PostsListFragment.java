@@ -69,54 +69,8 @@ public class PostsListFragment
     private MainActivity activity;
     private boolean initialized = false;
 
-    private LoaderManager.LoaderCallbacks<Cursor> contentDataLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            if  (id == LoaderIds.CONTENT_LOADER) {
-                Integer entryPos = null;
-                Integer insertedCount = null;
-                int loadIntention = LoadIntention.REFRESH;
-                if (args != null) {
-                    entryPos = args.getInt(ContentLoader.BundleKeys.ENTRY_POSITION, -1);
-                    entryPos = entryPos == -1 ? null : entryPos;
-
-                    insertedCount = args.getInt(ContentLoader.BundleKeys.INSERTED_COUNT, -1);
-                    insertedCount = insertedCount == -1 ? null : insertedCount;
-
-                    loadIntention = args.getInt(ContentLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
-                }
-
-                //TODO: you may ask: why don't just store section and categories here, as field? idk
-                return new ContentLoader(getActivity(), ContentProvider.getContentSection(), ContentProvider.getCategories(), entryPos, insertedCount, loadIntention);
-            }
-            throw new IllegalArgumentException("Loader with given id is not found");
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
-            ContentLoader contentLoader = (ContentLoader) loader;
-            Integer entryPos = contentLoader.getEntryPosition();
-            Integer count = contentLoader.getInsertedCount();
-            int loadIntention = contentLoader.getLoadIntention();
-
-            if (loadIntention == LoadIntention.REFRESH) {
-                adapter.swapCursor(newCursor);
-            } else {
-                if (entryPos != null) {
-                    adapter.swapCursor(newCursor, entryPos);
-                } else if (count != null) {
-                    adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
-                } else {
-                    adapter.swapCursor(newCursor);
-                }
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-            adapter.swapCursor(null);
-        }
-    };
+    private LoaderManager.LoaderCallbacks<Cursor> contentDataLoaderCallbacks
+            = new LoaderCallbacksImpl();
 
     @Deprecated
     private void setPosts(ArrayList<QuestionEntry> entries) {
@@ -377,5 +331,54 @@ public class PostsListFragment
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    private class LoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            if  (id == LoaderIds.CONTENT_LOADER) {
+                Integer entryPos = null;
+                Integer insertedCount = null;
+                int loadIntention = LoadIntention.REFRESH;
+                if (args != null) {
+                    entryPos = args.getInt(ContentLoader.BundleKeys.ENTRY_POSITION, -1);
+                    entryPos = entryPos == -1 ? null : entryPos;
+
+                    insertedCount = args.getInt(ContentLoader.BundleKeys.INSERTED_COUNT, -1);
+                    insertedCount = insertedCount == -1 ? null : insertedCount;
+
+                    loadIntention = args.getInt(ContentLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+                }
+
+                //TODO: you may ask: why don't just store section and categories here, as field? idk
+                return new ContentLoader(getActivity(), ContentProvider.getContentSection(), ContentProvider.getCategories(), entryPos, insertedCount, loadIntention);
+            }
+            throw new IllegalArgumentException("Loader with given id is not found");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+            ContentLoader contentLoader = (ContentLoader) loader;
+            Integer entryPos = contentLoader.getEntryPosition();
+            Integer count = contentLoader.getInsertedCount();
+            int loadIntention = contentLoader.getLoadIntention();
+
+            if (loadIntention == LoadIntention.REFRESH) {
+                adapter.swapCursor(newCursor);
+            } else {
+                if (entryPos != null) {
+                    adapter.swapCursor(newCursor, entryPos);
+                } else if (count != null) {
+                    adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
+                } else {
+                    adapter.swapCursor(newCursor);
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            adapter.swapCursor(null);
+        }
     }
 }
