@@ -48,5 +48,8 @@
     <string name="new_tab">New</string>
     <string name="my_tab">My</string>
     <string name="share">share</string>
+    <string name="create_post">Create </string>
+    <string name="add_post_toolbar_title">New question</string>
+    <string name="fill_all_fields">Please, fill all the fields</string>
 
 </resources>

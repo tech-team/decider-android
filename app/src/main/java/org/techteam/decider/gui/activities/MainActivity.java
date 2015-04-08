@@ -96,4 +96,25 @@ public class MainActivity extends ActionBarActivity {
         VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() == 0) {
+            super.onBackPressed();
+            return;
+        }
+
+        getFragmentManager().popBackStack();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

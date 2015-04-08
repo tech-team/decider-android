@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentCategory;
 import org.techteam.decider.content.ContentSection;
@@ -41,6 +43,8 @@ public class MainFragment
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
+
+    private FloatingActionButton createPostButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,7 +127,19 @@ public class MainFragment
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return R.color.primary;
+            return R.color.primary;
+            }
+        });
+
+        // setup plus button
+        createPostButton = (FloatingActionButton) this.activity.findViewById(R.id.create_post_button);
+        createPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction()
+                        .add(R.id.content_frame, new AddPostFragment())
+                        .addToBackStack("mainFragment")
+                        .commit();
             }
         });
     }
