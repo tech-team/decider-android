@@ -33,8 +33,10 @@ import org.techteam.decider.gui.adapters.Category;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
+import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 import java.util.ArrayList;
@@ -61,7 +63,14 @@ public class MainFragment
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView recyclerView;
 
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ServiceHelper serviceHelper;
+
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,8 +84,9 @@ public class MainFragment
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
+        serviceHelper = new ServiceHelper(activity);
 
-        this.activity.getCallbacksKeeper().addCallback(OperationType.GET_CATEGORIES, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.GET_CATEGORIES, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
@@ -94,6 +104,10 @@ public class MainFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
+        }
 
         Toolbar toolbar = (Toolbar) this.activity.findViewById(R.id.main_toolbar);
         this.activity.setSupportActionBar(toolbar);
@@ -178,12 +192,13 @@ public class MainFragment
             }
         });
 
-        this.activity.getServiceHelper().getCategories(getResources().getConfiguration().locale.toLanguageTag(), activity.getCallbacksKeeper().getCallback(OperationType.GET_CATEGORIES));
+        serviceHelper.getCategories(getResources().getConfiguration().locale.toLanguageTag(), callbacksKeeper.getCallback(OperationType.GET_CATEGORIES));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter {

@@ -35,18 +35,11 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
     public static final String TOKEN_PREF_KEY = "token";
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
-    private ServiceHelper serviceHelper;
-    private boolean refreshing = false;
 
-    private static final class BundleKeys {
-        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        serviceHelper = new ServiceHelper(this);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -65,16 +58,13 @@ public class MainActivity extends ActionBarActivity {
                         .add(R.id.content_frame, new AuthFragment()).commit();
             }
         } else {
-            refreshing = serviceHelper.restoreOperationsState(savedInstanceState,
-                    BundleKeys.PENDING_OPERATIONS,
-                    callbacksKeeper);
+
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     //
@@ -100,31 +90,17 @@ public class MainActivity extends ActionBarActivity {
 //        return super.onOptionsItemSelected(item);
 //    }
 
-
-    public CallbacksKeeper getCallbacksKeeper() {
-        return callbacksKeeper;
-    }
-
-    public ServiceHelper getServiceHelper() {
-        return serviceHelper;
-    }
-
-    public boolean isRefreshing() {
-        return refreshing;
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
         VKUIHelper.onResume(this);
-        serviceHelper.init();
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         VKUIHelper.onDestroy(this);
-        serviceHelper.release();
     }
 
     @Override

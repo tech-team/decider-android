@@ -70,6 +70,10 @@ public class ServiceHelper {
      **/
     public boolean restoreOperationsState(Bundle savedInstanceState, String key, CallbacksKeeper callbacksKeeper) {
         ArrayList<PendingOperation> operations = savedInstanceState.getParcelableArrayList(key);
+        if (operations == null) {
+            System.err.println("Operations are null!!!");
+            return false;
+        }
         for (PendingOperation op : operations) {
             pendingOperations.put(op.getOperationId(), op);
         }

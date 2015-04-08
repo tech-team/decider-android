@@ -61,12 +61,18 @@ public class PostsListFragment
     private RecyclerView recyclerView;
     private PostsListAdapter adapter;
 
-
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ServiceHelper serviceHelper;
+    public boolean refreshing = false;
 
     private MainActivity activity;
     private boolean initialized = false;
 
     private LoaderManager.LoaderCallbacks<Cursor> contentDataLoaderCallbacks = new LoaderCallbacksImpl();
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
 
     @Deprecated
     private void setPosts(ArrayList<QuestionEntry> entries) {
@@ -149,7 +155,8 @@ public class PostsListFragment
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
-        this.activity.getCallbacksKeeper().addCallback(OperationType.GET_QUESTIONS, new ServiceCallback() {
+        serviceHelper = new ServiceHelper(activity);
+        callbacksKeeper.addCallback(OperationType.GET_QUESTIONS, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -221,9 +228,11 @@ public class PostsListFragment
             //factory = new ContentFactory(Locale.getDefault().toString());
         } else {
             //factory = savedInstanceState.getParcelable(BundleKeys.FACTORY);
+            boolean isRefreshing = serviceHelper.restoreOperationsState(savedInstanceState,
+                    BundleKeys.PENDING_OPERATIONS,
+                    callbacksKeeper);
 
-
-            if (activity.isRefreshing()) {
+            if (isRefreshing) {
                 // TODO: it is not working
                 mSwipeRefreshLayout.setRefreshing(true);
             } else {
@@ -240,6 +249,7 @@ public class PostsListFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
         //TODO
         //outState.putParcelable(BundleKeys.FACTORY, factory);
 
@@ -251,12 +261,12 @@ public class PostsListFragment
 
 //        Toaster.toast(getActivity().getBaseContext(), R.string.loading);
 
-        activity.getServiceHelper().getQuestions(currentSection,
+        serviceHelper.getQuestions(currentSection,
                 QUESTIONS_LIMIT,
                 questionsOffset,
                 chosenCategories,
                 LoadIntention.REFRESH,
-                activity.getCallbacksKeeper().getCallback(OperationType.GET_QUESTIONS));
+                callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
     }
 
     @Override
@@ -288,12 +298,14 @@ public class PostsListFragment
     public void onResume() {
         super.onResume();
         System.out.println("onResume");
+        serviceHelper.init();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         System.out.println("onPause");
+        serviceHelper.release();
     }
 
     @Override
