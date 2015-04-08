@@ -8,6 +8,7 @@ import com.activeandroid.ActiveAndroid;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
@@ -48,13 +49,12 @@ public class GetCategoriesProcessor extends Processor {
                 JSONArray data = response.getJSONArray("data");
                 for (int i = 0; i < data.length(); ++i) {
                     JSONObject q = data.getJSONObject(i);
-                    QuestionEntry entry = QuestionEntry.fromJson(q);
-                    entry.saveTotal();
-//                    resolver.insert(getContext(), QuestionEntry.fromJson(q));
+                    ContentCategory entry = ContentCategory.fromJson(q);
+                    entry.save();
                 }
                 ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
+                result.putInt(ServiceCallback.GetCategoriesExtras.COUNT, data.length());
             } finally {
                 ActiveAndroid.endTransaction();
             }
@@ -73,5 +73,6 @@ public class GetCategoriesProcessor extends Processor {
         }
 
         transactionError(operationType, requestId);
+        cb.onError(null, result);
     }
 }

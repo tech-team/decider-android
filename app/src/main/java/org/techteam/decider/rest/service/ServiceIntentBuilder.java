@@ -3,13 +3,12 @@ package org.techteam.decider.rest.service;
 import android.content.Context;
 import android.content.Intent;
 
-import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 public final class ServiceIntentBuilder {

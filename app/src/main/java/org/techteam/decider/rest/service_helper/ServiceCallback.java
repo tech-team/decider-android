@@ -12,6 +12,10 @@ public interface ServiceCallback {
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
     }
 
+    class GetCategoriesExtras {
+        public static final String COUNT = "COUNT";
+    }
+
 //    class BashVoteExtras {
 //        public static final String ENTRY_ID = "ENTRY_ID";
 //        public static final String ENTRY_POSITION = "ENTRY_POSITION";

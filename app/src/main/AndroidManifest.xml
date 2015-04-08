@@ -18,7 +18,8 @@
             android:value="org.techteam.decider.content.entities.UserEntry,
                            org.techteam.decider.content.entities.PollItemEntry,
                            org.techteam.decider.content.entities.QuestionEntry,
-                           org.techteam.decider.content.entities.TransactionEntry
+                           org.techteam.decider.content.entities.TransactionEntry,
+                           org.techteam.decider.content.entities.ContentCategory
                            " />
 
         <activity

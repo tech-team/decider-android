@@ -3,6 +3,7 @@ package org.techteam.decider.content;
 import android.content.Context;
 import android.database.Cursor;
 
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.entities.QuestionEntry;
 
 import java.util.List;

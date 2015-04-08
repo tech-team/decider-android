@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentProvider;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;

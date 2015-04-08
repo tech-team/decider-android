@@ -16,7 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
@@ -76,8 +76,8 @@ public class MainFragment
         // Set the adapter for the list view
         //TODO: load categories via CursorLoader from server
         List<Category> categories = new ArrayList<>();
-        categories.add(new Category(new ContentCategory("Test 1", 1), false));
-        categories.add(new Category(new ContentCategory("Test 2", 2), false));
+        categories.add(new Category(new ContentCategory(1, "Test 1"), false));
+        categories.add(new Category(new ContentCategory(2, "Test 2"), false));
 
         categoriesListAdapter = new CategoriesListAdapter(this.activity.getBaseContext(), categories);
         mDrawerList.setAdapter(categoriesListAdapter);

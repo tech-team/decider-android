@@ -76,52 +76,7 @@ public class GetQuestionsProcessor extends Processor {
         }
 
         transactionError(operationType, requestId);
-
-
-//        ContentList list = null;
-//        Throwable exc = null;
-//        try {
-//            list = contentSource.retrieveNextList(getContext());
-//        } catch (FeedOverException ignored) {
-//
-//        } catch (ContentParseException e) {
-//            exc = e;
-//        }
-//
-//        if (list == null) {
-//            if (exc != null) {
-//                transactionError(operationType, requestId);
-//                cb.onError(exc.getMessage(), null);
-//            } else {
-//                transactionFinished(operationType, requestId);
-//                Bundle data = getInitialBundle();
-//                data.putBoolean(ServiceCallback.GetPostsExtras.FEED_FINISHED, true);
-//                cb.onSuccess(data);
-//            }
-//
-//            System.out.println("DONE! list is null");
-//        } else {
-//            System.out.println("DONE! + " + list.getEntries().size());
-//
-//            ContentResolver resolver = AbstractContentResolver.getResolver(contentSection);
-//
-//            int insertedCount = list.getEntries().size();
-//            if (resolver != null) {
-//                if (loadIntention == LoadIntention.REFRESH) {
-//                    resolver.deleteAllEntries(getContext());
-//                }
-//
-//                // writing to db
-//                insertedCount = resolver.insertEntries(getContext(), list).size();
-//            }
-
-            // finishing up a transaction
-//            transactionFinished(operationType, requestId);
-
-//
-//            data.putInt(ServiceCallback.GetPostsExtras.INSERTED_COUNT, insertedCount);
-//            cb.onSuccess(data);
-//        }
+        cb.onError(null, result);
     }
 
     @Override

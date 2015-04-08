@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
