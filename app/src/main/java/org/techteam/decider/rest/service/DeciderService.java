@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
@@ -29,12 +30,6 @@ public class DeciderService extends IntentService {
         public static final String REQUEST_ID = "REQUEST_ID";
         public static final String OPERATION = "OPERATION";
 
-        public class GetQuestionsOperation {
-            public static final String CONTENT_SECTION = "CONTENT_SECTION";
-            public static final String LIMIT = "LIMIT";
-            public static final String OFFSET = "OFFSET";
-            public static final String LOAD_INTENTION = "LOAD_INTENTION";
-        }
 
 //        public class BashVoteOperation {
 //            public static final String ENTRY_ID = "ENTRY_ID";
@@ -75,10 +70,18 @@ public class DeciderService extends IntentService {
 
         Processor processor = null;
 
+        switch (operation) {
 
-        if (operation == OperationType.GET_QUESETIONS) {
-            GetQuestionsRequest request = GetQuestionsRequest.fromBundle(extras);
-            processor = new GetQuestionsProcessor(getBaseContext(), request);
+            case GET_QUESTIONS: {
+                GetQuestionsRequest request = GetQuestionsRequest.fromBundle(extras);
+                processor = new GetQuestionsProcessor(getBaseContext(), request);
+                break;
+            }
+            case GET_CATEGORIES: {
+                GetCategoriesRequest request = GetCategoriesRequest.fromBundle(extras);
+                processor = new GetCategoriesProcessor(getBaseContext(), request);
+                break;
+            }
         }
 
 //        } else if (operation == OperationType.BASH_VOTE) {

@@ -31,15 +31,12 @@ public class GetQuestionsProcessor extends Processor {
     @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
 
-//        transactionStarted(operationType, requestId);
+        transactionStarted(operationType, requestId);
 
         Bundle result = getInitialBundle();
         try {
             JSONObject response = apiUI.getQuestions(request);
             System.out.println(response);
-
-//            ContentResolver resolver = AbstractContentResolver.getResolver(request.getContentSection());
-
 
             if (request.getLoadIntention() == LoadIntention.REFRESH) {
 //                    resolver.deleteAllEntries(getContext());
@@ -57,7 +54,6 @@ public class GetQuestionsProcessor extends Processor {
                     JSONObject q = data.getJSONObject(i);
                     QuestionEntry entry = QuestionEntry.fromJson(q);
                     entry.saveTotal();
-//                    resolver.insert(getContext(), QuestionEntry.fromJson(q));
                 }
                 ActiveAndroid.setTransactionSuccessful();
 
@@ -66,7 +62,9 @@ public class GetQuestionsProcessor extends Processor {
                 ActiveAndroid.endTransaction();
             }
 
+            transactionFinished(operationType, requestId);
             cb.onSuccess(result);
+            return;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -76,6 +74,8 @@ public class GetQuestionsProcessor extends Processor {
         } catch (TokenRefreshFailException e) {
             e.printStackTrace();
         }
+
+        transactionError(operationType, requestId);
 
 
 //        ContentList list = null;
@@ -124,7 +124,8 @@ public class GetQuestionsProcessor extends Processor {
 //        }
     }
 
-    private Bundle getInitialBundle() {
+    @Override
+    protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
         data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, request.getLoadIntention());
         return data;

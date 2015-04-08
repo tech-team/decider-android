@@ -7,7 +7,7 @@ import android.net.Uri;
 
 import org.techteam.decider.content.Entry;
 import org.techteam.decider.db.TransactionEntry;
-import org.techteam.decider.db.TransactionStatus;
+import org.techteam.decider.content.entities.TransactionStatus;
 import org.techteam.decider.db.providers.TransactionProvider;
 import org.techteam.decider.db.tables.Transactions;
 import org.techteam.decider.rest.OperationType;

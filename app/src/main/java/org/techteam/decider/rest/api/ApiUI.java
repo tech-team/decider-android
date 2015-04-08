@@ -77,8 +77,22 @@ public class ApiUI {
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
         params.add("tab", request.getContentSection().toString().toLowerCase());
+        for (int category : request.getCategories()) {
+            params.add("categories[]", category);
+        }
 
         HttpResponse response = makeProtectedGetCall(GetQuestionsRequest.URL, params);
+        if (response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
+    public JSONObject getCategories(GetCategoriesRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        UrlParams params = new UrlParams();
+        params.add("locale", request.getLocale());
+
+        HttpResponse response = makeProtectedGetCall(GetCategoriesRequest.URL, params);
         if (response.getBody() == null) {
             return null;
         }

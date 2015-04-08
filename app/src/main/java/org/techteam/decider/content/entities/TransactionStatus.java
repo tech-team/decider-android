@@ -1,4 +1,4 @@
-package org.techteam.decider.db;
+package org.techteam.decider.content.entities;
 
 public enum TransactionStatus {
     STARTED,
