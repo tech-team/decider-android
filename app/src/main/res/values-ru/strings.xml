@@ -43,4 +43,5 @@
     <string name="create_post">Отправить </string>
     <string name="add_post_toolbar_title">New question</string>
     <string name="fill_all_fields">Please, fill all the fields</string>
+    <string name="comments_toolbar_title">Decider: comments</string>
 </resources>

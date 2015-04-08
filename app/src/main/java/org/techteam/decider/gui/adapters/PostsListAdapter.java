@@ -12,17 +12,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.ContentProvider;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnPostEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.views.PostInteractor;
+import org.techteam.decider.gui.views.PostView;
 import org.techteam.decider.gui.views.EllipsizingTextView;
 
 import java.text.ParseException;
@@ -35,6 +32,7 @@ public class PostsListAdapter
         extends CursorRecyclerViewAdapter<PostsListAdapter.ViewHolder> {
     private final OnPostEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
+    private final PostInteractor postInteractor;
     private List<QuestionEntry> dataset;
 
     private Context context;
@@ -71,51 +69,25 @@ public class PostsListAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        // header
-        public TextView authorText;
-        public TextView dateText;
-        public ImageView avatarImage;
-        public ImageButton overflowButton;
-
-        // content
-        public EllipsizingTextView postText;
-        public TextView ellipsizeHintText;
-
-        // footer
-        public Button likeButton;
-        public Button commentsButton;
-
+        public PostView postView;
 
         public ViewHolder(View v) {
             super(v);
 
-            // header
-            authorText = (TextView) v.findViewById(R.id.author_text);
-            dateText = (TextView) v.findViewById(R.id.date_text);
-            avatarImage = (ImageView) v.findViewById(R.id.avatar_image);
-            overflowButton = (ImageButton) v.findViewById(R.id.overflow_button);
-
-            // content
-            postText = (EllipsizingTextView) v.findViewById(R.id.post_text);
-            ellipsizeHintText = (TextView) v.findViewById(R.id.post_ellipsize_hint);
-
-            //TODO: images
-            //TODO: poll
-
-            // footer
-            likeButton = (Button) v.findViewById(R.id.like_button);
-            commentsButton = (Button) v.findViewById(R.id.comments_button);
+            postView = (PostView) v.findViewById(R.id.post_view);
         }
     }
 
     public PostsListAdapter(Cursor contentCursor,
                             Context context,
                             OnPostEventCallback eventCallback,
-                            OnListScrolledDownCallback scrolledDownCallback) {
+                            OnListScrolledDownCallback scrolledDownCallback,
+                            PostInteractor postInteractor) {
         super(contentCursor);
         this.context = context;
         this.eventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
+        this.postInteractor = postInteractor;
     }
 
     // Create new views (invoked by the layout manager)
@@ -125,7 +97,7 @@ public class PostsListAdapter
         View v;
         if (viewType == VIEW_TYPE_ENTRY) {
             v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.post_entry, parent, false);
+                    .inflate(R.layout.fragment_post_card, parent, false);
         } else {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_loading_entry, parent, false);
@@ -143,37 +115,38 @@ public class PostsListAdapter
 
         QuestionEntry entry = QuestionEntry.fromCursor(cursor);
 
-        //TODO: set data
-//        holder.id.setText(entry.getQId());
-        holder.authorText.setText(entry.getAuthor().getUsername());
-        holder.dateText.setText(getDateString(entry.getCreationDate()));
-        holder.postText.setText(entry.getText());
-        holder.likeButton.setText("+" + entry.getLikesCount());
-        holder.commentsButton.setText(Integer.toString(entry.getCommentsCount()));
+        //TODO: move all the code below to reuse()
+        holder.postView.reuse(entry, postInteractor);
+
+        holder.postView.authorText.setText(entry.getAuthor().getUsername());
+        holder.postView.dateText.setText(getDateString(entry.getCreationDate()));
+        holder.postView.postText.setText(entry.getText());
+        holder.postView.likeButton.setText("+" + entry.getLikesCount());
+        holder.postView.commentsButton.setText(Integer.toString(entry.getCommentsCount()));
 
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs.getBoolean(context.getString(R.string.pref_shorten_long_posts_key), true))
-            holder.postText.setMaxLines(POST_TEXT_MAX_LINES);
+            holder.postView.postText.setMaxLines(POST_TEXT_MAX_LINES);
         else
-            holder.postText.setMaxLines(Integer.MAX_VALUE);
+            holder.postView.postText.setMaxLines(Integer.MAX_VALUE);
 
         String textSize = prefs.getString(context.getString(R.string.pref_text_size_key), "small");
         assert textSize != null;  // suppress inspection
         switch (textSize) {
             case "small":
-                holder.postText.setTextAppearance(context, android.R.style.TextAppearance_Small);
+                holder.postView.postText.setTextAppearance(context, android.R.style.TextAppearance_Small);
                 break;
 
             case "medium":
-                holder.postText.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+                holder.postView.postText.setTextAppearance(context, android.R.style.TextAppearance_Medium);
                 break;
 
             case "large":
-                holder.postText.setTextAppearance(context, android.R.style.TextAppearance_Large);
+                holder.postView.postText.setTextAppearance(context, android.R.style.TextAppearance_Large);
                 break;
         }
-        holder.postText.setTextColor(context.getResources().getColor(android.R.color.black));
+        holder.postView.postText.setTextColor(context.getResources().getColor(android.R.color.black));
 
         //TODO: text justification, see:
         //http://stackoverflow.com/questions/1292575/android-textview-justify-text
@@ -186,29 +159,29 @@ public class PostsListAdapter
 
         //TODO: set handlers
 
-        holder.postText.addEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
+        holder.postView.postText.addEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
             @Override
             public void ellipsizeStateChanged(boolean ellipsized) {
-                holder.ellipsizeHintText.setVisibility(ellipsized ? View.VISIBLE : View.GONE);
+                holder.postView.ellipsizeHintText.setVisibility(ellipsized ? View.VISIBLE : View.GONE);
             }
         });
 
         //set expand function both for text and hint controls
-        holder.ellipsizeHintText.setOnClickListener(new View.OnClickListener() {
+        holder.postView.ellipsizeHintText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.postText.setMaxLines(Integer.MAX_VALUE);
+                holder.postView.postText.setMaxLines(Integer.MAX_VALUE);
             }
         });
 
-        holder.postText.setOnClickListener(new View.OnClickListener() {
+        holder.postView.postText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.postText.setMaxLines(Integer.MAX_VALUE);
+                holder.postView.postText.setMaxLines(Integer.MAX_VALUE);
             }
         });
 
-        holder.overflowButton.setOnClickListener(new View.OnClickListener() {
+        holder.postView.overflowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Context context = v.getContext();

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/post_details_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        style="@style/HeaderBar"
+        app:title="@string/comments_toolbar_title"
+        app:theme="@style/ActionBarThemeOverlay"
+        app:popupTheme="@style/ActionBarPopupThemeOverlay"
+        />
+
+    <org.techteam.decider.gui.views.PostView
+        android:id="@+id/post_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/comments_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:overScrollMode="never"
+        android:background="@color/grey_color"/>
+
+</LinearLayout>

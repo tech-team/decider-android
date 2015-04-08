@@ -26,6 +26,7 @@ import org.techteam.decider.gui.adapters.PostsListAdapter;
 import org.techteam.decider.gui.loaders.ContentLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
+import org.techteam.decider.gui.views.PostInteractor;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -43,6 +44,7 @@ public class PostsListFragment
         SwipeRefreshLayout.OnRefreshListener,
         OnPostEventCallback,
         OnListScrolledDownCallback,
+        PostInteractor,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TAG = PostsListFragment.class.toString();
@@ -109,13 +111,13 @@ public class PostsListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_posts_list, container, false);
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.posts_recycler);
         recyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new PostsListAdapter(null, getActivity(), PostsListFragment.this, PostsListFragment.this);
+        adapter = new PostsListAdapter(null, getActivity(), PostsListFragment.this, PostsListFragment.this, PostsListFragment.this);
         recyclerView.setAdapter(adapter);
 
         //this thing waits for user to stop scrolling and adds new data or refreshes existing data
@@ -275,13 +277,32 @@ public class PostsListFragment
     }
 
     @Override
-    public void onLike(QuestionEntry post) {
+    public void onCommentsClick(QuestionEntry entry) {
+        PostDetailsFragment detailsFragment = new PostDetailsFragment();
+        Bundle detailsBundle = new Bundle();
+        detailsBundle.putInt("qid", entry.getQId());
+        detailsFragment.setArguments(detailsBundle);
 
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.content_frame, detailsFragment)
+                .addToBackStack("mainFragment")
+                .commit();
+    }
+
+    @Override
+    public void onLikeClick(QuestionEntry post) {
+        Toaster.toast(getActivity(), "Like pressed");
+    }
+
+    @Override
+    public void onLike(QuestionEntry post) {
+        Toaster.toast(getActivity(), "Liked successfully");
     }
 
     @Override
     public void onVote(QuestionEntry post, int voteId) {
-
+        Toaster.toast(getActivity(), "Voted successfully");
     }
 
     @Override
