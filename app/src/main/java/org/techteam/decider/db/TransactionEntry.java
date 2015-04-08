@@ -1,6 +1,7 @@
 package org.techteam.decider.db;
 
 import org.techteam.decider.content.Entry;
+import org.techteam.decider.content.entities.TransactionStatus;
 import org.techteam.decider.rest.OperationType;
 
 public class TransactionEntry implements Entry {

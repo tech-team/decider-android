@@ -1,6 +1,6 @@
 package org.techteam.decider.gui.adapters;
 
-import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.entities.ContentCategory;
 
 public class Category {
     private ContentCategory category;

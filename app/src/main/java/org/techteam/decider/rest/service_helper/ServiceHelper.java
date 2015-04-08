@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -16,6 +17,7 @@ import org.techteam.decider.rest.service.ServiceIntentBuilder;
 import org.techteam.decider.util.CallbackHelper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,18 +33,32 @@ public class ServiceHelper {
         this.context = context;
     }
 
-    public void getQuestions(ContentSection contentSection, int limit, int offset, int loadIntention, ServiceCallback cb) {
+    public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<ContentCategory> categories, int loadIntention, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.GET_QUESETIONS + "_" + limit + "_" + offset;
+        String requestId = OperationType.GET_QUESTIONS + "__" + limit + "__" + offset;
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, requestId, contentSection, limit, offset, loadIntention);
+            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, requestId, contentSection, limit, offset, categories, loadIntention);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_QUESETIONS, requestId));
+        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_QUESTIONS, requestId));
+    }
+
+    public void getCategories(String locale, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.GET_CATEGORIES + "__" + locale;
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.getCategoriesIntent(context, requestId, locale);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_CATEGORIES, requestId));
     }
 
     public void saveOperationsState(Bundle outState, String key) {
@@ -63,7 +79,7 @@ public class ServiceHelper {
         // callbacks are subscribed again to restored pending operations
         for (String opId : pendingOperations.keySet()) {
             PendingOperation op = pendingOperations.get(opId);
-            if (op.getOperationType() == OperationType.GET_QUESETIONS)
+            if (op.getOperationType() == OperationType.GET_QUESTIONS)
                 isRefreshing = true;
 
             addCallback(op.getOperationId(), callbacksKeeper.getCallback(op.getOperationType()));

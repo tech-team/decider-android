@@ -1,22 +1,16 @@
 package org.techteam.decider.rest;
 
 public enum OperationType {
-    GET_QUESETIONS;
+    GET_QUESTIONS,
+    GET_CATEGORIES;
 
-    public static OperationType fromInt(int status) {
-        switch (status) {
-            case 0:
-                return GET_QUESETIONS;
-            default:
-                throw new IllegalArgumentException("Unknown status");
-        }
+    private static OperationType[] cachedValues = values();
+
+    public static OperationType fromInt(int i) {
+        return cachedValues[i];
     }
 
     public int toInt() {
-        if (this == GET_QUESETIONS) {
-            return 0;
-        } else {
-            return 2;
-        }
+        return ordinal();
     }
 }

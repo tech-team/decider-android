@@ -1,6 +1,5 @@
 package org.techteam.decider.rest.api;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import org.techteam.decider.content.ContentSection;
@@ -10,6 +9,7 @@ public class GetQuestionsRequest {
     private final int limit;
     private final int offset;
     private final int loadIntention;
+    private final int[] categories;
 
     public static final String URL = "/questions";
 
@@ -18,12 +18,14 @@ public class GetQuestionsRequest {
         public static final String LIMIT = "LIMIT";
         public static final String OFFSET = "OFFSET";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
+        public static final String CATEGORIES = "CATEGORIES";
     }
 
-    public GetQuestionsRequest(ContentSection contentSection, int limit, int offset, int loadIntention) {
+    public GetQuestionsRequest(ContentSection contentSection, int limit, int offset, int[] categories, int loadIntention) {
         this.contentSection = contentSection;
         this.limit = limit;
         this.offset = offset;
+        this.categories = categories;
         this.loadIntention = loadIntention;
     }
 
@@ -32,8 +34,9 @@ public class GetQuestionsRequest {
         int limit = bundle.getInt(IntentExtras.LIMIT);
         int offset = bundle.getInt(IntentExtras.OFFSET);
         int loadIntention = bundle.getInt(IntentExtras.LOAD_INTENTION);
+        int[] categories = bundle.getIntArray(IntentExtras.CATEGORIES);
 
-        return new GetQuestionsRequest(contentSection, limit, offset, loadIntention);
+        return new GetQuestionsRequest(contentSection, limit, offset, categories, loadIntention);
     }
 
     public ContentSection getContentSection() {
@@ -46,6 +49,10 @@ public class GetQuestionsRequest {
 
     public int getOffset() {
         return offset;
+    }
+
+    public int[] getCategories() {
+        return categories;
     }
 
     public int getLoadIntention() {

@@ -7,7 +7,7 @@ import android.net.Uri;
 
 import com.activeandroid.content.ContentProvider;
 
-import org.techteam.decider.content.ContentCategory;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;
 

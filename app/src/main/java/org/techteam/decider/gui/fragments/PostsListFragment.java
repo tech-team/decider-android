@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentProvider;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;
@@ -33,6 +34,7 @@ import org.techteam.decider.util.Toaster;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class PostsListFragment
@@ -49,6 +51,7 @@ public class PostsListFragment
     private static final int QUESTIONS_LIMIT = 30;
     private int questionsOffset = 0;
     private ContentSection currentSection = ContentSection.NEW;
+    private List<ContentCategory> chosenCategories = new LinkedList<>();
 
     private static final class BundleKeys {
         public static final String FACTORY = "FACTORY";
@@ -154,7 +157,7 @@ public class PostsListFragment
 
         this.activity = (MainActivity) activity;
         serviceHelper = new ServiceHelper(activity);
-        callbacksKeeper.addCallback(OperationType.GET_QUESETIONS, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.GET_QUESTIONS, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -261,7 +264,7 @@ public class PostsListFragment
         //TODO: TODO TODO TODO
         //content = factory.buildContent(activity.getSection().getContentSection(), true);
 
-        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, LoadIntention.REFRESH, callbacksKeeper.getCallback(OperationType.GET_QUESETIONS));
+        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, LoadIntention.REFRESH, callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
     }
 
     @Override
@@ -275,8 +278,8 @@ public class PostsListFragment
         } else {
             intention = LoadIntention.APPEND;
         }
-        //TODO
-//        serviceHelper.getPosts(content, intention, callbacksKeeper.getCallback(OperationType.GET_QUESETIONS));
+
+//        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, intention, callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
     }
 
     @Override

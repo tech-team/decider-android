@@ -8,11 +8,11 @@ import com.activeandroid.ActiveAndroid;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.db.resolvers.AbstractContentResolver;
-import org.techteam.decider.db.resolvers.ContentResolver;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
@@ -20,10 +20,10 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class GetQuestionsProcessor extends Processor {
-    private final GetQuestionsRequest request;
+public class GetCategoriesProcessor extends Processor {
+    private final GetCategoriesRequest request;
 
-    public GetQuestionsProcessor(Context context, GetQuestionsRequest request) {
+    public GetCategoriesProcessor(Context context, GetCategoriesRequest request) {
         super(context);
         this.request = request;
     }
@@ -35,12 +35,9 @@ public class GetQuestionsProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getQuestions(request);
+            JSONObject response = apiUI.getCategories(request);
             System.out.println(response);
 
-            if (request.getLoadIntention() == LoadIntention.REFRESH) {
-//                    resolver.deleteAllEntries(getContext());
-            }
 
             if (!response.getString("status").equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
@@ -52,12 +49,12 @@ public class GetQuestionsProcessor extends Processor {
                 JSONArray data = response.getJSONArray("data");
                 for (int i = 0; i < data.length(); ++i) {
                     JSONObject q = data.getJSONObject(i);
-                    QuestionEntry entry = QuestionEntry.fromJson(q);
-                    entry.saveTotal();
+                    ContentCategory entry = ContentCategory.fromJson(q);
+                    entry.save();
                 }
                 ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
+                result.putInt(ServiceCallback.GetCategoriesExtras.COUNT, data.length());
             } finally {
                 ActiveAndroid.endTransaction();
             }
@@ -77,12 +74,5 @@ public class GetQuestionsProcessor extends Processor {
 
         transactionError(operationType, requestId);
         cb.onError(null, result);
-    }
-
-    @Override
-    protected Bundle getInitialBundle() {
-        Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, request.getLoadIntention());
-        return data;
     }
 }

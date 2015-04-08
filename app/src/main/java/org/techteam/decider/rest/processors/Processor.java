@@ -1,25 +1,21 @@
 package org.techteam.decider.rest.processors;
 
 import android.content.Context;
+import android.os.Bundle;
 
-import org.techteam.decider.db.TransactionEntry;
-import org.techteam.decider.db.TransactionStatus;
-import org.techteam.decider.db.resolvers.AbstractContentResolver;
-import org.techteam.decider.db.resolvers.ExtraResolver;
-import org.techteam.decider.db.resolvers.TransactionsResolver;
+import org.techteam.decider.content.entities.TransactionEntry;
+import org.techteam.decider.content.entities.TransactionStatus;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
 
 public abstract class Processor {
 
     private final Context context;
-//    private final TransactionsResolver transactioner;
     protected final ApiUI apiUI;
 
     public Processor(Context context) {
         this.context = context;
         apiUI = new ApiUI(context);
-//        transactioner = (TransactionsResolver) AbstractContentResolver.getResolver(ExtraResolver.TRANSACTIONS);
     }
 
     public Context getContext() {
@@ -29,23 +25,21 @@ public abstract class Processor {
     public abstract void start(OperationType operationType, String requestId, ProcessorCallback cb);
 
     protected void transactionStarted(OperationType operationType, String requestId) {
-        TransactionEntry trx = new TransactionEntry().setId(requestId)
-                                                     .setOperationType(operationType)
-                                                     .setStatus(TransactionStatus.STARTED);
-//        transactioner.insert(getContext(), trx);
+        TransactionEntry trx = new TransactionEntry(requestId, TransactionStatus.STARTED, operationType);
+        trx.save();
     }
 
     protected void transactionFinished(OperationType operationType, String requestId) {
-        TransactionEntry trx = new TransactionEntry().setId(requestId)
-                                                     .setOperationType(operationType)
-                                                     .setStatus(TransactionStatus.FINISHED);
-//        transactioner.insert(getContext(), trx);
+        TransactionEntry trx = new TransactionEntry(requestId, TransactionStatus.FINISHED, operationType);
+        trx.save();
     }
 
     protected void transactionError(OperationType operationType, String requestId) {
-        TransactionEntry trx = new TransactionEntry().setId(requestId)
-                                                     .setOperationType(operationType)
-                                                     .setStatus(TransactionStatus.ERROR);
-//        transactioner.insert(getContext(), trx);
+        TransactionEntry trx = new TransactionEntry(requestId, TransactionStatus.ERROR, operationType);
+        trx.save();
+    }
+
+    protected Bundle getInitialBundle() {
+        return new Bundle();
     }
 }
