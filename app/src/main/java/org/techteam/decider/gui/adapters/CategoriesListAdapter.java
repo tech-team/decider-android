@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
 import org.techteam.decider.util.Toaster;
 
 import java.util.List;
@@ -21,22 +22,24 @@ public class CategoriesListAdapter
         extends CursorRecyclerViewAdapter<CategoriesListAdapter.ViewHolder> {
 
     private Context context;
+    private final OnCategorySelectedListener onCategorySelectedListener;
 
-    public CategoriesListAdapter(Cursor contentCursor,
-                                 Context context) {
+    public CategoriesListAdapter(Cursor contentCursor, Context context, OnCategorySelectedListener onCategorySelectedListener) {
         super(contentCursor);
         this.context = context;
+        this.onCategorySelectedListener = onCategorySelectedListener;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor, int position) {
-        ContentCategory category = ContentCategory.fromCursor(cursor);
+        final ContentCategory category = ContentCategory.fromCursor(cursor);
         viewHolder.name.setText(category.getLocalizedLabel());
         viewHolder.name.setChecked(category.isSelected());
         viewHolder.name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toaster.toast(context, "Selected");
+                CheckBox b = (CheckBox) v;
+                onCategorySelectedListener.categorySelected(category, b.isChecked());
             }
         });
     }

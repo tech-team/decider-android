@@ -9,7 +9,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
-import android.support.v4.content.IntentCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,8 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
@@ -29,7 +26,6 @@ import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
-import org.techteam.decider.gui.adapters.Category;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
@@ -39,11 +35,14 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class MainFragment
-        extends Fragment {
+        extends Fragment
+        implements OnCategorySelectedListener {
 
     public static final String TAG = MainFragment.class.toString();
     private MainActivity activity;
@@ -67,6 +66,18 @@ public class MainFragment
     private ServiceHelper serviceHelper;
 
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
+    private Map<Integer, ContentCategory> selectedCategories = new HashMap<>();
+
+    @Override
+    public void categorySelected(ContentCategory category, boolean isChecked) {
+        Toaster.toast(getActivity(), "Selected");
+        category.setSelectedAsync(isChecked);
+        if (!isChecked) {
+            selectedCategories.remove(category.getUid());
+        } else {
+            selectedCategories.put(category.getUid(), category);
+        }
+    }
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -131,7 +142,7 @@ public class MainFragment
 //        categories.add(new Category(new ContentCategory(1, "Test 1"), false));
 //        categories.add(new Category(new ContentCategory(2, "Test 2"), false));
 
-        categoriesListAdapter = new CategoriesListAdapter(null, this.activity.getBaseContext());
+        categoriesListAdapter = new CategoriesListAdapter(null, this.activity.getBaseContext(), this);
         recyclerView.setAdapter(categoriesListAdapter);
 
         // Set the list's click listener
