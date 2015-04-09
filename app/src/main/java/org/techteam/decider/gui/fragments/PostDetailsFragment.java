@@ -26,6 +26,14 @@ public class PostDetailsFragment extends Fragment {
     private PostView postView;
 
     @Override
+    public void setArguments(Bundle args) {
+        //TODO: hardcoded key, bla-bla-bla...
+        if (args != null) {
+            qid = args.getInt("qid");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_post_details, container, false);
 
@@ -44,9 +52,6 @@ public class PostDetailsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //TODO: hardcoded key, bla-bla-bla...
-        qid = savedInstanceState.getInt("qid");
-
         // setup toolbar
         Toolbar toolbar = (Toolbar) this.activity.findViewById(R.id.post_details_toolbar);
         this.activity.setSupportActionBar(toolbar);
@@ -56,9 +61,10 @@ public class PostDetailsFragment extends Fragment {
         actionBar.setHomeButtonEnabled(true);
 
         // find children
-        postView = (PostView) postView.findViewById(R.id.post_view);
+        postView = (PostView) this.activity.findViewById(R.id.post_view);
 
         // set data
+        retrieveEntryTask = new RetrieveEntryTask();
         retrieveEntryTask.execute();
     }
 

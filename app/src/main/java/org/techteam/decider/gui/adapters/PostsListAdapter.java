@@ -37,18 +37,9 @@ public class PostsListAdapter
 
     private Context context;
 
-    @SuppressLint("SimpleDateFormat")
-    private SimpleDateFormat sourceDateFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-    @SuppressLint("SimpleDateFormat")
-    private SimpleDateFormat uiDateFormat =
-            new SimpleDateFormat("d MMM, hh:mm");
-
     private static final int VIEW_TYPE_ENTRY = 0;
     private static final int VIEW_TYPE_FOOTER = 1;
 
-    private static final int POST_TEXT_MAX_LINES = 5;
 
     public void setAll(ArrayList<QuestionEntry> entries) {
         dataset.clear();
@@ -115,95 +106,8 @@ public class PostsListAdapter
 
         QuestionEntry entry = QuestionEntry.fromCursor(cursor);
 
-        //TODO: move all the code below to reuse()
+
         holder.postView.reuse(entry, postInteractor);
-
-        holder.postView.authorText.setText(entry.getAuthor().getUsername());
-        holder.postView.dateText.setText(getDateString(entry.getCreationDate()));
-        holder.postView.postText.setText(entry.getText());
-        holder.postView.likeButton.setText("+" + entry.getLikesCount());
-        holder.postView.commentsButton.setText(Integer.toString(entry.getCommentsCount()));
-
-        //configure according to SharedPreferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (prefs.getBoolean(context.getString(R.string.pref_shorten_long_posts_key), true))
-            holder.postView.postText.setMaxLines(POST_TEXT_MAX_LINES);
-        else
-            holder.postView.postText.setMaxLines(Integer.MAX_VALUE);
-
-        String textSize = prefs.getString(context.getString(R.string.pref_text_size_key), "small");
-        assert textSize != null;  // suppress inspection
-        switch (textSize) {
-            case "small":
-                holder.postView.postText.setTextAppearance(context, android.R.style.TextAppearance_Small);
-                break;
-
-            case "medium":
-                holder.postView.postText.setTextAppearance(context, android.R.style.TextAppearance_Medium);
-                break;
-
-            case "large":
-                holder.postView.postText.setTextAppearance(context, android.R.style.TextAppearance_Large);
-                break;
-        }
-        holder.postView.postText.setTextColor(context.getResources().getColor(android.R.color.black));
-
-        //TODO: text justification, see:
-        //http://stackoverflow.com/questions/1292575/android-textview-justify-text
-
-        // TODO: mark liked and so on
-
-//        holder.toolbarView.setRating(entry.getRating());
-//        holder.toolbarView._setBayaned(entry.getIsBayan());
-//        holder.toolbarView._setFaved(entry.isFavorite());
-
-        //TODO: set handlers
-
-        holder.postView.postText.addEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
-            @Override
-            public void ellipsizeStateChanged(boolean ellipsized) {
-                holder.postView.ellipsizeHintText.setVisibility(ellipsized ? View.VISIBLE : View.GONE);
-            }
-        });
-
-        //set expand function both for text and hint controls
-        holder.postView.ellipsizeHintText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.postView.postText.setMaxLines(Integer.MAX_VALUE);
-            }
-        });
-
-        holder.postView.postText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.postView.postText.setMaxLines(Integer.MAX_VALUE);
-            }
-        });
-
-        holder.postView.overflowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Context context = v.getContext();
-
-                PopupMenu menu = new PopupMenu(context, v);
-                menu.inflate(R.menu.post_entry_context_menu);
-
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                        switch (item.getItemId()) {
-                            //TODO: context menu
-                            default:
-                                return false;
-                        }
-                    }
-                });
-
-                menu.show();
-            }
-        });
     }
 
     private void share(Context context, QuestionEntry entry) {
@@ -251,18 +155,5 @@ public class PostsListAdapter
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
-    }
-
-    private String getDateString(String raw) {
-        String result;
-
-        try {
-            Date date = sourceDateFormat.parse(raw);
-            result = uiDateFormat.format(date);
-        } catch (ParseException e) {
-            result = "";
-        }
-
-        return result;
     }
 }
