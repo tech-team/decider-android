@@ -85,8 +85,10 @@ public class QuestionEntry extends Model {
 
     public Long saveTotal() {
         author.save();
-        pollItem1.save();
-        pollItem2.save();
+        if (pollItem1 != null)
+            pollItem1.save();
+        if (pollItem2 != null)
+            pollItem2.save();
         return save();
     }
 
@@ -103,14 +105,18 @@ public class QuestionEntry extends Model {
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));
         entry.likesCount = obj.getInt("likes_count");
 
-        JSONArray pollItems = obj.getJSONArray("poll");
+        if (!obj.isNull("poll")) {
+            JSONArray pollItems = obj.getJSONArray("poll");
 
-        if (pollItems.length() == 2) {
-            entry.pollItem1 = PollItemEntry.fromJson(pollItems.getJSONObject(0));
-            entry.pollItem2 = PollItemEntry.fromJson(pollItems.getJSONObject(1));
+            if (pollItems != null && pollItems.length() == 2) {
+                if (pollItems.length() == 2) {
+                    entry.pollItem1 = PollItemEntry.fromJson(pollItems.getJSONObject(0));
+                    entry.pollItem2 = PollItemEntry.fromJson(pollItems.getJSONObject(1));
 
-        } else {
-            throw new JSONException("poll must contain exactly 2 items");
+                } else {
+                    throw new JSONException("poll must contain exactly 2 items");
+                }
+            }
         }
 
         if (obj.has("comments_count")) {

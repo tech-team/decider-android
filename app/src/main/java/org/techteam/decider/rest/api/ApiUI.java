@@ -28,7 +28,7 @@ public class ApiUI {
         String prefName = "TOKENS_PREFS"; // TODO
         this.context = context;
         prefs = this.context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
-        saveToken("kZ24nabT5m8MoVZyyaoPG8HkmbIzVP", 36000, "Qbyd0xpHh0CRPybhoCKzEtJ3anm7WT");
+        saveToken("8kg9sNM95lhZdXfssfguYpGUivRhlt", 36000, "qKTOGc6Z8HLHBf3ne8dcWgFGjl0gb7");
     }
 
     public String getAccessToken() {
@@ -161,13 +161,14 @@ public class ApiUI {
     }
 
     private String resolveApiUrl(String path) {
-        URI uri;
-        try {
-            uri = new URI(API_URL);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-
-        return uri.resolve(path).toString();
+        return API_URL + path;
+//        URI uri;
+//        try {
+//            uri = new URI(API_URL);
+//        } catch (URISyntaxException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return uri.resolve(path).toString();
     }
 }
