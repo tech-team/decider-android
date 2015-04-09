@@ -8,6 +8,7 @@ import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.RegisterRequest;
 
 import java.util.Collection;
 
@@ -42,6 +43,14 @@ public final class ServiceIntentBuilder {
         intent.putExtra(GetCategoriesRequest.IntentExtras.LOCALE, locale);
         return intent;
     }
+
+    public static Intent registerIntent(Context context, String requestId, String email, String password) {
+        Intent intent = getBasicIntent(context, requestId, OperationType.REGISTER);
+        intent.putExtra(RegisterRequest.IntentExtras.EMAIL, email);
+        intent.putExtra(RegisterRequest.IntentExtras.PASSWORD, password);
+        return intent;
+    }
+
 //
 //    public static Intent voteBashIntent(Context context, String requestId, int entryPosition, String entryId, String rating, int direction) {
 //        Intent intent = new Intent(context, DeciderService.class);

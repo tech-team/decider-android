@@ -201,7 +201,7 @@ public class MainFragment
             }
         });
 
-        serviceHelper.getCategories(getResources().getConfiguration().locale.toLanguageTag(), callbacksKeeper.getCallback(OperationType.GET_CATEGORIES));
+        serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.GET_CATEGORIES));
     }
 
     @Override

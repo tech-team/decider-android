@@ -2,7 +2,9 @@ package org.techteam.decider.rest;
 
 public enum OperationType {
     GET_QUESTIONS,
-    GET_CATEGORIES;
+    GET_CATEGORIES,
+    REGISTER,
+    LOGIN;
 
     private static OperationType[] cachedValues = values();
 

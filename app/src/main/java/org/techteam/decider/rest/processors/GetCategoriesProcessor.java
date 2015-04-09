@@ -38,6 +38,10 @@ public class GetCategoriesProcessor extends Processor {
             JSONObject response = apiUI.getCategories(request);
             System.out.println(response);
 
+            if (response == null) {
+                cb.onError("No categories found", result);
+                return;
+            }
 
             if (!response.getString("status").equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");

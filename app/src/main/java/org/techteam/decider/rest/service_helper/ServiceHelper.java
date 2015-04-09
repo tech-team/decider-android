@@ -61,6 +61,20 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.GET_CATEGORIES, requestId));
     }
 
+    public void register(String email, String password, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.REGISTER + "__" + email;
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.registerIntent(context, requestId, email, password);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.REGISTER, requestId));
+    }
+
     public void saveOperationsState(Bundle outState, String key) {
         outState.putParcelableArrayList(key, new ArrayList<>(pendingOperations.values()));
     }

@@ -8,10 +8,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.RegisterRequest;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
+import org.techteam.decider.rest.processors.RegisterProcessor;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 
 
@@ -29,15 +31,6 @@ public class DeciderService extends IntentService {
     public class IntentExtras {
         public static final String REQUEST_ID = "REQUEST_ID";
         public static final String OPERATION = "OPERATION";
-
-
-//        public class BashVoteOperation {
-//            public static final String ENTRY_ID = "ENTRY_ID";
-//            public static final String RATING = "rating";
-//            public static final String DIRECTION = "direction";
-//            public static final String ENTRY_POSITION = "entryPosition";
-//            public static final String BAYAN = "bayan";
-//        }
     }
 
     public class CallbackIntentExtras {
@@ -82,6 +75,13 @@ public class DeciderService extends IntentService {
                 processor = new GetCategoriesProcessor(getBaseContext(), request);
                 break;
             }
+            case REGISTER: {
+                RegisterRequest request = RegisterRequest.fromBundle(extras);
+                processor = new RegisterProcessor(getBaseContext(), request);
+                break;
+            }
+            case LOGIN:
+                break;
         }
 
 //        } else if (operation == OperationType.BASH_VOTE) {

@@ -16,6 +16,10 @@ public interface ServiceCallback {
         public static final String COUNT = "COUNT";
     }
 
+    class RegisterExtras {
+        public static final String STATUS = "STATUS";
+    }
+
 //    class BashVoteExtras {
 //        public static final String ENTRY_ID = "ENTRY_ID";
 //        public static final String ENTRY_POSITION = "ENTRY_POSITION";

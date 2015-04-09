@@ -21,12 +21,14 @@ public class ApiUI {
     private SharedPreferences prefs;
 
 //    private static final String API_URL = "http://localhost:8888/api/v1";
-    private static final String API_URL = "http://private-3225b-decider.apiary-mock.com/";
+    private static final String API_URL = "http://188.166.126.79/api/v1";
+//    private static final String API_URL = "http://private-3225b-decider.apiary-mock.com/";
 
     public ApiUI(Context context) {
         String prefName = "TOKENS_PREFS"; // TODO
         this.context = context;
         prefs = this.context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
+        saveToken("kZ24nabT5m8MoVZyyaoPG8HkmbIzVP", 36000, "Qbyd0xpHh0CRPybhoCKzEtJ3anm7WT");
     }
 
     public String getAccessToken() {
@@ -68,8 +70,23 @@ public class ApiUI {
             }
             throw new InvalidAccessTokenException();
         }
+        if (code == HttpURLConnection.HTTP_OK) {
+            return httpResponse;
+        }
+        return null;
+    }
 
-        return httpResponse;
+    public HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        httpRequest.setParams(params);
+
+        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
+        int code = httpResponse.getResponseCode();
+
+        if (code == HttpURLConnection.HTTP_CREATED) {
+            return httpResponse;
+        }
+        return null;
     }
 
     public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
@@ -93,10 +110,37 @@ public class ApiUI {
         params.add("locale", request.getLocale());
 
         HttpResponse response = makeProtectedGetCall(GetCategoriesRequest.URL, params);
-        if (response.getBody() == null) {
+        if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
+    }
+
+    public JSONObject register(RegisterRequest request) throws IOException, JSONException {
+        UrlParams params = new UrlParams();
+        params.add("email", request.getEmail());
+        params.add("password", request.getPassword());
+
+        HttpResponse response = makeAuthPostCall(GetCategoriesRequest.URL, params);
+        if (response.getBody() == null) {
+            return null;
+        }
+        JSONObject obj = new JSONObject(response.getBody());
+        JSONObject objData = obj.getJSONObject("data");
+        saveToken(objData);
+        return obj;
+    }
+
+    private void saveToken(String accessToken, int expires, String refreshToken) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("access_token", accessToken);
+        editor.putInt("expires", expires);
+        editor.putString("refresh_token", refreshToken);
+        editor.apply();
+    }
+
+    private void saveToken(JSONObject objData) throws JSONException {
+        saveToken(objData.getString("access_token"), objData.getInt("expires"), objData.getString("refresh_token"));
     }
 
     private void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
