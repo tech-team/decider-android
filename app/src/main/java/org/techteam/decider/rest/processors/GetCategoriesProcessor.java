@@ -50,7 +50,10 @@ public class GetCategoriesProcessor extends Processor {
                 for (int i = 0; i < data.length(); ++i) {
                     JSONObject q = data.getJSONObject(i);
                     ContentCategory entry = ContentCategory.fromJson(q);
-                    entry.save();
+                    ContentCategory dbEntry = ContentCategory.byUid(entry.getUid());
+                    if (dbEntry == null || !dbEntry.contentEquals(entry)) {
+                        entry.save();
+                    }
                 }
                 ActiveAndroid.setTransactionSuccessful();
 

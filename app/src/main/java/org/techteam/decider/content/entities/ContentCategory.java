@@ -1,14 +1,17 @@
 package org.techteam.decider.content.entities;
 
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.provider.BaseColumns;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.util.Toaster;
 
 @Table(name = "Categories", id = BaseColumns._ID)
 public class ContentCategory extends Model {
@@ -49,6 +52,20 @@ public class ContentCategory extends Model {
         return selected;
     }
 
+    public void setSelectedAsync(boolean selected) {
+        CategorySelectionSaver saver = new CategorySelectionSaver();
+        saver.execute(selected);
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        this.save();
+    }
+
+    public static ContentCategory byUid(int uid) {
+        return new Select().from(ContentCategory.class).where("uid = ?", uid).executeSingle();
+    }
+
     public static ContentCategory fromJson(JSONObject obj) throws JSONException {
         int uid = obj.getInt("id");
         String name = obj.getString("name");
@@ -59,5 +76,33 @@ public class ContentCategory extends Model {
         ContentCategory entry = new ContentCategory();
         entry.loadFromCursor(cursor);
         return entry;
+    }
+
+    private class CategorySelectionSaver extends AsyncTask<Boolean, Void, Void> {
+        protected Void doInBackground(Boolean... selectedArr) {
+            for (Boolean selected : selectedArr) {
+                setSelected(selected);
+                if (isCancelled()) break;
+            }
+            return null;
+        }
+
+        protected void onProgressUpdate(Void... progress) {
+
+        }
+
+        protected void onPostExecute(Void result) {
+            System.out.println("Saved Category selection");
+        }
+    }
+
+    public boolean contentEquals(final ContentCategory rhs) {
+        if (rhs == null) {
+            return false;
+        }
+        if (this == rhs) {
+            return true;
+        }
+        return uid == rhs.getUid() && localizedLabel.equals(rhs.localizedLabel);
     }
 }
