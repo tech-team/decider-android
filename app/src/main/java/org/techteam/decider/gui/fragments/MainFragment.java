@@ -36,8 +36,6 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class MainFragment
@@ -196,7 +194,7 @@ public class MainFragment
             @Override
             public void onClick(View v) {
                 getFragmentManager().beginTransaction()
-                        .add(R.id.content_frame, new AddPostFragment())
+                        .add(R.id.content_frame, new AddQuestionFragment())
                         .addToBackStack("mainFragment")
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit();
@@ -220,7 +218,7 @@ public class MainFragment
         @Override
         public Fragment getItem(int position) {
             // TODO: static create() method with section arg
-            return new PostsListFragment();
+            return new QuestionsListFragment();
         }
 
         @Override

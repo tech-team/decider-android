@@ -26,7 +26,7 @@ import org.techteam.decider.gui.adapters.PostsListAdapter;
 import org.techteam.decider.gui.loaders.ContentLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
-import org.techteam.decider.gui.views.PostInteractor;
+import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -38,16 +38,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class PostsListFragment
+public class QuestionsListFragment
         extends Fragment
         implements
         SwipeRefreshLayout.OnRefreshListener,
-        OnPostEventCallback,
+        OnQuestionEventCallback,
         OnListScrolledDownCallback,
-        PostInteractor,
+        QuestionInteractor,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final String TAG = PostsListFragment.class.toString();
+    public static final String TAG = QuestionsListFragment.class.toString();
 
 
     private static final int QUESTIONS_LIMIT = 30;
@@ -115,7 +115,7 @@ public class PostsListFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_posts_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_questions_list, container, false);
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.posts_recycler);
         recyclerView.setHasFixedSize(true);
@@ -123,7 +123,7 @@ public class PostsListFragment
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new PostsListAdapter(null, getActivity(), PostsListFragment.this, PostsListFragment.this, PostsListFragment.this);
+        adapter = new PostsListAdapter(null, getActivity(), QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
         recyclerView.setAdapter(adapter);
 
         //this thing waits for user to stop scrolling and adds new data or refreshes existing data
@@ -288,7 +288,7 @@ public class PostsListFragment
 
     @Override
     public void onCommentsClick(QuestionEntry entry) {
-        PostDetailsFragment detailsFragment = new PostDetailsFragment();
+        QuestionDetailsFragment detailsFragment = new QuestionDetailsFragment();
         Bundle detailsBundle = new Bundle();
         detailsBundle.putInt("qid", entry.getQId());
         detailsFragment.setArguments(detailsBundle);

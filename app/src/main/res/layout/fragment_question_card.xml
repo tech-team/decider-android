@@ -12,9 +12,9 @@
     card_view:contentPaddingBottom="-20dp"
     android:layout_marginTop="3dp"
     android:layout_marginBottom="3dp"
-    tools:context="org.techteam.decider.gui.fragments.PostsListFragment" >
+    tools:context="org.techteam.decider.gui.fragments.QuestionsListFragment" >
 
-    <org.techteam.decider.gui.views.PostView
+    <org.techteam.decider.gui.views.QuestionView
         android:id="@+id/post_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

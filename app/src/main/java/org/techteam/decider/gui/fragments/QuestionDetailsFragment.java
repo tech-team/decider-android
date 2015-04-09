@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
-import org.techteam.decider.gui.views.PostView;
+import org.techteam.decider.gui.views.QuestionView;
 
-public class PostDetailsFragment extends Fragment {
+public class QuestionDetailsFragment extends Fragment {
     private MainActivity activity;
     private QuestionEntry entry;
     private int qid;
@@ -24,7 +24,7 @@ public class PostDetailsFragment extends Fragment {
 
     private View rootView;
     // children
-    private PostView postView;
+    private QuestionView questionView;
 
     @Override
     public void setArguments(Bundle args) {
@@ -36,7 +36,7 @@ public class PostDetailsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_post_details, container, false);
+        rootView = inflater.inflate(R.layout.fragment_question_details, container, false);
 
         return rootView;
     }
@@ -62,7 +62,7 @@ public class PostDetailsFragment extends Fragment {
         actionBar.setHomeButtonEnabled(true);
 
         // find children
-        postView = (PostView) rootView.findViewById(R.id.post_view);
+        questionView = (QuestionView) rootView.findViewById(R.id.post_view);
 
         // set data
         retrieveEntryTask = new RetrieveEntryTask();
@@ -80,7 +80,7 @@ public class PostDetailsFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            postView.reuse(entry, null);
+            questionView.reuse(entry, null);
         }
     }
 }

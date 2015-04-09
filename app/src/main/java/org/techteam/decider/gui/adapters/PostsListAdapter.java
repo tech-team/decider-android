@@ -1,38 +1,28 @@
 package org.techteam.decider.gui.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.PopupMenu;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.fragments.OnPostEventCallback;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
-import org.techteam.decider.gui.views.PostInteractor;
-import org.techteam.decider.gui.views.PostView;
-import org.techteam.decider.gui.views.EllipsizingTextView;
+import org.techteam.decider.gui.views.QuestionInteractor;
+import org.techteam.decider.gui.views.QuestionView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class PostsListAdapter
         extends CursorRecyclerViewAdapter<PostsListAdapter.ViewHolder> {
-    private final OnPostEventCallback eventCallback;
+    private final OnQuestionEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private final PostInteractor postInteractor;
+    private final QuestionInteractor questionInteractor;
     private List<QuestionEntry> dataset;
 
     private Context context;
@@ -60,25 +50,25 @@ public class PostsListAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        public PostView postView;
+        public QuestionView questionView;
 
         public ViewHolder(View v) {
             super(v);
 
-            postView = (PostView) v.findViewById(R.id.post_view);
+            questionView = (QuestionView) v.findViewById(R.id.post_view);
         }
     }
 
     public PostsListAdapter(Cursor contentCursor,
                             Context context,
-                            OnPostEventCallback eventCallback,
+                            OnQuestionEventCallback eventCallback,
                             OnListScrolledDownCallback scrolledDownCallback,
-                            PostInteractor postInteractor) {
+                            QuestionInteractor questionInteractor) {
         super(contentCursor);
         this.context = context;
         this.eventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
-        this.postInteractor = postInteractor;
+        this.questionInteractor = questionInteractor;
     }
 
     // Create new views (invoked by the layout manager)
@@ -88,7 +78,7 @@ public class PostsListAdapter
         View v;
         if (viewType == VIEW_TYPE_ENTRY) {
             v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_post_card, parent, false);
+                    .inflate(R.layout.fragment_question_card, parent, false);
         } else {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_loading_entry, parent, false);
@@ -107,7 +97,7 @@ public class PostsListAdapter
         QuestionEntry entry = QuestionEntry.fromCursor(cursor);
 
 
-        holder.postView.reuse(entry, postInteractor);
+        holder.questionView.reuse(entry, questionInteractor);
     }
 
     private void share(Context context, QuestionEntry entry) {

@@ -18,7 +18,7 @@ import org.techteam.decider.R;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.util.Toaster;
 
-public class AddPostFragment extends Fragment{
+public class AddQuestionFragment extends Fragment{
     private MainActivity activity;
 
     // child controls

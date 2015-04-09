@@ -18,7 +18,7 @@
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         />
 
-    <org.techteam.decider.gui.views.PostView
+    <org.techteam.decider.gui.views.QuestionView
         android:id="@+id/post_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
