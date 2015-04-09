@@ -22,6 +22,7 @@ public class PostDetailsFragment extends Fragment {
 
     private RetrieveEntryTask retrieveEntryTask;
 
+    private View rootView;
     // children
     private PostView postView;
 
@@ -35,7 +36,7 @@ public class PostDetailsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_post_details, container, false);
+        rootView = inflater.inflate(R.layout.fragment_post_details, container, false);
 
         return rootView;
     }
@@ -53,7 +54,7 @@ public class PostDetailsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         // setup toolbar
-        Toolbar toolbar = (Toolbar) this.activity.findViewById(R.id.post_details_toolbar);
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.post_details_toolbar);
         this.activity.setSupportActionBar(toolbar);
 
         ActionBar actionBar = this.activity.getSupportActionBar();
@@ -61,7 +62,7 @@ public class PostDetailsFragment extends Fragment {
         actionBar.setHomeButtonEnabled(true);
 
         // find children
-        postView = (PostView) this.activity.findViewById(R.id.post_view);
+        postView = (PostView) rootView.findViewById(R.id.post_view);
 
         // set data
         retrieveEntryTask = new RetrieveEntryTask();
