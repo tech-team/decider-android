@@ -37,10 +37,10 @@
 
             <ImageButton
                 android:id="@+id/login_via_vk_button"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:src="@drawable/vk"
-                android:background="@android:color/transparent"
+                android:background="@color/vk_logo_background"
                 android:layout_marginTop="10dp"
                 android:contentDescription="@string/vk" />
 

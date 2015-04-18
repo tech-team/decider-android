@@ -181,6 +181,8 @@ public class MainFragment
         mSlidingTabLayout = (SlidingTabLayout) this.activity.findViewById(R.id.sections_pager_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
+
+        mSlidingTabLayout.setBackgroundColor(this.activity.getResources().getColor(R.color.primary));
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {

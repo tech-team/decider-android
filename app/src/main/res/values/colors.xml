@@ -16,4 +16,6 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="vk_logo_background">#4D75A3</color>
 </resources>
