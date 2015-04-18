@@ -184,7 +184,7 @@ public class MainFragment
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return R.color.primary;
+                return getResources().getColor(R.color.white);
             }
         });
 

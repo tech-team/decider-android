@@ -5,7 +5,7 @@ import android.os.Bundle;
 public class GetCategoriesRequest {
     private final String locale;
 
-    public static final String URL = "/categories";
+    public static final String URL = "categories";
 
     public class IntentExtras {
         public static final String LOCALE = "LOCALE";

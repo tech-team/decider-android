@@ -11,7 +11,7 @@ public class GetQuestionsRequest {
     private final int loadIntention;
     private final int[] categories;
 
-    public static final String URL = "/questions";
+    public static final String URL = "questions";
 
     public class IntentExtras {
         public static final String CONTENT_SECTION = "CONTENT_SECTION";

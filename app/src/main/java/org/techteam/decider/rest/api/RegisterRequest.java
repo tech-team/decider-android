@@ -3,7 +3,7 @@ package org.techteam.decider.rest.api;
 import android.os.Bundle;
 
 public class RegisterRequest {
-    public static final String URL = "/registration";
+    public static final String URL = "registration";
     private final String email;
     private final String password;
 

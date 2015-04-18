@@ -39,6 +39,7 @@ public class GetQuestionsProcessor extends Processor {
             System.out.println(response);
 
             if (request.getLoadIntention() == LoadIntention.REFRESH) {
+                QuestionEntry.deleteAll();
 //                    resolver.deleteAllEntries(getContext());
             }
 

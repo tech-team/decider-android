@@ -20,9 +20,9 @@ public class ApiUI {
     private Context context;
     private SharedPreferences prefs;
 
-//    private static final String API_URL = "http://localhost:8888/api/v1";
-    private static final String API_URL = "http://188.166.126.79/api/v1";
-//    private static final String API_URL = "http://private-3225b-decider.apiary-mock.com/";
+//    private static final String API_URL = "http://localhost:8888/api/v1/";
+//    private static final String API_URL = "http://188.166.126.79/api/v1/";
+    private static final String API_URL = "http://private-954f0e-decider.apiary-mock.com/";
 
     public ApiUI(Context context) {
         String prefName = "TOKENS_PREFS"; // TODO
@@ -161,14 +161,13 @@ public class ApiUI {
     }
 
     private String resolveApiUrl(String path) {
-        return API_URL + path;
-//        URI uri;
-//        try {
-//            uri = new URI(API_URL);
-//        } catch (URISyntaxException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return uri.resolve(path).toString();
+        URI uri;
+        try {
+            uri = new URI(API_URL);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        return uri.resolve(path).toString();
     }
 }
