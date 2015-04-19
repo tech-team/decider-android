@@ -8,12 +8,9 @@ import com.activeandroid.ActiveAndroid;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.ContentCategory;
-import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.loaders.LoadIntention;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
-import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -53,8 +50,8 @@ public class GetCategoriesProcessor extends Processor {
                 JSONArray data = response.getJSONArray("data");
                 for (int i = 0; i < data.length(); ++i) {
                     JSONObject q = data.getJSONObject(i);
-                    ContentCategory entry = ContentCategory.fromJson(q);
-                    ContentCategory dbEntry = ContentCategory.byUid(entry.getUid());
+                    CategoryEntry entry = CategoryEntry.fromJson(q);
+                    CategoryEntry dbEntry = CategoryEntry.byUid(entry.getUid());
                     if (dbEntry == null || !dbEntry.contentEquals(entry)) {
                         entry.save();
                     }

@@ -3,20 +3,14 @@ package org.techteam.decider.gui.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
-import org.techteam.decider.util.Toaster;
-
-import java.util.List;
 
 public class CategoriesListAdapter
         extends CursorRecyclerViewAdapter<CategoriesListAdapter.ViewHolder> {
@@ -32,7 +26,7 @@ public class CategoriesListAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor, int position) {
-        final ContentCategory category = ContentCategory.fromCursor(cursor);
+        final CategoryEntry category = CategoryEntry.fromCursor(cursor);
         viewHolder.name.setText(category.getLocalizedLabel());
         viewHolder.name.setChecked(category.isSelected());
         viewHolder.name.setOnClickListener(new View.OnClickListener() {

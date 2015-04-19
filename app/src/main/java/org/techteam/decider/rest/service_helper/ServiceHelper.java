@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -33,7 +33,7 @@ public class ServiceHelper {
         this.context = context;
     }
 
-    public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<ContentCategory> categories, int loadIntention, ServiceCallback cb) {
+    public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
         init();
 
         String requestId = OperationType.GET_QUESTIONS + "__" + limit + "__" + offset;

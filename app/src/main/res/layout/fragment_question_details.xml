@@ -30,6 +30,6 @@
         android:paddingLeft="6dp"
         android:paddingRight="6dp"
         android:overScrollMode="never"
-        android:background="@color/grey_color"/>
+        android:background="@color/cards_background_color"/>
 
 </LinearLayout>

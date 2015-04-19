@@ -3,17 +3,10 @@ package org.techteam.decider.rest.processors;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.activeandroid.ActiveAndroid;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.ContentCategory;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.GetCategoriesRequest;
-import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.RegisterRequest;
-import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;

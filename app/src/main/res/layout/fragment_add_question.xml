@@ -74,76 +74,97 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_post_category_label"/>
 
-            <TabHost
-                android:id="@+id/type_tab_host"
+            <org.techteam.decider.gui.widget.SlidingTabLayout
+                android:id="@+id/question_type_pager_tabs"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/add_post_category_spinner">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/add_post_category_spinner"
+                />
+
+            <org.techteam.decider.gui.views.WrappingViewPager
+                android:id="@+id/question_type_pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/question_type_pager_tabs">
+
+                <!-- TODO: images -->
+                <LinearLayout
+                    android:id="@+id/images_tab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:tag="@string/images_type">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@android:style/TextAppearance.Medium"
+                        android:text="@string/option1" />
+
+                    <EditText
+                        android:id="@+id/add_post_text_choice1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/yes"
+                        android:inputType="text" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@android:style/TextAppearance.Medium"
+                        android:text="@string/option2" />
+
+                    <EditText
+                        android:id="@+id/add_post_text_choice2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no"
+                        android:inputType="text" />
+
+                </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/text_tab"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:tag="@string/text_type">
 
-                    <TabWidget
-                        android:id="@android:id/tabs"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@android:style/TextAppearance.Medium"
+                        android:text="@string/option1" />
+
+                    <EditText
+                        android:id="@+id/add_post_text_choice1"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                    </TabWidget>
+                        android:layout_height="wrap_content"
+                        android:text="@string/yes"
+                        android:inputType="text" />
 
-                    <FrameLayout
-                        android:id="@android:id/tabcontent"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@android:style/TextAppearance.Medium"
+                        android:text="@string/option2" />
+
+                    <EditText
+                        android:id="@+id/add_post_text_choice2"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content"
+                        android:text="@string/no"
+                        android:inputType="text" />
 
-                        <LinearLayout
-                            android:id="@+id/images_tab"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/text_tab"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/option1" />
-
-                            <EditText
-                                android:id="@+id/add_post_text_choice1"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/yes"
-                                android:inputType="text" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/option2" />
-
-                            <EditText
-                                android:id="@+id/add_post_text_choice2"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/no"
-                                android:inputType="text" />
-
-                        </LinearLayout>
-                    </FrameLayout>
                 </LinearLayout>
-            </TabHost>
+
+            </org.techteam.decider.gui.views.WrappingViewPager>
 
             <CheckBox
                 android:id="@+id/add_post_anonymity_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/type_tab_host"
+                android:layout_below="@id/question_type_pager"
                 android:layout_alignParentBottom="true"
                 android:checked="false"
                 android:layout_alignParentEnd="true"

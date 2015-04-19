@@ -33,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.techteam.decider.R;
+import org.techteam.decider.gui.adapters.ColoredAdapter;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -187,6 +188,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private void populateTabStrip() {
         final PagerAdapter adapter = mViewPager.getAdapter();
+        final ColoredAdapter coloredAdapter = (ColoredAdapter) adapter;
+
         final View.OnClickListener tabClickListener = new TabClickListener();
 
         for (int i = 0; i < adapter.getCount(); i++) {
@@ -216,8 +219,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
             tabTitleView.setText(adapter.getPageTitle(i));
 
-            //TODO: Such change, very inside SDK almost
-            tabTitleView.setTextColor(getContext().getResources().getColor(R.color.white));
+            //TODO: Such change, very almost inside SDK
+            tabTitleView.setTextColor(
+                    getContext().getResources().getColor(coloredAdapter.getTextColor()));
+
             tabView.setOnClickListener(tabClickListener);
             String desc = mContentDescriptions.get(i, null);
             if (desc != null) {

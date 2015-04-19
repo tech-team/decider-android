@@ -11,32 +11,33 @@ import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.util.Toaster;
 
 @Table(name = "Categories", id = BaseColumns._ID)
-public class ContentCategory extends Model {
+public class CategoryEntry extends Model {
+
+    public final static String LOCALIZED_LABEL_FIELD = "localized_label";
 
     @Column(name = "uid", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private int uid;
 
-    @Column(name = "localized_label")
+    @Column(name = LOCALIZED_LABEL_FIELD)
     private String localizedLabel;
 
     @Column(name = "selected")
     private boolean selected;
 
-    public ContentCategory() {
+    public CategoryEntry() {
         super();
     }
 
-    public ContentCategory(int uid, String localizedLabel, boolean selected) {
+    public CategoryEntry(int uid, String localizedLabel, boolean selected) {
         super();
         this.uid = uid;
         this.localizedLabel = localizedLabel;
         this.selected = selected;
     }
 
-    public ContentCategory(int uid, String localizedLabel) {
+    public CategoryEntry(int uid, String localizedLabel) {
         this(uid, localizedLabel, false);
     }
 
@@ -62,18 +63,18 @@ public class ContentCategory extends Model {
         this.save();
     }
 
-    public static ContentCategory byUid(int uid) {
-        return new Select().from(ContentCategory.class).where("uid = ?", uid).executeSingle();
+    public static CategoryEntry byUid(int uid) {
+        return new Select().from(CategoryEntry.class).where("uid = ?", uid).executeSingle();
     }
 
-    public static ContentCategory fromJson(JSONObject obj) throws JSONException {
+    public static CategoryEntry fromJson(JSONObject obj) throws JSONException {
         int uid = obj.getInt("id");
         String name = obj.getString("name");
-        return new ContentCategory(uid, name, false);
+        return new CategoryEntry(uid, name, false);
     }
 
-    public static ContentCategory fromCursor(Cursor cursor) {
-        ContentCategory entry = new ContentCategory();
+    public static CategoryEntry fromCursor(Cursor cursor) {
+        CategoryEntry entry = new CategoryEntry();
         entry.loadFromCursor(cursor);
         return entry;
     }
@@ -96,7 +97,7 @@ public class ContentCategory extends Model {
         }
     }
 
-    public boolean contentEquals(final ContentCategory rhs) {
+    public boolean contentEquals(final CategoryEntry rhs) {
         if (rhs == null) {
             return false;
         }

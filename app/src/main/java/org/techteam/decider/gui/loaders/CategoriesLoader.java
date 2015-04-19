@@ -7,11 +7,7 @@ import android.net.Uri;
 
 import com.activeandroid.content.ContentProvider;
 
-import org.techteam.decider.content.ContentSection;
-import org.techteam.decider.content.entities.ContentCategory;
-import org.techteam.decider.content.entities.QuestionEntry;
-
-import java.util.List;
+import org.techteam.decider.content.entities.CategoryEntry;
 
 public class CategoriesLoader extends CursorLoader {
 
@@ -28,7 +24,7 @@ public class CategoriesLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        Uri uri = ContentProvider.createUri(ContentCategory.class, null);
+        Uri uri = ContentProvider.createUri(CategoryEntry.class, null);
         return getContext().getContentResolver().query(uri, null, null, null, null);
     }
 }

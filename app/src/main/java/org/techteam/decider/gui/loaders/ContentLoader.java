@@ -7,7 +7,7 @@ import android.net.Uri;
 
 import com.activeandroid.content.ContentProvider;
 
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class ContentLoader extends CursorLoader {
 
     private ContentSection contentSection;
-    private final List<ContentCategory> categories;
+    private final List<CategoryEntry> categories;
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
@@ -31,7 +31,7 @@ public class ContentLoader extends CursorLoader {
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
     }
 
-    public ContentLoader(Context context, ContentSection contentSection, List<ContentCategory> categories, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public ContentLoader(Context context, ContentSection contentSection, List<CategoryEntry> categories, Integer entryPosition, Integer insertedCount, int loadIntention) {
         super(context);
         this.contentSection = contentSection;
         this.categories = categories;

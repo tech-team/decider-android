@@ -3,7 +3,7 @@ package org.techteam.decider.rest.service;
 import android.content.Context;
 import android.content.Intent;
 
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
@@ -21,7 +21,7 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
-    public static Intent getQuestionsIntent(Context context, String requestId, ContentSection contentSection, int limit, int offset, Collection<ContentCategory> categories, int loadIntention) {
+    public static Intent getQuestionsIntent(Context context, String requestId, ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention) {
         Intent intent = getBasicIntent(context, requestId, OperationType.GET_QUESTIONS);
 
         intent.putExtra(GetQuestionsRequest.IntentExtras.CONTENT_SECTION, contentSection.toInt());
@@ -30,7 +30,7 @@ public final class ServiceIntentBuilder {
 
         int[] categories_ids = new int[categories.size()];
         int i = 0;
-        for (ContentCategory c : categories) {
+        for (CategoryEntry c : categories) {
             categories_ids[i++] = c.getUid();
         }
         intent.putExtra(GetQuestionsRequest.IntentExtras.CATEGORIES, categories_ids);

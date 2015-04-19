@@ -1,7 +1,7 @@
 package org.techteam.decider.gui.fragments;
 
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 
 public interface OnCategorySelectedListener {
-    void categorySelected(ContentCategory category, boolean isChecked);
+    void categorySelected(CategoryEntry category, boolean isChecked);
 }

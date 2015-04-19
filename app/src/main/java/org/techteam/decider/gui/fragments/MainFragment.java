@@ -22,10 +22,11 @@ import android.view.ViewGroup;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
+import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
@@ -47,7 +48,6 @@ public class MainFragment
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-//    private ListView mDrawerList;
 
     private CategoriesListAdapter categoriesListAdapter;
 
@@ -64,10 +64,10 @@ public class MainFragment
     private ServiceHelper serviceHelper;
 
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
-    private Map<Integer, ContentCategory> selectedCategories = new HashMap<>();
+    private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
 
     @Override
-    public void categorySelected(ContentCategory category, boolean isChecked) {
+    public void categorySelected(CategoryEntry category, boolean isChecked) {
         Toaster.toast(getActivity(), "Selected");
         category.setSelectedAsync(isChecked);
         if (!isChecked) {
@@ -137,8 +137,8 @@ public class MainFragment
         // Set the adapter for the list view
         //TODO: load categories via CursorLoader from server
 //        List<Category> categories = new ArrayList<>();
-//        categories.add(new Category(new ContentCategory(1, "Test 1"), false));
-//        categories.add(new Category(new ContentCategory(2, "Test 2"), false));
+//        categories.add(new Category(new CategoryEntry(1, "Test 1"), false));
+//        categories.add(new Category(new CategoryEntry(2, "Test 2"), false));
 
         categoriesListAdapter = new CategoriesListAdapter(null, this.activity.getBaseContext(), this);
         recyclerView.setAdapter(categoriesListAdapter);
@@ -186,7 +186,7 @@ public class MainFragment
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.white);
+                return getResources().getColor(android.R.color.white);
             }
         });
 
@@ -212,7 +212,8 @@ public class MainFragment
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
-    private class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    //TODO: refactor this out
+    private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -232,6 +233,11 @@ public class MainFragment
         public CharSequence getPageTitle(int position) {
             int resId = ContentSection.fromInt(position).getResId();
             return getString(resId);
+        }
+
+        @Override
+        public int getTextColor() {
+            return android.R.color.white;
         }
     }
 

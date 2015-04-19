@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.entities.ContentCategory;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentProvider;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;
@@ -53,7 +53,7 @@ public class QuestionsListFragment
     private static final int QUESTIONS_LIMIT = 30;
     private int questionsOffset = 0;
     private ContentSection currentSection = ContentSection.NEW;
-    private List<ContentCategory> chosenCategories = new LinkedList<>();
+    private List<CategoryEntry> chosenCategories = new LinkedList<>();
 
     //see comment in onCreateView()
     private Queue<Runnable> delayedAdapterNotifications = new LinkedList<Runnable>();

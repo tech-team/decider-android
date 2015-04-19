@@ -4,7 +4,7 @@
     <color name="swipe_color_2">#FF6600</color>
     <color name="swipe_color_3">#006600</color>
     <color name="swipe_color_4">#CC2900</color>
-    <color name="grey_color">#ffdcdcdc</color>
+    <color name="cards_background_color">#ffdcdcdc</color>
 
     <color name="primary">#E91E63</color>
     <color name="primary_dark">#C2185B</color>
@@ -15,7 +15,6 @@
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
-    <color name="white">#FFFFFF</color>
 
     <color name="vk_logo_background">#4D75A3</color>
 </resources>

@@ -19,7 +19,7 @@
                            org.techteam.decider.content.entities.PollItemEntry,
                            org.techteam.decider.content.entities.QuestionEntry,
                            org.techteam.decider.content.entities.TransactionEntry,
-                           org.techteam.decider.content.entities.ContentCategory
+                           org.techteam.decider.content.entities.CategoryEntry
                            " />
 
         <activity
