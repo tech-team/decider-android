@@ -102,7 +102,7 @@
                         android:text="@string/option1" />
 
                     <EditText
-                        android:id="@+id/add_post_text_choice1"
+                        android:id="@+id/add_post_image_choice1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/yes"
@@ -115,7 +115,7 @@
                         android:text="@string/option2" />
 
                     <EditText
-                        android:id="@+id/add_post_text_choice2"
+                        android:id="@+id/add_post_image_choice2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/no"
