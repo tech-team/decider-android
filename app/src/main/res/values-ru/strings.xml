@@ -44,4 +44,6 @@
     <string name="add_post_toolbar_title">Новый вопрос</string>
     <string name="fill_all_fields">Пожалуйста, заполните все поля</string>
     <string name="comments_toolbar_title">Decider: комментарии</string>
+    <string name="poll_item1">Vote 1</string>
+    <string name="poll_item2">Vote 2</string>
 </resources>

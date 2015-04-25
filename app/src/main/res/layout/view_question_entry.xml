@@ -79,7 +79,15 @@
         android:layout_below="@id/post_text"
         style="@style/post_header"
         android:visibility="gone"
-        android:text="@string/ellipsize_hint"/>
+        android:text="@string/ellipsize_hint" />
+
+    <org.techteam.decider.gui.views.PollView
+        android:id="@+id/poll_view"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_ellipsize_hint"
+        android:layout_marginTop="8dp" />
 
     <View
         android:id="@+id/footer_hr"
@@ -88,7 +96,7 @@
         android:layout_marginBottom="4dp"
         android:layout_height="1dp"
         android:background="#DDDDDD"
-        android:layout_below="@id/post_ellipsize_hint" />
+        android:layout_below="@id/poll_view" />
 
     <LinearLayout
         android:layout_width="match_parent"

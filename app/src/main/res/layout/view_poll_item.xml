@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/poll_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:contentDescription="@string/poll_item_image" />
+
+    <ImageView
+        android:id="@+id/poll_selection_mark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/poll_image"
+        android:layout_alignEnd="@id/poll_image"
+        android:src="@android:drawable/btn_star_big_on"
+        android:contentDescription="@string/poll_item_selection_mark"
+        />
+
+    <TextView
+        android:id="@+id/poll_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/poll_image" />
+
+</RelativeLayout>

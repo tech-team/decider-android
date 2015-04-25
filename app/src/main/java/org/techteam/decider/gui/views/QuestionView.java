@@ -1,6 +1,5 @@
 package org.techteam.decider.gui.views;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -9,18 +8,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.techteam.decider.util.Toaster;
 
 
 public class QuestionView extends PostView {
@@ -40,6 +36,7 @@ public class QuestionView extends PostView {
     // content
     private EllipsizingTextView postText;
     private TextView ellipsizeHintText;
+    private PollView pollView;
 
     // footer
     private Button likeButton;
@@ -61,7 +58,7 @@ public class QuestionView extends PostView {
     }
 
     protected void init(Context context) {
-        View v = View.inflate(context, R.layout.fragment_question_entry, this);
+        View v = View.inflate(context, R.layout.view_question_entry, this);
 
         // find children
         // header
@@ -73,9 +70,7 @@ public class QuestionView extends PostView {
         // content
         postText = (EllipsizingTextView) v.findViewById(R.id.post_text);
         ellipsizeHintText = (TextView) v.findViewById(R.id.post_ellipsize_hint);
-
-        //TODO: images
-        //TODO: poll
+        pollView = (PollView) v.findViewById(R.id.poll_view);
 
         // footer
         likeButton = (Button) v.findViewById(R.id.like_button);
@@ -104,7 +99,7 @@ public class QuestionView extends PostView {
     }
 
     protected void fillFields() {
-        Context context = getContext();
+        final Context context = getContext();
 
         authorText.setText(entry.getAuthor().getUsername());
         dateText.setText(getDateString(entry.getCreationDate()));
@@ -137,6 +132,16 @@ public class QuestionView extends PostView {
         
         postText.setTextColor(context.getResources().getColor(android.R.color.black));
 
+        pollView.setItems(new PollItemEntry[]{
+                entry.getPollItem1(),
+                entry.getPollItem2()
+        });
+        pollView.setListener(new PollView.Listener() {
+            @Override
+            public void polled(int pollItemId) {
+                Toaster.toast(context, "Polled: " + pollItemId);
+            }
+        });
 
         //TODO: text justification, see:
         //http://stackoverflow.com/questions/1292575/android-textview-justify-text

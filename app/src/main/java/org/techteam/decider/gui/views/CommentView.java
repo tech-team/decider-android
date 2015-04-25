@@ -1,27 +1,15 @@
 package org.techteam.decider.gui.views;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
-import org.techteam.decider.content.entities.QuestionEntry;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class CommentView extends PostView {
@@ -56,7 +44,7 @@ public class CommentView extends PostView {
     }
 
     protected void init(Context context) {
-        View v = View.inflate(context, R.layout.fragment_comment_entry, this);
+        View v = View.inflate(context, R.layout.view_comment_entry, this);
 
         // find children
         // header
