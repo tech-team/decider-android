@@ -5,7 +5,9 @@ import android.content.Intent;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.RegisterRequest;
@@ -48,6 +50,12 @@ public final class ServiceIntentBuilder {
         Intent intent = getBasicIntent(context, requestId, OperationType.REGISTER);
         intent.putExtra(RegisterRequest.IntentExtras.EMAIL, email);
         intent.putExtra(RegisterRequest.IntentExtras.PASSWORD, password);
+        return intent;
+    }
+
+    public static Intent createQuestionIntent(Context context, String requestId, QuestionData questionData) {
+        Intent intent = getBasicIntent(context, requestId, OperationType.CREATE_QUESTION);
+        intent.putExtra(CreateQuestionRequest.IntentExtras.QUESTION_DATA_JSON, questionData.toJson());
         return intent;
     }
 

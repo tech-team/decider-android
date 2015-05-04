@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.RegisterRequest;
+import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
 import org.techteam.decider.rest.processors.Processor;
@@ -80,8 +82,14 @@ public class DeciderService extends IntentService {
                 processor = new RegisterProcessor(getBaseContext(), request);
                 break;
             }
-            case LOGIN:
+            case LOGIN: {
                 break;
+            }
+            case CREATE_QUESTION: {
+                CreateQuestionRequest request = CreateQuestionRequest.fromBundle(extras);
+                processor = new CreateQuestionProcessor(getBaseContext(), request);
+                break;
+            }
         }
 
 //        } else if (operation == OperationType.BASH_VOTE) {

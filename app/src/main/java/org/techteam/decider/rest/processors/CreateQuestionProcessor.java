@@ -9,10 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.db.resolvers.AbstractContentResolver;
-import org.techteam.decider.db.resolvers.ContentResolver;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
@@ -20,10 +19,10 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class GetQuestionsProcessor extends Processor {
-    private final GetQuestionsRequest request;
+public class CreateQuestionProcessor extends Processor {
+    private final CreateQuestionRequest request;
 
-    public GetQuestionsProcessor(Context context, GetQuestionsRequest request) {
+    public CreateQuestionProcessor(Context context, CreateQuestionRequest request) {
         super(context);
         this.request = request;
     }
@@ -35,12 +34,8 @@ public class GetQuestionsProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getQuestions(request);
+            JSONObject response = apiUI.createQuestion(request);
             System.out.println(response);
-
-            if (request.getLoadIntention() == LoadIntention.REFRESH) {
-                QuestionEntry.deleteAll();
-            }
 
             if (!response.getString("status").equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
@@ -49,15 +44,11 @@ public class GetQuestionsProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                JSONArray data = response.getJSONArray("data");
-                for (int i = 0; i < data.length(); ++i) {
-                    JSONObject q = data.getJSONObject(i);
-                    QuestionEntry entry = QuestionEntry.fromJson(q);
-                    entry.saveTotal();
-                }
+                JSONObject data = response.getJSONObject("data");
+                QuestionEntry entry = QuestionEntry.fromJson(data);
+                entry.saveTotal();
                 ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
             } finally {
                 ActiveAndroid.endTransaction();
             }
@@ -82,8 +73,6 @@ public class GetQuestionsProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, request.getLoadIntention());
-        data.putInt(ServiceCallback.GetQuestionsExtras.SECTION, request.getContentSection().toInt());
         return data;
     }
 }

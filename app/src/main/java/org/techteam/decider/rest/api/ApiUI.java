@@ -76,6 +76,34 @@ public class ApiUI {
         return null;
     }
 
+    public HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+
+        String accessToken = getAccessToken();
+        if (accessToken == null) {
+            throw new InvalidAccessTokenException("No access token found");
+        }
+        params.add("access_token", accessToken);
+        httpRequest.setParams(params);
+
+        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
+        int code = httpResponse.getResponseCode();
+
+        if (code == HttpURLConnection.HTTP_FORBIDDEN) {
+            refreshToken();
+            httpResponse = HttpDownloader.httpPost(httpRequest);
+            code = httpResponse.getResponseCode();
+            if (code != HttpURLConnection.HTTP_FORBIDDEN) {
+                return httpResponse;
+            }
+            throw new InvalidAccessTokenException("Access token is probably expired");
+        }
+        return httpResponse;
+//        if (code == HttpURLConnection.HTTP_OK) {
+//        }
+//        return null;
+    }
+
     public HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         httpRequest.setParams(params);
@@ -129,6 +157,17 @@ public class ApiUI {
         JSONObject objData = obj.getJSONObject("data");
         saveToken(objData);
         return obj;
+    }
+
+    public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+        UrlParams params = new UrlParams();
+        params.add("data", request.getQuestionDataJson());
+
+        HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
+        if (response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
     }
 
     private void saveToken(String accessToken, int expires, String refreshToken) {

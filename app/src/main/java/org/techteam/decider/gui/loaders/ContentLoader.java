@@ -16,7 +16,6 @@ import java.util.List;
 public class ContentLoader extends CursorLoader {
 
     private ContentSection contentSection;
-    private final List<CategoryEntry> categories;
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
@@ -29,12 +28,12 @@ public class ContentLoader extends CursorLoader {
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
         public static final String INSERTED_COUNT = "INSERTED_COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
+        public static final String SECTION = "SECTION";
     }
 
-    public ContentLoader(Context context, ContentSection contentSection, List<CategoryEntry> categories, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public ContentLoader(Context context, ContentSection contentSection, Integer entryPosition, Integer insertedCount, int loadIntention) {
         super(context);
         this.contentSection = contentSection;
-        this.categories = categories;
         this.entryPosition = entryPosition;
         this.insertedCount = insertedCount;
         this.loadIntention = loadIntention;
@@ -42,6 +41,15 @@ public class ContentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
+        // TODO: fill the missing branches.. i guess
+        switch (contentSection) {
+            case NEW:
+                break;
+            case POPULAR:
+                break;
+            case MY:
+                break;
+        }
         Uri uri = ContentProvider.createUri(QuestionEntry.class, null);
         return getContext().getContentResolver().query(uri, null, null, null, null);
     }

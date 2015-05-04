@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
-import org.techteam.decider.content.ContentProvider;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
@@ -168,6 +167,7 @@ public class QuestionsListFragment
                 boolean isFeedFinished = data.getBoolean(GetQuestionsExtras.FEED_FINISHED, false);
                 int insertedCount = data.getInt(GetQuestionsExtras.COUNT, -1);
                 int loadIntention = data.getInt(GetQuestionsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
+                int loadedSection = data.getInt(GetQuestionsExtras.SECTION);
 
                 String msg;
                 if (isFeedFinished) {
@@ -177,6 +177,7 @@ public class QuestionsListFragment
                     Bundle args = new Bundle();
                     args.putInt(ContentLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                     args.putInt(ContentLoader.BundleKeys.LOAD_INTENTION, loadIntention);
+                    args.putInt(ContentLoader.BundleKeys.SECTION, loadedSection);
                     getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
                 }
 
@@ -242,8 +243,6 @@ public class QuestionsListFragment
             }
         }
 
-        //TODO: content
-        //content = factory.buildContent(activity.getSection().getContentSection());
         getLoaderManager().initLoader(LoaderIds.CONTENT_LOADER, null, contentDataLoaderCallbacks);
         initialized = true;
     }
@@ -282,6 +281,13 @@ public class QuestionsListFragment
         } else {
             intention = LoadIntention.APPEND;
         }
+
+//        serviceHelper.getQuestions(currentSection,
+//                QUESTIONS_LIMIT,
+//                questionsOffset = 0,
+//                chosenCategories,
+//                intention,
+//                callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
 
 //        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, intention, callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
     }
@@ -363,6 +369,7 @@ public class QuestionsListFragment
                 Integer entryPos = null;
                 Integer insertedCount = null;
                 int loadIntention = LoadIntention.REFRESH;
+                ContentSection loadedSection = currentSection;
                 if (args != null) {
                     entryPos = args.getInt(ContentLoader.BundleKeys.ENTRY_POSITION, -1);
                     entryPos = entryPos == -1 ? null : entryPos;
@@ -371,10 +378,11 @@ public class QuestionsListFragment
                     insertedCount = insertedCount == -1 ? null : insertedCount;
 
                     loadIntention = args.getInt(ContentLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+                    loadedSection = ContentSection.fromInt(args.getInt(ContentLoader.BundleKeys.SECTION));
                 }
 
                 //TODO: you may ask: why don't just store section and categories here, as field? idk
-                return new ContentLoader(getActivity(), ContentProvider.getContentSection(), ContentProvider.getCategories(), entryPos, insertedCount, loadIntention);
+                return new ContentLoader(getActivity(), loadedSection, entryPos, insertedCount, loadIntention);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }
