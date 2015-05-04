@@ -74,11 +74,20 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_post_category_label"/>
 
+            <TextView
+                android:id="@+id/add_post_answers_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/add_post_category_spinner"
+                android:layout_marginTop="10dp"
+                android:text="@string/add_post_choices_label"
+                android:textAppearance="@android:style/TextAppearance.Medium"/>
+
             <org.techteam.decider.gui.widget.SlidingTabLayout
                 android:id="@+id/question_type_pager_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/add_post_category_spinner"
+                android:layout_below="@id/add_post_answers_label"
                 />
 
             <org.techteam.decider.gui.views.WrappingViewPager
@@ -87,39 +96,32 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/question_type_pager_tabs">
 
-                <!-- TODO: images -->
                 <LinearLayout
                     android:id="@+id/images_tab"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     android:tag="@string/images_type">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@android:style/TextAppearance.Medium"
-                        android:text="@string/option1" />
-
-                    <EditText
+                    <ImageView
                         android:id="@+id/add_post_image_choice1"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="@string/yes"
-                        android:inputType="text" />
+                        android:drawingCacheQuality="low"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/photo_placeholder"
+                        android:contentDescription="@string/add_post_image_choice1" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@android:style/TextAppearance.Medium"
-                        android:text="@string/option2" />
-
-                    <EditText
+                    <ImageView
                         android:id="@+id/add_post_image_choice2"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="@string/no"
-                        android:inputType="text" />
+                        android:drawingCacheQuality="low"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/photo_placeholder"
+                        android:contentDescription="@string/add_post_image_choice2" />
 
                 </LinearLayout>
 

@@ -1,17 +1,22 @@
 package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v13.app.FragmentStatePagerAdapter;
+import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -20,11 +25,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import org.techteam.decider.R;
-import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
@@ -35,6 +42,9 @@ import org.techteam.decider.gui.widget.SlidingTabLayout;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class AddQuestionFragment extends Fragment{
     private MainActivity activity;
@@ -49,7 +59,8 @@ public class AddQuestionFragment extends Fragment{
     private EditText textChoice2;
 
     // image choices
-    //TODO
+    private ImageView imageChoice1;
+    private ImageView imageChoice2;
 
     private Button createButton;
 
@@ -63,6 +74,12 @@ public class AddQuestionFragment extends Fragment{
     private QuestionTypePagerAdapter mQuestionTypePagerAdapter;
     private SlidingTabLayout mQuestionTypeTabLayout;
     private WrappingViewPager mQuestionTypePager;
+
+    // image selector stuff
+    private static final int TAKE_PICTURE = 1;
+    private static final int SELECT_IMAGE = 2;
+    private ImageView currentImageView;
+    private ContentResolver cr;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,6 +98,7 @@ public class AddQuestionFragment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        cr = getActivity().getContentResolver();
 
         View v = getView();
         assert v != null;
@@ -102,6 +120,13 @@ public class AddQuestionFragment extends Fragment{
         // text choices
         textChoice1 = (EditText) v.findViewById(R.id.add_post_text_choice1);
         textChoice2 = (EditText) v.findViewById(R.id.add_post_text_choice2);
+
+        // image choices
+        imageChoice1 = (ImageView) v.findViewById(R.id.add_post_image_choice1);
+        imageChoice2 = (ImageView) v.findViewById(R.id.add_post_image_choice2);
+
+        imageChoice1.setOnClickListener(new ImageChoiceClickListener(imageChoice1));
+        imageChoice2.setOnClickListener(new ImageChoiceClickListener(imageChoice2));
 
         createButton = (Button) v.findViewById(R.id.add_post_send_button);
         createButton.setOnClickListener(new View.OnClickListener() {
@@ -235,5 +260,100 @@ public class AddQuestionFragment extends Fragment{
         public int getTextColor() {
             return android.R.color.black;
         }
+    }
+
+    private class ImageChoiceClickListener implements View.OnClickListener {
+        private ImageView imageView;
+
+        public ImageChoiceClickListener(ImageView imageView) {
+            this.imageView = imageView;
+        }
+
+        @Override
+        public void onClick(View v) {
+            AddQuestionFragment.this.currentImageView = imageView;
+
+            final CharSequence fromCamera = getString(R.string.take_photo);
+            final CharSequence fromGallery = getString(R.string.choose_from_gallery);
+            final CharSequence items[] = { fromCamera, fromGallery };
+
+            AlertDialog dialog = new AlertDialog.Builder(activity)
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            if (which == -1)
+                                return;
+
+                            if (items[which].equals(fromCamera)) {
+                                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                startActivityForResult(takePicture, TAKE_PICTURE);
+                            } else if (items[which].equals(fromGallery)) {
+                                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                startActivityForResult(pickPhoto, SELECT_IMAGE);
+                            }
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == SELECT_IMAGE || requestCode == TAKE_PICTURE) {
+                Uri selectedImage = data.getData();
+                try {
+                    currentImageView.setImageBitmap(
+                            prepareBitmap(
+                                    selectedImage,
+                                    currentImageView.getWidth(),
+                                    currentImageView.getHeight()));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private Bitmap prepareBitmap(Uri uri, int reqWidth, int reqHeight) throws IOException {
+        InputStream input = cr.openInputStream(uri);
+        // First decode with inJustDecodeBounds=true to check dimensions
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(input, null, options);
+        input.close();
+        input = cr.openInputStream(uri);
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeStream(input, null, options);
+        input.close();
+        return bitmap;
+    }
+
+    // this is the same method from Android's sample code
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }

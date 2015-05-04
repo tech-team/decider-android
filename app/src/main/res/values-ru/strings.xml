@@ -44,6 +44,11 @@
     <string name="add_post_toolbar_title">Новый вопрос</string>
     <string name="fill_all_fields">Пожалуйста, заполните все поля</string>
     <string name="comments_toolbar_title">Decider: комментарии</string>
-    <string name="poll_item1">Vote 1</string>
-    <string name="poll_item2">Vote 2</string>
+    <string name="poll_item1">Выбрать первый вариант</string>
+    <string name="poll_item2">Выбрать второй вариант</string>
+    <string name="add_post_image_choice1">Картинка 1</string>
+    <string name="add_post_image_choice2">Картинка 2</string>
+    <string name="add_post_choices_label">Варианты ответов:</string>
+    <string name="take_photo">Сфотографировать</string>
+    <string name="choose_from_gallery">Выбрать из галереи</string>
 </resources>

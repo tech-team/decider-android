@@ -46,6 +46,11 @@ public class PollView extends LinearLayout {
                 }
             });
 
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.MATCH_PARENT, 1
+            );
+            pollItemView.setLayoutParams(layoutParams);
+
             super.addView(pollItemView);
             pollItemViews.add(pollItemView);
         }

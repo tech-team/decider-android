@@ -53,5 +53,10 @@
     <string name="poll_item2">Vote 2</string>
     <string name="poll_item_image">poll_item_image</string>
     <string name="poll_item_selection_mark">Marked as selected</string>
+    <string name="add_post_image_choice1">Image choice 1</string>
+    <string name="add_post_image_choice2">Image choice 2</string>
+    <string name="add_post_choices_label">Choices:</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
 
 </resources>
