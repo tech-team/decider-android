@@ -8,11 +8,20 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 public class HttpDownloader {
     // TODO: add proxy
 
     private static final String USER_AGENT = "Decider-App v0.1";
+
+    private static final String MULTIPART_BOUNDARY = "DeciderBoundary";
+    private static final char[] MULTIPART_CHARS =
+            "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    .toCharArray();
+    private static final int MULTIPART_BOUNDARY_MIN_SIZE = 30;
+    private static final int MULTIPART_BOUNDARY_MAX_SIZE = 40;
 
 
     public static HttpResponse httpGet(String url) throws IOException {
@@ -83,6 +92,101 @@ public class HttpDownloader {
         }
     }
 
+    public static HttpResponse httpMultipartPost(HttpRequest request) throws IOException {
+        URL urlObj = constructUrl(request.getUrl(), null, request.getEncoding());
+        HttpURLConnection connection = null;
+        OutputStream out = null;
+
+        try {
+            connection = (HttpURLConnection) urlObj.openConnection();
+
+            String boundary = MULTIPART_BOUNDARY + generateNewBoundary();
+
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setUseCaches(false);
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("ENCTYPE", "multipart/form-data");
+            connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+            connection.setInstanceFollowRedirects(request.isFollowRedirects());
+
+            fillHeaders(request, connection);
+
+            connection.connect();
+            out = new BufferedOutputStream(connection.getOutputStream());
+
+            for (UrlParams.UrlParam<?> p : request.getParams()) {
+                addPart(out, boundary, p);
+            }
+            addBoundary(out, boundary);
+
+            out.flush();
+
+            return parseConnection(connection, request);
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    private static void addBoundary(OutputStream out, String boundary) throws IOException {
+        out.write(("\r\n" + boundary + "\r\n").getBytes());
+    }
+
+    private static void addPart(OutputStream out, String boundary, UrlParams.UrlParam<?> p) throws IOException {
+        Class<?> c = p.getValue().getClass();
+        if (c == String.class) {
+            addPart(out, boundary, p.getKey(), (String) p.getValue());
+        } else if (c == InputStream.class) {
+            addPart(out, boundary, p.getKey(), (InputStream) p.getValue());
+        } else {
+            System.err.println("Unsupported UrlParam value type: " + c.toString());
+        }
+    }
+
+    private static void addPart(OutputStream out, String boundary, final String key, final String value) throws IOException {
+        addBoundary(out, boundary);
+        out.write(("Content-Disposition: form-data; name=\"" + key + "\"\r\n").getBytes());
+        out.write("Content-Type: text/plain; charset=UTF-8\r\n".getBytes());
+        out.write("Content-Transfer-Encoding: 8bit\r\n\r\n".getBytes());
+        out.write(value.getBytes());
+    }
+
+    private static void addPart(OutputStream out, String boundary, final String key, final InputStream fin) throws IOException {
+        String filename = UUID.randomUUID().toString() + ".jpg";
+        addPart(out, boundary, key, filename, fin, "application/octet-stream");
+    }
+
+    public static void addPart(OutputStream out, String boundary, final String key, final String fileName, final InputStream fin, String type) throws IOException {
+        addBoundary(out, boundary);
+        type = "Content-Type: " + type + "\r\n";
+        out.write(("Content-Disposition: form-data; name=\""+ key+"\"; filename=\"" + fileName + "\"\r\n").getBytes());
+        out.write(type.getBytes());
+        out.write("Content-Transfer-Encoding: binary\r\n\r\n".getBytes());
+
+        final byte[] tmp = new byte[4096];
+        int l = 0;
+        while ((l = fin.read(tmp)) != -1) {
+            out.write(tmp, 0, l);
+        }
+    }
+
+    private static String generateNewBoundary() {
+        StringBuilder buffer = new StringBuilder();
+        Random rand = new Random();
+        int count = rand.nextInt(MULTIPART_BOUNDARY_MAX_SIZE - MULTIPART_BOUNDARY_MIN_SIZE + 1) + MULTIPART_BOUNDARY_MIN_SIZE;
+        for (int i = 0; i < count; i++) {
+            buffer.append(MULTIPART_CHARS[rand.nextInt(MULTIPART_CHARS.length)]);
+        }
+        return buffer.toString();
+    }
+
     private static URL constructUrl(String url, UrlParams params, String encoding) throws MalformedURLException, UnsupportedEncodingException {
         if (params == null || params.isEmpty()) {
             return new URL(url);
@@ -96,8 +200,8 @@ public class HttpDownloader {
         }
 
         String newUrl = "";
-        for (UrlParams.UrlParam p : params) {
-            newUrl += URLEncoder.encode(p.getKey(), encoding) + "=" + URLEncoder.encode(p.getValue(), encoding) + "&";
+        for (UrlParams.UrlParam<?> p : params) {
+            newUrl += URLEncoder.encode(p.getKey(), encoding) + "=" + URLEncoder.encode((String) p.getValue(), encoding) + "&";
         }
         return newUrl.substring(0, newUrl.length() - 1);
     }
