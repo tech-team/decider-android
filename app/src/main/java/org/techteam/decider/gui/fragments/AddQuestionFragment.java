@@ -4,15 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -29,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.android.camera.CropImageIntentBuilder;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
@@ -43,8 +39,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
 
 public class AddQuestionFragment extends Fragment{
     private MainActivity activity;
@@ -78,8 +73,17 @@ public class AddQuestionFragment extends Fragment{
     // image selector stuff
     private static final int TAKE_PICTURE = 1;
     private static final int SELECT_IMAGE = 2;
-    private ImageView currentImageView;
-    private ContentResolver cr;
+    private static final int CROP_IMAGE = 3;
+
+    private static final int ASPECT_WIDTH = 9;
+    private static final int ASPECT_HEIGHT = 16;
+
+    private static final int CROPPED_WIDTH = 800;
+    private static final int CROPPED_HEIGHT = CROPPED_WIDTH * ASPECT_HEIGHT / ASPECT_WIDTH;
+
+    private static final String CROPPED_FILE_EXTENSION = ".cropped.jpg";
+
+    private ImageHolder currentImageHolder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,7 +102,6 @@ public class AddQuestionFragment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        cr = getActivity().getContentResolver();
 
         View v = getView();
         assert v != null;
@@ -258,7 +261,7 @@ public class AddQuestionFragment extends Fragment{
 
         @Override
         public void onClick(View v) {
-            AddQuestionFragment.this.currentImageView = imageView;
+            AddQuestionFragment.this.currentImageHolder = new ImageHolder(imageView);
 
             final CharSequence fromCamera = getString(R.string.take_photo);
             final CharSequence fromGallery = getString(R.string.choose_from_gallery);
@@ -291,56 +294,40 @@ public class AddQuestionFragment extends Fragment{
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_IMAGE || requestCode == TAKE_PICTURE) {
                 Uri selectedImage = data.getData();
-                try {
-                    currentImageView.setImageBitmap(
-                            prepareBitmap(
-                                    selectedImage,
-                                    currentImageView.getWidth(),
-                                    currentImageView.getHeight()));
+                currentImageHolder.setSource(selectedImage);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                // generate cropped path
+                File cacheDir = getActivity().getCacheDir();
+                File croppedFile = new File(cacheDir,
+                        selectedImage.getLastPathSegment() + CROPPED_FILE_EXTENSION);
+
+                currentImageHolder.setCropped(Uri.fromFile(croppedFile));
+
+                cropImage(currentImageHolder);
+            } else if (requestCode == CROP_IMAGE) {
+                showImage(currentImageHolder);
+                sendImage(currentImageHolder);
             }
         }
     }
 
-    private Bitmap prepareBitmap(Uri uri, int reqWidth, int reqHeight) throws IOException {
-        InputStream input = cr.openInputStream(uri);
-        // First decode with inJustDecodeBounds=true to check dimensions
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(input, null, options);
-        input.close();
-        input = cr.openInputStream(uri);
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-        options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeStream(input, null, options);
-        input.close();
-        return bitmap;
+    private void cropImage(ImageHolder imageHolder) {
+        CropImageIntentBuilder cropBuilder = new CropImageIntentBuilder(
+                ASPECT_WIDTH, ASPECT_HEIGHT,
+                CROPPED_WIDTH, CROPPED_HEIGHT,
+                imageHolder.getCropped());
+        cropBuilder.setSourceImage(imageHolder.getSource());
+
+        startActivityForResult(cropBuilder.getIntent(getActivity()), CROP_IMAGE);
     }
 
-    // this is the same method from Android's sample code
-    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
+    private void showImage(ImageHolder imageHolder) {
+        currentImageHolder.getImageView()
+                .setImageURI(imageHolder.getCropped());
     }
+
+    private void sendImage(ImageHolder imageHolder) {
+        //TODO: send image and save uid
+    }
+
 }

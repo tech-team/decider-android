@@ -33,6 +33,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.vk.sdk.VKOpenAuthActivity" />
+        <!-- Declare the bundled CropImage Activity -->
+        <activity android:name="com.android.camera.CropImage"/>
 
         <service
             android:name=".rest.service.DeciderService"
