@@ -3,8 +3,7 @@ package org.techteam.decider.rest;
 public enum OperationType {
     GET_QUESTIONS,
     GET_CATEGORIES,
-    REGISTER,
-    LOGIN,
+    LOGIN_REGISTER,
     CREATE_QUESTION, UPLOAD_IMAGE;
 
     private static OperationType[] cachedValues = values();

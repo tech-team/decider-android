@@ -22,13 +22,17 @@ public class ApiUI {
 
 //    private static final String API_URL = "http://localhost:8888/api/v1/";
 //    private static final String API_URL = "http://188.166.126.79/api/v1/";
-    private static final String API_URL = "http://private-954f0e-decider.apiary-mock.com/";
+    private static final String API_URL = "http://decidr.ru/api/v1/";
+//    private static final String API_URL = "http://private-954f0e-decider.apiary-mock.com/";
+
+
+    public static final String REFRESH_TOKEN_URL = "refresh_token";
 
     public ApiUI(Context context) {
         String prefName = "TOKENS_PREFS"; // TODO
         this.context = context;
         prefs = this.context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
-        saveToken("8kg9sNM95lhZdXfssfguYpGUivRhlt", 36000, "qKTOGc6Z8HLHBf3ne8dcWgFGjl0gb7");
+//        saveToken("0atkeWZqnRq9GVxHNCCtJpOevUtrrN", 36000, "Z77gke1xm6xJ5xaAs7mTUB9fSm1RpO");
     }
 
     public String getAccessToken() {
@@ -111,7 +115,7 @@ public class ApiUI {
         HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
         int code = httpResponse.getResponseCode();
 
-        if (code == HttpURLConnection.HTTP_CREATED) {
+        if (code < HttpURLConnection.HTTP_BAD_REQUEST) {
             return httpResponse;
         }
         return null;
@@ -144,12 +148,12 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject register(RegisterRequest request) throws IOException, JSONException {
+    public JSONObject loginRegister(RegisterRequest request) throws IOException, JSONException {
         UrlParams params = new UrlParams();
         params.add("email", request.getEmail());
         params.add("password", request.getPassword());
 
-        HttpResponse response = makeAuthPostCall(GetCategoriesRequest.URL, params);
+        HttpResponse response = makeAuthPostCall(RegisterRequest.URL, params);
         if (response.getBody() == null) {
             return null;
         }
@@ -196,7 +200,7 @@ public class ApiUI {
     }
 
     private void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(AuthRequest.REFRESH_TOKEN_URL));
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_URL));
         UrlParams params = new UrlParams();
         params.add("refresh_token", getRefreshToken());
         HttpResponse response = HttpDownloader.httpPost(httpRequest);

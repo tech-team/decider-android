@@ -64,19 +64,12 @@ public class GetQuestionsProcessor extends Processor {
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-            return;
-        } catch (IOException e) {
+        } catch (IOException | JSONException | InvalidAccessTokenException | TokenRefreshFailException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-        } catch (TokenRefreshFailException e) {
-            e.printStackTrace();
+            transactionError(operationType, requestId);
+            cb.onError(e.getMessage(), result);
         }
 
-        transactionError(operationType, requestId);
-        cb.onError(null, result);
     }
 
     @Override

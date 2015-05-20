@@ -189,35 +189,10 @@ public class QuestionsListFragment
             public void onError(String operationId, Bundle data, String message) {
                 mSwipeRefreshLayout.setRefreshing(false);
                 String msg = "Error. " + message;
-                Toaster.toast(getActivity().getApplicationContext(), msg);
+                Toaster.toastLong(getActivity().getApplicationContext(), msg);
                 System.out.println(msg);
             }
         });
-
-//        callbacksKeeper.addCallback(OperationType.BASH_VOTE, new ServiceCallback() {
-//            @Override
-//            public void onSuccess(String operationId, Bundle data) {
-//                String entryId = data.getString(ServiceCallback.BashVoteExtras.ENTRY_ID);
-//                int entryPosition = data.getInt(BashVoteExtras.ENTRY_POSITION);
-//
-//                String msg = "Voted for entry: " + entryId;
-////                Toaster.toast(getActivity().getApplicationContext(), msg);
-//                System.out.println(msg);
-//
-//                Bundle args = new Bundle();
-//                args.putInt(ContentLoader.BundleKeys.ENTRY_POSITION, entryPosition);
-//                getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
-//            }
-//
-//            @Override
-//            public void onError(String operationId, Bundle data, String message) {
-//                String entryId = data.getString(ServiceCallback.BashVoteExtras.ENTRY_ID);
-//
-//                String msg = "Vote failed for entry: " + entryId + ". " + message;
-//                Toaster.toast(getActivity().getApplicationContext(), msg);
-//                System.out.println(msg);
-//            }
-//        });
     }
 
     @Override
@@ -228,9 +203,9 @@ public class QuestionsListFragment
         sharedPref.registerOnSharedPreferenceChangeListener(this);
 
         if (savedInstanceState == null) {
-            //factory = new ContentFactory(Locale.getDefault().toString());
+
         } else {
-            //factory = savedInstanceState.getParcelable(BundleKeys.FACTORY);
+
             boolean isRefreshing = serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
@@ -251,8 +226,6 @@ public class QuestionsListFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
-        //TODO
-        //outState.putParcelable(BundleKeys.FACTORY, factory);
 
     }
 

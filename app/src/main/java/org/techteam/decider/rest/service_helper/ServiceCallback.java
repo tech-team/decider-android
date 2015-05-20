@@ -17,7 +17,7 @@ public interface ServiceCallback {
         public static final String COUNT = "COUNT";
     }
 
-    class RegisterExtras {
+    class LoginRegisterExtras {
         public static final String STATUS = "STATUS";
     }
 

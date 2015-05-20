@@ -11,10 +11,10 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class RegisterProcessor extends Processor {
+public class LoginRegisterProcessor extends Processor {
     private final RegisterRequest request;
 
-    public RegisterProcessor(Context context, RegisterRequest request) {
+    public LoginRegisterProcessor(Context context, RegisterRequest request) {
         super(context);
         this.request = request;
     }
@@ -26,27 +26,21 @@ public class RegisterProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.register(request);
+            JSONObject response = apiUI.loginRegister(request);
             System.out.println(response);
 
 
             if (!response.getString("status").equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
-                return;
+                cb.onError("status is not ok!", result);
+            } else {
+                transactionFinished(operationType, requestId);
+                cb.onSuccess(result);
             }
-
-            result.putString(ServiceCallback.RegisterExtras.STATUS, "ok");
-
-            transactionFinished(operationType, requestId);
-            cb.onSuccess(result);
-            return;
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            transactionError(operationType, requestId);
+            cb.onError(e.getMessage(), result);
         }
-
-        transactionError(operationType, requestId);
-        cb.onError(null, result);
     }
 }

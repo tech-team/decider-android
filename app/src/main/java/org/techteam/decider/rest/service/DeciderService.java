@@ -16,7 +16,7 @@ import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
-import org.techteam.decider.rest.processors.RegisterProcessor;
+import org.techteam.decider.rest.processors.LoginRegisterProcessor;
 import org.techteam.decider.rest.processors.UploadImageProcessor;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 
@@ -79,12 +79,9 @@ public class DeciderService extends IntentService {
                 processor = new GetCategoriesProcessor(getBaseContext(), request);
                 break;
             }
-            case REGISTER: {
+            case LOGIN_REGISTER: {
                 RegisterRequest request = RegisterRequest.fromBundle(extras);
-                processor = new RegisterProcessor(getBaseContext(), request);
-                break;
-            }
-            case LOGIN: {
+                processor = new LoginRegisterProcessor(getBaseContext(), request);
                 break;
             }
             case CREATE_QUESTION: {

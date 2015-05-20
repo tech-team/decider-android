@@ -49,7 +49,7 @@ public final class ServiceIntentBuilder {
     }
 
     public static Intent registerIntent(Context context, String requestId, String email, String password) {
-        Intent intent = getBasicIntent(context, requestId, OperationType.REGISTER);
+        Intent intent = getBasicIntent(context, requestId, OperationType.LOGIN_REGISTER);
         intent.putExtra(RegisterRequest.IntentExtras.EMAIL, email);
         intent.putExtra(RegisterRequest.IntentExtras.PASSWORD, password);
         return intent;

@@ -19,6 +19,10 @@ import com.vk.sdk.api.VKError;
 
 import org.techteam.decider.R;
 import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class AuthFragment
@@ -38,6 +42,13 @@ public class AuthFragment
     private Button registerButton;
     private Button loginButton;
     private ImageButton loginViaVKButton;
+
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ServiceHelper serviceHelper;
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,10 +93,23 @@ public class AuthFragment
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
+
+        serviceHelper = new ServiceHelper(activity);
+        callbacksKeeper.addCallback(OperationType.LOGIN_REGISTER, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(activity.getBaseContext(), "LoginRegister: ok");
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                Toaster.toast(activity.getBaseContext(), "LoginRegister: failed");
+            }
+        });
     }
 
     @Override
@@ -101,25 +125,47 @@ public class AuthFragment
             //actionBar.setDisplayHomeAsUpEnabled(true);
             //actionBar.setHomeButtonEnabled(true);
         }
+
+        if (savedInstanceState == null) {
+
+        } else {
+            serviceHelper.restoreOperationsState(savedInstanceState,
+                    BundleKeys.PENDING_OPERATIONS,
+                    callbacksKeeper);
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     private void register() {
-        String email = emailText.getText().toString();
+        String email = emailText.getText().toString().trim();
         String password = passwordText.getText().toString();
 
+
+        if (email.equals("") || password.equals("")) {
+            Toaster.toast(activity.getBaseContext(), "email or password are empty");
+            return;
+        }
+
         Toaster.toast(activity.getBaseContext(), email + " : " + password);
+        serviceHelper.loginRegister(email, password, callbacksKeeper.getCallback(OperationType.LOGIN_REGISTER));
     }
 
     private void login() {
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
+        if (email.equals("") || password.equals("")) {
+            Toaster.toast(activity.getBaseContext(), "email or password are empty");
+            return;
+        }
+
         Toaster.toast(activity.getBaseContext(), email + " : " + password);
+        serviceHelper.loginRegister(email, password, callbacksKeeper.getCallback(OperationType.LOGIN_REGISTER));
     }
 
     private void loginViaVK() {

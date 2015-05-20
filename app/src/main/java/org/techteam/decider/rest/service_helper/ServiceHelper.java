@@ -63,10 +63,10 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.GET_CATEGORIES, requestId));
     }
 
-    public void register(String email, String password, ServiceCallback cb) {
+    public void loginRegister(String email, String password, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.REGISTER + "__" + email;
+        String requestId = OperationType.LOGIN_REGISTER + "__" + email;
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -74,7 +74,7 @@ public class ServiceHelper {
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.REGISTER, requestId));
+        pendingOperations.put(requestId, new PendingOperation(OperationType.LOGIN_REGISTER, requestId));
     }
 
     public void uploadImage(Bitmap image, ServiceCallback cb) {
