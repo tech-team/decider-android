@@ -58,5 +58,7 @@
     <string name="add_post_choices_label">Choices:</string>
     <string name="take_photo">Take a photo</string>
     <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="send_comment">Send comment</string>
+    <string name="comment_placeholder">Comment…</string>
 
 </resources>

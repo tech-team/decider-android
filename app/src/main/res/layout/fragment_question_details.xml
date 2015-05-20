@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -18,18 +18,65 @@
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         />
 
-    <org.techteam.decider.gui.views.QuestionView
-        android:id="@+id/post_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/comments_recycler"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:overScrollMode="never"
-        android:background="@color/cards_background_color"/>
+        android:layout_below="@id/post_details_toolbar">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <org.techteam.decider.gui.views.QuestionView
+                android:id="@+id/post_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/comments_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:overScrollMode="never"
+                android:background="@color/cards_background_color"/>
+
+            <!-- Over-scroll for comment edit and button below -->
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="80dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:paddingTop="8dp"
+        android:background="@android:color/white"
+        >
+
+        <EditText
+            android:id="@+id/comment_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/comment_placeholder"
+            android:layout_weight="1"
+            android:inputType="text|textMultiLine"
+            android:minHeight="48dp"
+            android:maxLength="1000"
+            android:maxLines="4" />
+
+        <ImageButton
+            android:id="@+id/comment_send"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/comment_send_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:contentDescription="@string/send_comment" />
+
+    </LinearLayout>
+</RelativeLayout>

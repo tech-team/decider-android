@@ -5,10 +5,17 @@ import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.method.CharacterPickerDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
+
+import com.android.camera.gallery.ImageListUber;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
@@ -25,6 +32,9 @@ public class QuestionDetailsFragment extends Fragment {
     private View rootView;
     // children
     private QuestionView questionView;
+    private RecyclerView commentsView;
+    private EditText commentEdit;
+    private ImageButton sendCommentButton;
 
     @Override
     public void setArguments(Bundle args) {
@@ -63,10 +73,31 @@ public class QuestionDetailsFragment extends Fragment {
 
         // find children
         questionView = (QuestionView) rootView.findViewById(R.id.post_view);
+        commentsView = (RecyclerView) rootView.findViewById(R.id.comments_recycler);
+
+        commentEdit = (EditText) rootView.findViewById(R.id.comment_edit);
+        sendCommentButton = (ImageButton) rootView.findViewById(R.id.comment_send);
 
         // set data
         retrieveEntryTask = new RetrieveEntryTask();
         retrieveEntryTask.execute();
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        commentsView.setLayoutManager(layoutManager);
+
+        sendCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendComment();
+            }
+        });
+    }
+
+    private void sendComment() {
+        //TODO: sendComment
+
+        commentEdit.setText("");
     }
 
     class RetrieveEntryTask extends AsyncTask<Void, Void, Void> {
