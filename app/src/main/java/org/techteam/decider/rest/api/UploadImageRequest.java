@@ -1,23 +1,26 @@
 package org.techteam.decider.rest.api;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 
 public class UploadImageRequest {
     public static class Image {
-        private final Uri originalFilename;
-        private final Uri previewFilename;
+        private final String originalFilename;
+        private final String previewFilename;
 
-        public Image(Uri originalFilename, Uri previewFilename) {
+        public Image(String originalFilename, String previewFilename) {
             this.originalFilename = originalFilename;
             this.previewFilename = previewFilename;
         }
 
-        public Uri getOriginalFilename() {
+        public String getOriginalFilename() {
             return originalFilename;
         }
 
-        public Uri getPreviewFilename() {
+        public String getPreviewFilename() {
             return previewFilename;
         }
     }
@@ -35,8 +38,8 @@ public class UploadImageRequest {
     }
 
     public static UploadImageRequest fromBundle(Bundle bundle) {
-        Uri originalImage = bundle.getParcelable(IntentExtras.ORIGINAL_IMAGE);
-        Uri previewImage = bundle.getParcelable(IntentExtras.PREVIEW_IMAGE);
+        String originalImage = bundle.getString(IntentExtras.ORIGINAL_IMAGE);
+        String previewImage = bundle.getString(IntentExtras.PREVIEW_IMAGE);
         return new UploadImageRequest(new Image(originalImage, previewImage));
     }
 

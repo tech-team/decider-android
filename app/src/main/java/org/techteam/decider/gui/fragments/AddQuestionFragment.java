@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
@@ -111,12 +112,12 @@ public class AddQuestionFragment extends Fragment{
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 String uid = data.getString(ImageUploadExtras.UID); // TODO: save this
-                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid);
+                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid);
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Upload failed: " + message);
+                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload failed: " + message);
             }
         });
 
@@ -375,10 +376,19 @@ public class AddQuestionFragment extends Fragment{
     }
 
     private void sendImage(ImageHolder imageHolder) {
-        Uri original = imageHolder.getSource();
-        Uri preview = imageHolder.getCropped();
+        String original = uriToPath(imageHolder.getSource());
+        String preview = uriToPath(imageHolder.getCropped());
         UploadImageRequest.Image image = new UploadImageRequest.Image(original, preview);
         serviceHelper.uploadImage(image, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
+    }
+
+    private String uriToPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(getActivity(), uri, projection, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 
 }

@@ -187,7 +187,7 @@ public class ApiUI {
         BufferedInputStream bufin = null;
 
         try {
-            file = new File(image.getOriginalFilename().getPath());
+            file = new File(image.getOriginalFilename());
             fin = new FileInputStream(file);
             bufin = new BufferedInputStream(fin);
 
