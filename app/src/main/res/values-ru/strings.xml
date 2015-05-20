@@ -51,4 +51,6 @@
     <string name="add_post_choices_label">Варианты ответов:</string>
     <string name="take_photo">Сфотографировать</string>
     <string name="choose_from_gallery">Выбрать из галереи</string>
+    <string name="send_comment">Отправить комментарий</string>
+    <string name="comment_placeholder">Комментарий…</string>
 </resources>

@@ -9,21 +9,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
+import org.techteam.decider.content.entities.CommentEntry;
+import org.techteam.decider.content.entities.CommentEntry;
+import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
-import org.techteam.decider.gui.views.QuestionInteractor;
-import org.techteam.decider.gui.views.QuestionView;
+import org.techteam.decider.gui.fragments.OnCommentEventCallback;
+import org.techteam.decider.gui.views.CommentInteractor;
+import org.techteam.decider.gui.views.CommentView;
+import org.techteam.decider.gui.views.CommentInteractor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostsListAdapter
-        extends CursorRecyclerViewAdapter<PostsListAdapter.ViewHolder> {
-    private final OnQuestionEventCallback eventCallback;
+public class CommentsListAdapter
+        extends CursorRecyclerViewAdapter<CommentsListAdapter.ViewHolder> {
+    private final OnCommentEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private final QuestionInteractor questionInteractor;
-    private List<QuestionEntry> dataset = new ArrayList<>();
+    private final CommentInteractor commentInteractor;
+    private List<CommentEntry> dataset = new ArrayList<>();;
 
     private Context context;
 
@@ -31,12 +34,12 @@ public class PostsListAdapter
     private static final int VIEW_TYPE_FOOTER = 1;
 
 
-    public void setAll(ArrayList<QuestionEntry> entries) {
+    public void setAll(ArrayList<CommentEntry> entries) {
         dataset.clear();
         dataset.addAll(entries);
     }
 
-    public void addAll(ArrayList<QuestionEntry> entries) {
+    public void addAll(ArrayList<CommentEntry> entries) {
         dataset.addAll(entries);
     }
 
@@ -50,35 +53,35 @@ public class PostsListAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        public QuestionView questionView;
+        public CommentView commentView;
 
         public ViewHolder(View v) {
             super(v);
 
-            questionView = (QuestionView) v.findViewById(R.id.post_view);
+            commentView = (CommentView) v.findViewById(R.id.comment_view);
         }
     }
 
-    public PostsListAdapter(Cursor contentCursor,
-                            Context context,
-                            OnQuestionEventCallback eventCallback,
-                            OnListScrolledDownCallback scrolledDownCallback,
-                            QuestionInteractor questionInteractor) {
+    public CommentsListAdapter(Cursor contentCursor,
+                               Context context,
+                               OnCommentEventCallback eventCallback,
+                               OnListScrolledDownCallback scrolledDownCallback,
+                               CommentInteractor commentInteractor) {
         super(contentCursor);
         this.context = context;
         this.eventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
-        this.questionInteractor = questionInteractor;
+        this.commentInteractor = commentInteractor;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public PostsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public CommentsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                             int viewType) {
         View v;
         if (viewType == VIEW_TYPE_ENTRY) {
             v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_question_card, parent, false);
+                    .inflate(R.layout.fragment_comment_card, parent, false);
         } else {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_loading_entry, parent, false);
@@ -94,13 +97,13 @@ public class PostsListAdapter
             return;
         }
 
-        QuestionEntry entry = QuestionEntry.fromCursor(cursor);
+        CommentEntry entry = CommentEntry.fromCursor(cursor);
 
 
-        holder.questionView.reuse(entry, questionInteractor);
+        holder.commentView.reuse(entry, commentInteractor);
     }
 
-    private void share(Context context, QuestionEntry entry) {
+    private void share(Context context, CommentEntry entry) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, formatEntryForSharing(context, entry));
@@ -108,11 +111,11 @@ public class PostsListAdapter
         context.startActivity(sendIntent);
     }
 
-    public QuestionEntry get(int position) {
+    public CommentEntry get(int position) {
         return dataset.get(position);
     }
 
-    private String formatEntryForSharing(Context context, QuestionEntry entry) {
+    private String formatEntryForSharing(Context context, CommentEntry entry) {
         StringBuilder sb = new StringBuilder();
 
         String delimiter = "\n";
@@ -141,7 +144,7 @@ public class PostsListAdapter
 
     @Override
     public int getItemViewType(int position) {
-        if (position < PostsListAdapter.this.getItemCount() - 1)
+        if (position < CommentsListAdapter.this.getItemCount() - 1)
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
