@@ -57,6 +57,11 @@ public class UrlParams implements Iterable<UrlParams.UrlParam<?>> {
         return this;
     }
 
+    public UrlParams add(String key, Object value) {
+        params.add(new UrlParam<>(key, value));
+        return this;
+    }
+
     public UrlParams add(UrlParam p) {
         params.add(p);
         return this;

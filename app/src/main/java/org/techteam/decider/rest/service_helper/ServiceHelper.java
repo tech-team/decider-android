@@ -14,6 +14,7 @@ import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.PendingOperation;
+import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service.DeciderService;
 import org.techteam.decider.rest.service.ServiceIntentBuilder;
 import org.techteam.decider.util.CallbackHelper;
@@ -77,10 +78,10 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.LOGIN_REGISTER, requestId));
     }
 
-    public void uploadImage(Bitmap image, ServiceCallback cb) {
+    public void uploadImage(UploadImageRequest.Image image, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.UPLOAD_IMAGE + "__" + "123123123123123123123123"; // TODO
+        String requestId = OperationType.UPLOAD_IMAGE + "__" + image.getOriginalFilename().toString().replace("_", "");
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {

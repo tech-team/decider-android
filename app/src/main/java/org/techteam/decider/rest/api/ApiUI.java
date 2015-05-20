@@ -6,10 +6,14 @@ import android.content.SharedPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.net2.HttpDownloader;
+import org.techteam.decider.net2.HttpFile;
 import org.techteam.decider.net2.HttpRequest;
 import org.techteam.decider.net2.HttpResponse;
 import org.techteam.decider.net2.UrlParams;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -175,16 +179,33 @@ public class ApiUI {
     }
 
     public JSONObject uploadImage(UploadImageRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
-        // TODO
-//        UrlParams params = new UrlParams();
-//        params.add("data", request.getQuestionDataJson());
+        UrlParams params = new UrlParams();
+        UploadImageRequest.Image image = request.getImage();
 
-//        HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
-//        if (response.getBody() == null) {
-//            return null;
-//        }
-//        return new JSONObject(response.getBody());
-        return null;
+        File file = null;
+        FileInputStream fin = null;
+        BufferedInputStream bufin = null;
+
+        try {
+            file = new File(image.getOriginalFilename().getPath());
+            fin = new FileInputStream(file);
+            bufin = new BufferedInputStream(fin);
+
+            params.add("image", new HttpFile(bufin, file.getName()));
+
+            HttpResponse response = makeProtectedPostCall(UploadImageRequest.URL, params);
+            if (response.getBody() == null) {
+                return null;
+            }
+            return new JSONObject(response.getBody());
+        } finally {
+            if (bufin != null) {
+                bufin.close();
+            }
+            if (fin != null) {
+                fin.close();
+            }
+        }
     }
 
     private void saveToken(String accessToken, int expires, String refreshToken) {

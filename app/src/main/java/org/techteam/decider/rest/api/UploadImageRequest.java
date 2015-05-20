@@ -1,27 +1,46 @@
 package org.techteam.decider.rest.api;
 
-import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
 public class UploadImageRequest {
-    private final Bitmap image;
+    public static class Image {
+        private final Uri originalFilename;
+        private final Uri previewFilename;
 
-    public static final String URL = "questions";
+        public Image(Uri originalFilename, Uri previewFilename) {
+            this.originalFilename = originalFilename;
+            this.previewFilename = previewFilename;
+        }
 
-    public class IntentExtras {
-        public static final String IMAGE = "IMAGE";
+        public Uri getOriginalFilename() {
+            return originalFilename;
+        }
+
+        public Uri getPreviewFilename() {
+            return previewFilename;
+        }
     }
 
-    public UploadImageRequest(Bitmap image) {
+    public static final String URL = "images";
+    private final Image image;
+
+    public class IntentExtras {
+        public static final String ORIGINAL_IMAGE = "ORIGINAL_IMAGE";
+        public static final String PREVIEW_IMAGE = "PREVIEW_IMAGE";
+    }
+
+    public UploadImageRequest(Image image) {
         this.image = image;
     }
 
     public static UploadImageRequest fromBundle(Bundle bundle) {
-        Bitmap image = bundle.getParcelable(IntentExtras.IMAGE);
-        return new UploadImageRequest(image);
+        Uri originalImage = bundle.getParcelable(IntentExtras.ORIGINAL_IMAGE);
+        Uri previewImage = bundle.getParcelable(IntentExtras.PREVIEW_IMAGE);
+        return new UploadImageRequest(new Image(originalImage, previewImage));
     }
 
-    public Bitmap getImage() {
+    public Image getImage() {
         return image;
     }
 }

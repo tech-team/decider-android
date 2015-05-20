@@ -62,9 +62,10 @@ public final class ServiceIntentBuilder {
     }
 
 
-    public static Intent uploadImageIntent(Context context, String requestId, Bitmap image) {
+    public static Intent uploadImageIntent(Context context, String requestId, UploadImageRequest.Image image) {
         Intent intent = getBasicIntent(context, requestId, OperationType.UPLOAD_IMAGE);
-        intent.putExtra(UploadImageRequest.IntentExtras.IMAGE, image);
+        intent.putExtra(UploadImageRequest.IntentExtras.ORIGINAL_IMAGE, image.getOriginalFilename());
+        intent.putExtra(UploadImageRequest.IntentExtras.PREVIEW_IMAGE, image.getPreviewFilename());
         return intent;
     }
 }

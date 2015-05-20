@@ -143,8 +143,8 @@ public class HttpDownloader {
         Class<?> c = p.getValue().getClass();
         if (c == String.class) {
             addPart(out, boundary, p.getKey(), (String) p.getValue());
-        } else if (c == InputStream.class) {
-            addPart(out, boundary, p.getKey(), (InputStream) p.getValue());
+        } else if (c == HttpFile.class) {
+            addPart(out, boundary, p.getKey(), (HttpFile) p.getValue());
         } else {
             System.err.println("Unsupported UrlParam value type: " + c.toString());
         }
@@ -158,8 +158,11 @@ public class HttpDownloader {
         out.write(value.getBytes());
     }
 
-    private static void addPart(OutputStream out, String boundary, final String key, final InputStream fin) throws IOException {
-        String filename = UUID.randomUUID().toString() + ".jpg";
+    private static void addPart(OutputStream out, String boundary, final String key, HttpFile httpFile) throws IOException {
+        addPart(out, boundary, key, httpFile.getFilename(), httpFile.getInputStream());
+    }
+
+    private static void addPart(OutputStream out, String boundary, final String key, final String filename, final InputStream fin) throws IOException {
         addPart(out, boundary, key, filename, fin, "application/octet-stream");
     }
 
