@@ -2,6 +2,7 @@ package org.techteam.decider.rest.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
@@ -11,6 +12,7 @@ import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.RegisterRequest;
+import org.techteam.decider.rest.api.UploadImageRequest;
 
 import java.util.Collection;
 
@@ -59,17 +61,10 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
-//
-//    public static Intent voteBashIntent(Context context, String requestId, int entryPosition, String entryId, String rating, int direction) {
-//        Intent intent = new Intent(context, DeciderService.class);
-//        intent.putExtra(DeciderService.IntentExtras.REQUEST_ID, requestId);
-//        intent.putExtra(DeciderService.IntentExtras.OPERATION, OperationType.BASH_VOTE.toString());
-//
-//        intent.putExtra(DeciderService.IntentExtras.BashVoteOperation.ENTRY_POSITION, entryPosition);
-//        intent.putExtra(DeciderService.IntentExtras.BashVoteOperation.ENTRY_ID, entryId);
-//        intent.putExtra(DeciderService.IntentExtras.BashVoteOperation.RATING, rating);
-//        intent.putExtra(DeciderService.IntentExtras.BashVoteOperation.DIRECTION, direction);
-//        return intent;
-//    }
 
+    public static Intent uploadImageIntent(Context context, String requestId, Bitmap image) {
+        Intent intent = getBasicIntent(context, requestId, OperationType.UPLOAD_IMAGE);
+        intent.putExtra(UploadImageRequest.IntentExtras.IMAGE, image);
+        return intent;
+    }
 }

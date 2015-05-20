@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
@@ -74,6 +75,20 @@ public class ServiceHelper {
         }
 
         pendingOperations.put(requestId, new PendingOperation(OperationType.REGISTER, requestId));
+    }
+
+    public void uploadImage(Bitmap image, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.UPLOAD_IMAGE + "__" + "123123123123123123123123"; // TODO
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, requestId, image);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.UPLOAD_IMAGE, requestId));
     }
 
     public void createQuestion(QuestionData questionData, ServiceCallback cb) {

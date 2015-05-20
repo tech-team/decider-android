@@ -170,6 +170,19 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
+    public JSONObject uploadImage(UploadImageRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+        // TODO
+//        UrlParams params = new UrlParams();
+//        params.add("data", request.getQuestionDataJson());
+
+//        HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
+//        if (response.getBody() == null) {
+//            return null;
+//        }
+//        return new JSONObject(response.getBody());
+        return null;
+    }
+
     private void saveToken(String accessToken, int expires, String refreshToken) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("access_token", accessToken);

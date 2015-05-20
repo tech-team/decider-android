@@ -5,7 +5,7 @@ public enum OperationType {
     GET_CATEGORIES,
     REGISTER,
     LOGIN,
-    CREATE_QUESTION;
+    CREATE_QUESTION, UPLOAD_IMAGE;
 
     private static OperationType[] cachedValues = values();
 
