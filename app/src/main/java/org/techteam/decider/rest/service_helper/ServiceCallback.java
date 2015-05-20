@@ -17,12 +17,7 @@ public interface ServiceCallback {
         public static final String COUNT = "COUNT";
     }
 
-    class LoginRegisterExtras {
-        public static final String STATUS = "STATUS";
+    class ImageUploadExtras {
+        public static final String UID = "UID";
     }
-
-//    class BashVoteExtras {
-//        public static final String ENTRY_ID = "ENTRY_ID";
-//        public static final String ENTRY_POSITION = "ENTRY_POSITION";
-//    }
 }

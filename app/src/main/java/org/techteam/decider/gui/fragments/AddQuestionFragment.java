@@ -35,6 +35,9 @@ import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.views.WrappingViewPager;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
@@ -62,7 +65,6 @@ public class AddQuestionFragment extends Fragment{
     // categories
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
     private SimpleCursorAdapter categoriesSpinnerAdapter;
-    private ServiceHelper serviceHelper;
 
     // question types
     private static final int PAGES_COUNT = 2;
@@ -85,6 +87,13 @@ public class AddQuestionFragment extends Fragment{
 
     private ImageHolder currentImageHolder;
 
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ServiceHelper serviceHelper;
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add_question, container, false);
@@ -97,6 +106,31 @@ public class AddQuestionFragment extends Fragment{
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
+
+        callbacksKeeper.addCallback(OperationType.UPLOAD_IMAGE, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                String uid = data.getString(ImageUploadExtras.UID); // TODO: save this
+                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid);
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Upload failed: " + message);
+            }
+        });
+
+        callbacksKeeper.addCallback(OperationType.CREATE_QUESTION, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question ok");
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question failed: " + message);
+            }
+        });
     }
 
     @Override
@@ -165,6 +199,20 @@ public class AddQuestionFragment extends Fragment{
         mQuestionTypeTabLayout = (SlidingTabLayout) v.findViewById(R.id.question_type_pager_tabs);
         mQuestionTypeTabLayout.setDistributeEvenly(true);
         mQuestionTypeTabLayout.setViewPager(mQuestionTypePager);
+
+        if (savedInstanceState == null) {
+
+        } else {
+            serviceHelper.restoreOperationsState(savedInstanceState,
+                    BundleKeys.PENDING_OPERATIONS,
+                    callbacksKeeper);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     private boolean createPost() {
@@ -327,7 +375,10 @@ public class AddQuestionFragment extends Fragment{
     }
 
     private void sendImage(ImageHolder imageHolder) {
-        //TODO: send image and save uid
+        Uri original = imageHolder.getSource();
+        Uri preview = imageHolder.getCropped();
+        UploadImageRequest.Image image = new UploadImageRequest.Image(original, preview);
+        serviceHelper.uploadImage(image, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
     }
 
 }

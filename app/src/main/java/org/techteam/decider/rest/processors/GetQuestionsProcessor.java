@@ -42,8 +42,11 @@ public class GetQuestionsProcessor extends Processor {
                 QuestionEntry.deleteAll();
             }
 
-            if (!response.getString("status").equalsIgnoreCase("ok")) {
+            String status = response.getString("status");
+            if (!status.equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
+                transactionError(operationType, requestId);
+                cb.onError("status is not ok. status = " + status, result);
                 return;
             }
 

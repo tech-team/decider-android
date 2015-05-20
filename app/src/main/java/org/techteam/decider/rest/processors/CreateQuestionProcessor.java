@@ -37,8 +37,11 @@ public class CreateQuestionProcessor extends Processor {
             JSONObject response = apiUI.createQuestion(request);
             System.out.println(response);
 
-            if (!response.getString("status").equalsIgnoreCase("ok")) {
+            String status = response.getString("status");
+            if (!status.equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
+                transactionError(operationType, requestId);
+                cb.onError("status is not ok. status = " + status, result);
                 return;
             }
 
@@ -55,19 +58,12 @@ public class CreateQuestionProcessor extends Processor {
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-            return;
-        } catch (IOException e) {
+        } catch (IOException | JSONException | TokenRefreshFailException | InvalidAccessTokenException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-        } catch (TokenRefreshFailException e) {
-            e.printStackTrace();
+            transactionError(operationType, requestId);
+            cb.onError(null, result);
         }
 
-        transactionError(operationType, requestId);
-        cb.onError(null, result);
     }
 
     @Override

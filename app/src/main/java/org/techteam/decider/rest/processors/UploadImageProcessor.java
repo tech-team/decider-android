@@ -13,6 +13,7 @@ import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.api.UploadImageRequest;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
@@ -34,37 +35,41 @@ public class UploadImageProcessor extends Processor {
             JSONObject response = apiUI.uploadImage(request);
             System.out.println(response);
 
-            if (!response.getString("status").equalsIgnoreCase("ok")) {
+            String status = response.getString("status");
+            if (!status.equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
+                transactionError(operationType, requestId);
+                cb.onError("status is not ok. status = " + status, result);
                 return;
             }
 
 //            ActiveAndroid.beginTransaction();
 //            try {
-//                JSONObject data = response.getJSONObject("data");
 //                QuestionEntry entry = QuestionEntry.fromJson(data);
 //                entry.saveTotal();
 //                ActiveAndroid.setTransactionSuccessful();
-//
+
 //            } finally {
 //                ActiveAndroid.endTransaction();
 //            }
 
+            JSONObject data = response.getJSONObject("data");
+            String uid = data.getString("uid");
+            if (uid == null) {
+                transactionError(operationType, requestId);
+                cb.onError("Received a null image uid", result);
+                return;
+            }
+            result.putString(ServiceCallback.ImageUploadExtras.UID, uid);
+
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-            return;
-        } catch (IOException e) {
+        } catch (IOException | JSONException | InvalidAccessTokenException | TokenRefreshFailException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-        } catch (TokenRefreshFailException e) {
-            e.printStackTrace();
+            transactionError(operationType, requestId);
+            cb.onError(e.getMessage(), result);
         }
 
-        transactionError(operationType, requestId);
-        cb.onError(null, result);
     }
 
     @Override

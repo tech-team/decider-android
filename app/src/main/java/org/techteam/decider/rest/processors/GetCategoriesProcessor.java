@@ -36,12 +36,16 @@ public class GetCategoriesProcessor extends Processor {
             System.out.println(response);
 
             if (response == null) {
+                transactionError(operationType, requestId);
                 cb.onError("No categories found", result);
                 return;
             }
 
-            if (!response.getString("status").equalsIgnoreCase("ok")) {
+            String status = response.getString("status");
+            if (!status.equalsIgnoreCase("ok")) {
                 System.err.println("not ok!");
+                transactionError(operationType, requestId);
+                cb.onError("status is not ok. status = " + status, result);
                 return;
             }
 
@@ -65,18 +69,11 @@ public class GetCategoriesProcessor extends Processor {
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-            return;
-        } catch (IOException e) {
+        } catch (IOException | JSONException | TokenRefreshFailException | InvalidAccessTokenException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-        } catch (TokenRefreshFailException e) {
-            e.printStackTrace();
+            transactionError(operationType, requestId);
+            cb.onError(null, result);
         }
 
-        transactionError(operationType, requestId);
-        cb.onError(null, result);
     }
 }

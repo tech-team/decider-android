@@ -2,7 +2,7 @@ package org.techteam.decider.content.question;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 
-public class PictureQuestionData extends QuestionData {
+public class ImageQuestionData extends QuestionData {
     public static class Picture {
         private String pictureId;
         private String text;
@@ -24,7 +24,7 @@ public class PictureQuestionData extends QuestionData {
     private Picture picture1;
     private Picture picture2;
 
-    public PictureQuestionData(String text, CategoryEntry categoryEntry, boolean anonymous, Picture picture1, Picture picture2) {
+    public ImageQuestionData(String text, CategoryEntry categoryEntry, boolean anonymous, Picture picture1, Picture picture2) {
         super(text, categoryEntry, anonymous);
         this.picture1 = picture1;
         this.picture2 = picture2;
