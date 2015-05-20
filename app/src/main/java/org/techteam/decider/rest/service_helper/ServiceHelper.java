@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.PendingOperation;
@@ -73,6 +74,20 @@ public class ServiceHelper {
         }
 
         pendingOperations.put(requestId, new PendingOperation(OperationType.REGISTER, requestId));
+    }
+
+    public void createQuestion(QuestionData questionData, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.CREATE_QUESTION + "__" + questionData.createFingerprint();
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.createQuestionIntent(context, requestId, questionData);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.CREATE_QUESTION, requestId));
     }
 
     public void saveOperationsState(Bundle outState, String key) {

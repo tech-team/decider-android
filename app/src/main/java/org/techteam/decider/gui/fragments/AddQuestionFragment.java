@@ -144,20 +144,7 @@ public class AddQuestionFragment extends Fragment{
         // setup categories list
         Context context = v.getContext();
         serviceHelper = new ServiceHelper(context);
-        serviceHelper.getCategories(
-                v.getResources().getConfiguration().locale.toString(),
-                new ServiceCallback() {
-                    @Override
-                    public void onSuccess(String operationId, Bundle data) {
-                        getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
-                    }
-
-                    @Override
-                    public void onError(String operationId, Bundle data, String message) {
-
-                    }
-                }
-        );
+        getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
 
         categoriesSpinnerAdapter = new SimpleCursorAdapter(
                 context,
