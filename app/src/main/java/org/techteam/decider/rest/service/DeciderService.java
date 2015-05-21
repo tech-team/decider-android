@@ -8,12 +8,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
+import org.techteam.decider.rest.api.GetCommentsRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.RegisterRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
+import org.techteam.decider.rest.processors.GetCommentsProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
 import org.techteam.decider.rest.processors.PollVoteProcessor;
 import org.techteam.decider.rest.processors.Processor;
@@ -99,6 +101,11 @@ public class DeciderService extends IntentService {
             case POLL_VOTE: {
                 PollVoteRequest request = PollVoteRequest.fromBundle(extras);
                 processor = new PollVoteProcessor(getBaseContext(), request);
+                break;
+            }
+            case GET_COMMENTS: {
+                GetCommentsRequest request = GetCommentsRequest.fromBundle(extras);
+                processor = new GetCommentsProcessor(getBaseContext(), request);
                 break;
             }
 

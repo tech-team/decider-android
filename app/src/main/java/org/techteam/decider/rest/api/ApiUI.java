@@ -185,6 +185,18 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
+    public JSONObject getComments(GetCommentsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        UrlParams params = new UrlParams();
+        params.add("limit", request.getLimit());
+        params.add("offset", request.getOffset());
+
+        HttpResponse response = makeProtectedGetCall(GetCommentsRequest.URL, params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException {
         String accessToken = getAccessToken();
         if (accessToken == null) {

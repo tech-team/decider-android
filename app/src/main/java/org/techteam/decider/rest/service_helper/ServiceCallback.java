@@ -27,4 +27,10 @@ public interface ServiceCallback {
         public static final String POLL_ITEM_ID = "POLL_ITEM_ID";
         public static final String VOTES_COUNT = "VOTES_COUNT";
     }
+
+    class GetCommentsExtras {
+        public static final String FEED_FINISHED = "FEED_FINISHED";
+        public static final String COUNT = "COUNT";
+        public static final String LOAD_INTENTION = "LOAD_INTENTION";
+    }
 }
