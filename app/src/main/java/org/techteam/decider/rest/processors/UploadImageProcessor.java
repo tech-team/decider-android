@@ -53,6 +53,7 @@ public class UploadImageProcessor extends Processor {
 //                ActiveAndroid.endTransaction();
 //            }
 
+
             JSONObject data = response.getJSONObject("data");
             String uid = data.getString("uid");
             if (uid == null) {
@@ -75,6 +76,7 @@ public class UploadImageProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
+        data.putInt(ServiceCallback.ImageUploadExtras.IMAGE_ORDINAL_ID, request.getImageOrdinalId());
         return data;
     }
 }

@@ -80,14 +80,14 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.LOGIN_REGISTER, requestId));
     }
 
-    public void uploadImage(UploadImageRequest.Image image, ServiceCallback cb) {
+    public void uploadImage(UploadImageRequest.Image image, int imageOrdinalId, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.UPLOAD_IMAGE + "__" + image.getOriginalFilename().replace("__", "");
+        String requestId = OperationType.UPLOAD_IMAGE + "__" + imageOrdinalId + "__" + image.getOriginalFilename().replace("__", "");
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, requestId, image);
+            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, requestId, image, imageOrdinalId);
             context.startService(intent);
         }
 

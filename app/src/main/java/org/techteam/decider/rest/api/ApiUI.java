@@ -33,120 +33,29 @@ public class ApiUI {
 
     public static final String REFRESH_TOKEN_URL = "refresh_token";
 
+    private class PrefsKeys {
+        public static final String PREFS_NAME = "TOKENS_PREFS";
+        public static final String ACCESS_TOKEN = "access_token";
+        public static final String REFRESH_TOKEN = "refresh_token";
+        public static final String EXPIRES = "expires";
+    }
+
     public ApiUI(Context context) {
-        String prefName = "TOKENS_PREFS"; // TODO
         this.context = context;
-        prefs = this.context.getSharedPreferences(prefName, Context.MODE_PRIVATE);
+        prefs = this.context.getSharedPreferences(PrefsKeys.PREFS_NAME, Context.MODE_PRIVATE);
 //        saveToken("0atkeWZqnRq9GVxHNCCtJpOevUtrrN", 36000, "Z77gke1xm6xJ5xaAs7mTUB9fSm1RpO");
     }
 
     public String getAccessToken() {
-        String key = "access_token"; // TODO
-        return prefs.getString(key, "ACCESS_TOKEN");
+        return prefs.getString(PrefsKeys.ACCESS_TOKEN, "ACCESS_TOKEN");
     }
 
     public String getRefreshToken() {
-        String key = "refresh_token"; // TODO
-        return prefs.getString(key, "REFRESH_TOKEN");
+        return prefs.getString(PrefsKeys.REFRESH_TOKEN, "REFRESH_TOKEN");
     }
 
-    public String getExpirationDate() {
-        String keyExpires = "expires"; // TODO
-        String keyAddedDate = "got_date"; // TODO
-//        return prefs.getString(key, null);
-        return null;
-    }
-
-    public HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
-
-        String accessToken = getAccessToken();
-        if (accessToken == null) {
-            throw new InvalidAccessTokenException();
-        }
-        params.add("access_token", accessToken);
-        httpRequest.setParams(params);
-
-        HttpResponse httpResponse = HttpDownloader.httpGet(httpRequest);
-        int code = httpResponse.getResponseCode();
-
-        if (code == HttpURLConnection.HTTP_FORBIDDEN) {
-            refreshToken();
-            httpResponse = HttpDownloader.httpGet(httpRequest);
-            code = httpResponse.getResponseCode();
-            if (code != HttpURLConnection.HTTP_FORBIDDEN) {
-                return httpResponse;
-            }
-            throw new InvalidAccessTokenException();
-        }
-        if (code == HttpURLConnection.HTTP_OK) {
-            return httpResponse;
-        }
-        return null;
-    }
-
-    public HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
-
-        String accessToken = getAccessToken();
-        if (accessToken == null) {
-            throw new InvalidAccessTokenException("No access token found");
-        }
-        params.add("access_token", accessToken);
-        httpRequest.setParams(params);
-
-        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
-        int code = httpResponse.getResponseCode();
-
-        if (code == HttpURLConnection.HTTP_FORBIDDEN) {
-            refreshToken();
-            httpResponse = HttpDownloader.httpPost(httpRequest);
-            code = httpResponse.getResponseCode();
-            if (code != HttpURLConnection.HTTP_FORBIDDEN) {
-                return httpResponse;
-            }
-            throw new InvalidAccessTokenException("Access token is probably expired");
-        }
-        return httpResponse;
-    }
-
-    public HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
-
-        String accessToken = getAccessToken();
-        if (accessToken == null) {
-            throw new InvalidAccessTokenException("No access token found");
-        }
-        params.add("access_token", accessToken);
-        httpRequest.setParams(params);
-
-        HttpResponse httpResponse = HttpDownloader.httpMultipartPost(httpRequest);
-        int code = httpResponse.getResponseCode();
-
-        if (code == HttpURLConnection.HTTP_FORBIDDEN) {
-            refreshToken();
-            httpResponse = HttpDownloader.httpPost(httpRequest);
-            code = httpResponse.getResponseCode();
-            if (code != HttpURLConnection.HTTP_FORBIDDEN) {
-                return httpResponse;
-            }
-            throw new InvalidAccessTokenException("Access token is probably expired");
-        }
-        return httpResponse;
-    }
-
-
-    public HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
-        httpRequest.setParams(params);
-
-        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
-        int code = httpResponse.getResponseCode();
-
-        if (code < HttpURLConnection.HTTP_BAD_REQUEST) {
-            return httpResponse;
-        }
-        return null;
+    public int getExpires() {
+        return prefs.getInt(PrefsKeys.EXPIRES, 0);
     }
 
     public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
@@ -159,7 +68,7 @@ public class ApiUI {
         }
 
         HttpResponse response = makeProtectedGetCall(GetQuestionsRequest.URL, params);
-        if (response.getBody() == null) {
+        if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
@@ -182,12 +91,16 @@ public class ApiUI {
         params.add("password", request.getPassword());
 
         HttpResponse response = makeAuthPostCall(RegisterRequest.URL, params);
-        if (response.getBody() == null) {
+        if (response == null || response.getBody() == null) {
             return null;
         }
+        int code = response.getResponseCode();
+
         JSONObject obj = new JSONObject(response.getBody());
-        JSONObject objData = obj.getJSONObject("data");
-        saveToken(objData);
+        if (code < 400) {
+            JSONObject objData = obj.getJSONObject("data");
+            saveToken(objData);
+        }
         return obj;
     }
 
@@ -197,7 +110,7 @@ public class ApiUI {
         params.add("data", data.toJson());
 
         HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
-        if (response.getBody() == null) {
+        if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
@@ -226,7 +139,7 @@ public class ApiUI {
             params.add("preview", new HttpFile(previewBufin, previewFile.getName()));
 
             HttpResponse response = makeProtectedMultipartPostCall(UploadImageRequest.URL, params);
-            if (response.getBody() == null) {
+            if (response == null || response.getBody() == null) {
                 return null;
             }
             return new JSONObject(response.getBody());
@@ -247,11 +160,81 @@ public class ApiUI {
         }
     }
 
+    private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException {
+        String accessToken = getAccessToken();
+        if (accessToken == null) {
+            throw new InvalidAccessTokenException();
+        }
+        params.add("access_token", accessToken);
+        httpRequest.setParams(params);
+        return httpRequest;
+    }
+
+    private HttpResponse checkResponse(HttpResponse httpResponse, HttpRequest httpRequest) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+        if (httpResponse == null) {
+            return null;
+        }
+
+        int code = httpResponse.getResponseCode();
+
+        if (code == HttpURLConnection.HTTP_FORBIDDEN) {
+            refreshToken();
+            httpResponse = HttpDownloader.httpGet(httpRequest);
+            code = httpResponse.getResponseCode();
+            if (code != HttpURLConnection.HTTP_FORBIDDEN) {
+                return httpResponse;
+            }
+            throw new InvalidAccessTokenException();
+        }
+        if (code == HttpURLConnection.HTTP_OK) {
+            return httpResponse;
+        }
+        return null;
+    }
+
+    private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        prepareHttpRequest(httpRequest, params);
+
+        HttpResponse httpResponse = HttpDownloader.httpGet(httpRequest);
+        httpResponse = checkResponse(httpResponse, httpRequest);
+        return httpResponse;
+    }
+
+    private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        prepareHttpRequest(httpRequest, params);
+
+        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
+        httpResponse = checkResponse(httpResponse, httpRequest);
+        return httpResponse;
+    }
+
+    private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        prepareHttpRequest(httpRequest, params);
+
+        HttpResponse httpResponse = HttpDownloader.httpMultipartPost(httpRequest);
+        httpResponse = checkResponse(httpResponse, httpRequest);
+        return httpResponse;
+    }
+
+
+    private HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        httpRequest.setParams(params);
+
+        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
+        int code = httpResponse.getResponseCode();
+
+        return httpResponse;
+    }
+
     private void saveToken(String accessToken, int expires, String refreshToken) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("access_token", accessToken);
-        editor.putInt("expires", expires);
-        editor.putString("refresh_token", refreshToken);
+        editor.putString(PrefsKeys.ACCESS_TOKEN, accessToken);
+        editor.putInt(PrefsKeys.EXPIRES, expires);
+        editor.putString(PrefsKeys.REFRESH_TOKEN, refreshToken);
         editor.apply();
     }
 
@@ -268,13 +251,10 @@ public class ApiUI {
             String body = response.getBody();
             JSONObject resp = new JSONObject(body);
             JSONObject data = resp.getJSONObject("data");
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("access_token", data.getString("access_token"));
-            editor.putString("expires", data.getString("expires"));
-            editor.putString("refresh_token", data.getString("refresh_token"));
-            editor.apply();
+            saveToken(data);
+        } else {
+            throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
         }
-        throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
     }
 
     private String resolveApiUrl(String path) {

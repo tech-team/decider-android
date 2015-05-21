@@ -127,12 +127,14 @@ public class AddQuestionFragment extends Fragment {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 String uid = data.getString(ImageUploadExtras.UID); // TODO: save this
-                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid);
+                int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
+                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid + ". OrdinalId = " + imageOrdinalId);
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload failed: " + message);
+                int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
+                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload failed: " + message + ". OrdinalId = " + imageOrdinalId);
             }
         });
 
@@ -435,7 +437,8 @@ public class AddQuestionFragment extends Fragment {
         String original = uriToPath(imageHolder.getSource());
         String preview = imageHolder.getCropped().getPath();
         UploadImageRequest.Image image = new UploadImageRequest.Image(original, preview);
-        serviceHelper.uploadImage(image, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
+        int imageOrdinalId = -1; // TODO: replace with a valid number
+        serviceHelper.uploadImage(image, imageOrdinalId, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
     }
 
     private String uriToPath(Uri uri) {
