@@ -10,8 +10,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
@@ -41,9 +43,15 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.BitmapUtils;
 import org.techteam.decider.util.Toaster;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 public class AddQuestionFragment extends Fragment{
     private MainActivity activity;
@@ -81,10 +89,11 @@ public class AddQuestionFragment extends Fragment{
     private static final int ASPECT_WIDTH = 9;
     private static final int ASPECT_HEIGHT = 16;
 
-    private static final int CROPPED_WIDTH = 800;
+    private static final int CROPPED_WIDTH = 1280;
     private static final int CROPPED_HEIGHT = CROPPED_WIDTH * ASPECT_HEIGHT / ASPECT_WIDTH;
 
     private static final String CROPPED_FILE_EXTENSION = ".cropped.jpg";
+    private static final String FIXED_FILE_EXTENSION = ".fixed.jpg";
 
     private ImageHolder currentImageHolder;
 
@@ -326,10 +335,17 @@ public class AddQuestionFragment extends Fragment{
 
                             if (items[which].equals(fromCamera)) {
                                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+                                File output = new File(dir, UUID.randomUUID() + ".jpeg");
+                                currentImageHolder.setSource(Uri.fromFile(output));
+
+                                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
+
                                 startActivityForResult(takePicture, TAKE_PICTURE);
                             } else if (items[which].equals(fromGallery)) {
                                 Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                        MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                                 startActivityForResult(pickPhoto, SELECT_IMAGE);
                             }
                         }
@@ -342,8 +358,12 @@ public class AddQuestionFragment extends Fragment{
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_IMAGE || requestCode == TAKE_PICTURE) {
-                Uri selectedImage = data.getData();
-                currentImageHolder.setSource(selectedImage);
+                Uri selectedImage = currentImageHolder.getSource();
+
+                if (selectedImage == null) {
+                    selectedImage = fixUri(data.getData());
+                    currentImageHolder.setSource(selectedImage);
+                }
 
                 // generate cropped path
                 File cacheDir = getActivity().getCacheDir();
@@ -383,6 +403,9 @@ public class AddQuestionFragment extends Fragment{
     }
 
     private String uriToPath(Uri uri) {
+        if (!uri.getPath().startsWith("/media")) {
+            return uri.getPath();
+        }
         String[] projection = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(getActivity(), uri, projection, null, null, null);
         Cursor cursor = loader.loadInBackground();
@@ -391,4 +414,52 @@ public class AddQuestionFragment extends Fragment{
         return cursor.getString(column_index);
     }
 
+    private Uri fixUri(Uri uri) {
+        InputStream is = null;
+        FileOutputStream out = null;
+
+//        if (!uri.toString().startsWith("content://com.google.android.apps.photos.content")) {
+//            return uri;
+//        }
+
+        try {
+            is = getActivity().getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapUtils.loadBitmap(is);
+
+            // generate fixed path
+            File cacheDir = getActivity().getCacheDir();
+            File fixedPath = new File(cacheDir,
+                    UUID.randomUUID().toString() + FIXED_FILE_EXTENSION);
+
+            if (fixedPath.exists()) {
+                fixedPath.delete();
+            }
+            out = new FileOutputStream(fixedPath);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+            return Uri.fromFile(fixedPath);
+
+        } catch (FileNotFoundException e) {
+            System.err.println("[fixUri Error]: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
 }

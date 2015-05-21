@@ -20,6 +20,14 @@ public class BitmapUtils {
         return bitmap;
     }
 
+    public static Bitmap loadBitmap(InputStream is) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+
+        return bitmap;
+    }
+
     public static Bitmap prepareBitmap(Context ctx, Uri uri, int reqWidth, int reqHeight) throws IOException {
         ContentResolver cr = ctx.getContentResolver();
         InputStream input = cr.openInputStream(uri);
