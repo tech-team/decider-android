@@ -9,11 +9,13 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.RegisterRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
+import org.techteam.decider.rest.processors.PollVoteProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
 import org.techteam.decider.rest.processors.LoginRegisterProcessor;
@@ -94,6 +96,12 @@ public class DeciderService extends IntentService {
                 processor = new UploadImageProcessor(getBaseContext(), request);
                 break;
             }
+            case POLL_VOTE: {
+                PollVoteRequest request = PollVoteRequest.fromBundle(extras);
+                processor = new PollVoteProcessor(getBaseContext(), request);
+                break;
+            }
+
         }
 
         final Intent cbIntent = new Intent(ServiceHelper.ServiceBroadcastReceiverHelper.NAME);

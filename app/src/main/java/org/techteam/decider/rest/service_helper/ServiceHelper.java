@@ -108,6 +108,20 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.CREATE_QUESTION, requestId));
     }
 
+    public void pollVote(int questionId, int pollItemId, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.POLL_VOTE + "__" + questionId + "__" + pollItemId;
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.pollVoteIntent(context, requestId, questionId, pollItemId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.POLL_VOTE, requestId));
+    }
+
     public void saveOperationsState(Bundle outState, String key) {
         outState.putParcelableArrayList(key, new ArrayList<>(pendingOperations.values()));
     }

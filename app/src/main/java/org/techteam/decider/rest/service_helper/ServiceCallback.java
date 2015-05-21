@@ -21,4 +21,10 @@ public interface ServiceCallback {
         public static final String UID = "UID";
         public static final String IMAGE_ORDINAL_ID = "IMAGE_ORDINAL_ID";
     }
+
+    class PollVoteExtras {
+        public static final String QUESTION_ID = "QUESTION_ID";
+        public static final String POLL_ITEM_ID = "POLL_ITEM_ID";
+        public static final String VOTES_COUNT = "VOTES_COUNT";
+    }
 }

@@ -10,6 +10,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.RegisterRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
 
@@ -66,6 +67,13 @@ public final class ServiceIntentBuilder {
         intent.putExtra(UploadImageRequest.IntentExtras.ORIGINAL_IMAGE, image.getOriginalFilename());
         intent.putExtra(UploadImageRequest.IntentExtras.PREVIEW_IMAGE, image.getPreviewFilename());
         intent.putExtra(UploadImageRequest.IntentExtras.IMAGE_ORDINAL_ID, imageOrdinalId);
+        return intent;
+    }
+
+    public static Intent pollVoteIntent(Context context, String requestId, int questionId, int pollItemId) {
+        Intent intent = getBasicIntent(context, requestId, OperationType.POLL_VOTE);
+        intent.putExtra(PollVoteRequest.IntentExtras.QUESTION_ID, questionId);
+        intent.putExtra(PollVoteRequest.IntentExtras.POLL_ITEM_ID, pollItemId);
         return intent;
     }
 }

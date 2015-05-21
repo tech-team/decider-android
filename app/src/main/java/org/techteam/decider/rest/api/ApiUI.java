@@ -173,6 +173,18 @@ public class ApiUI {
         }
     }
 
+    public JSONObject pollVote(PollVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+        UrlParams params = new UrlParams();
+        params.add("question_id", request.getQuestionId());
+        params.add("poll_item_id", request.getPollItemId());
+
+        HttpResponse response = makeProtectedPostCall(PollVoteRequest.URL, params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException {
         String accessToken = getAccessToken();
         if (accessToken == null) {
