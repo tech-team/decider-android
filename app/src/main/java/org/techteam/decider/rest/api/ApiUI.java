@@ -199,10 +199,7 @@ public class ApiUI {
             }
             throw new InvalidAccessTokenException();
         }
-        if (code == HttpURLConnection.HTTP_OK) {
-            return httpResponse;
-        }
-        return null;
+        return httpResponse;
     }
 
     private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {

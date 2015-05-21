@@ -224,13 +224,13 @@ public class AddQuestionFragment extends Fragment {
         super.onResume();
         activity.lockDrawer();
         serviceHelper.init();
-        serviceHelper.release();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         activity.unlockDrawer();
+        serviceHelper.release();
     }
 
     private QuestionData gatherQuestionData() {
@@ -238,11 +238,6 @@ public class AddQuestionFragment extends Fragment {
         //TODO: get category from spinner's adapter
         //categoriesSpinner
         boolean anonymous = anonymityCheckBox.isChecked();
-
-        //TODO: check current question type
-        // text choices
-        String choice1 = textChoice1.getText().toString();
-        String choice2 = textChoice2.getText().toString();
 
         ImageQuestionData data = new ImageQuestionData();
         data.setPicture1("pic1");  // TODO
