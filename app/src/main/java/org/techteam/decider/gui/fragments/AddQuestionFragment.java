@@ -65,10 +65,6 @@ public class AddQuestionFragment extends Fragment {
     private Spinner categoriesSpinner;
     private CheckBox anonymityCheckBox;
 
-    // text choices
-    private EditText textChoice1;
-    private EditText textChoice2;
-
     // image choices
     private ImageView imageChoice1;
     private ImageView imageChoice2;
@@ -78,12 +74,6 @@ public class AddQuestionFragment extends Fragment {
     // categories
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
     private SimpleCursorAdapter categoriesSpinnerAdapter;
-
-    // question types
-    private static final int PAGES_COUNT = 2;
-    private QuestionTypePagerAdapter mQuestionTypePagerAdapter;
-    private SlidingTabLayout mQuestionTypeTabLayout;
-    private WrappingViewPager mQuestionTypePager;
 
     // image selector stuff
     private static final int TAKE_PICTURE = 1;
@@ -99,6 +89,7 @@ public class AddQuestionFragment extends Fragment {
     private static final String ORIGINAL_FILE_EXTENSION = ".original.jpg";
     private static final String CROPPED_FILE_EXTENSION = ".cropped.jpg";
 
+    private ImageHolder imageHolders[] = new ImageHolder[2];  // left and right
     private ImageHolder currentImageHolder;
 
     private QuestionData currentQuestionData;
@@ -126,8 +117,10 @@ public class AddQuestionFragment extends Fragment {
         callbacksKeeper.addCallback(OperationType.UPLOAD_IMAGE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                String uid = data.getString(ImageUploadExtras.UID); // TODO: save this
+                String uid = data.getString(ImageUploadExtras.UID);
                 int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
+                getImageHolderById(imageOrdinalId).setUid(uid);
+
                 Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid + ". OrdinalId = " + imageOrdinalId);
             }
 
@@ -149,6 +142,16 @@ public class AddQuestionFragment extends Fragment {
                 Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question failed: " + message);
             }
         });
+    }
+
+    private ImageHolder getImageHolderById(int id) {
+        for (ImageHolder imageHolder: imageHolders) {
+            if (imageHolder.getOrdinal() == id) {
+                return imageHolder;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -177,6 +180,9 @@ public class AddQuestionFragment extends Fragment {
 
         imageChoice1.setOnClickListener(new ImageChoiceClickListener(imageChoice1));
         imageChoice2.setOnClickListener(new ImageChoiceClickListener(imageChoice2));
+
+        imageHolders[0] = new ImageHolder(imageChoice1);
+        imageHolders[1] = new ImageHolder(imageChoice2);
 
         createButton = (Button) v.findViewById(R.id.add_post_send_button);
         createButton.setOnClickListener(new View.OnClickListener() {
@@ -235,17 +241,20 @@ public class AddQuestionFragment extends Fragment {
 
     private QuestionData gatherQuestionData() {
         String message = postText.getText().toString();
-        //TODO: get category from spinner's adapter
-        //categoriesSpinner
-        boolean anonymous = anonymityCheckBox.isChecked();
+
+        Cursor categoryCursor = (Cursor) categoriesSpinner.getSelectedItem();
+        CategoryEntry categoryEntry = CategoryEntry.fromCursor(categoryCursor);
+        int categoryUid = categoryEntry.getUid();
+
+        boolean anonymity = anonymityCheckBox.isChecked();
 
         ImageQuestionData data = new ImageQuestionData();
-        data.setPicture1("pic1");  // TODO
-        data.setPicture2("pic2");  // TODO
+        data.setPicture1(imageHolders[0].getUid());
+        data.setPicture2(imageHolders[0].getUid());
 
         data.setText(message);
-        data.setAnonymous(anonymous);
-        data.setCategoryEntryUid(0);
+        data.setAnonymous(anonymity);
+        data.setCategoryEntryUid(categoryUid);
 
         return data;
     }
@@ -280,48 +289,12 @@ public class AddQuestionFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
-            CategoriesLoader contentLoader = (CategoriesLoader) loader;
             categoriesSpinnerAdapter.swapCursor(newCursor);
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             categoriesSpinnerAdapter.swapCursor(null);
-        }
-    }
-
-    //TODO: refactor this out
-    private class QuestionTypePagerAdapter extends PagerAdapter implements ColoredAdapter {
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View child = mQuestionTypePager.getChildAt(position);
-
-            container.setMinimumHeight(child.getHeight());
-
-            return child;
-        }
-
-        @Override
-        public int getCount() {
-            return PAGES_COUNT;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            View child = mQuestionTypePager.getChildAt(position);
-            String title = (String) child.getTag();
-
-            return title;
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == ((View) object);
-        }
-
-        @Override
-        public int getTextColor() {
-            return android.R.color.black;
         }
     }
 
@@ -334,7 +307,7 @@ public class AddQuestionFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            AddQuestionFragment.this.currentImageHolder = new ImageHolder(imageView);
+            AddQuestionFragment.this.currentImageHolder = getImageHolderById(imageView.getId());
 
             final CharSequence fromCamera = getString(R.string.take_photo);
             final CharSequence fromGallery = getString(R.string.choose_from_gallery);
@@ -419,7 +392,7 @@ public class AddQuestionFragment extends Fragment {
         String original = uriToPath(imageHolder.getSource());
         String preview = imageHolder.getCropped().getPath();
         UploadImageRequest.Image image = new UploadImageRequest.Image(original, preview);
-        int imageOrdinalId = -1; // TODO: replace with a valid number
+        int imageOrdinalId = imageHolder.getOrdinal();
         serviceHelper.uploadImage(image, imageOrdinalId, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
     }
 
