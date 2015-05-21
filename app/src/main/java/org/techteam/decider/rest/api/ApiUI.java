@@ -120,7 +120,7 @@ public class ApiUI {
     public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
         QuestionData data = request.getQuestionData();
         UrlParams params = new UrlParams();
-        params.add("data", data.toJson());
+        params.add("data", data.toJson().toString());
 
         HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
         if (response == null || response.getBody() == null) {
