@@ -1,31 +1,74 @@
 package org.techteam.decider.content.question;
 
-import org.techteam.decider.content.entities.CategoryEntry;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public abstract class QuestionData {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public abstract class QuestionData implements Parcelable {
     private String text;
-    private CategoryEntry categoryEntry;
+    private int categoryEntryUid;
     private boolean anonymous;
 
-    public QuestionData(String text, CategoryEntry categoryEntry, boolean anonymous) {
+    public QuestionData() {
+
+    }
+
+    public QuestionData(String text, int categoryEntryUid, boolean anonymous) {
         this.text = text;
-        this.categoryEntry = categoryEntry;
+        this.categoryEntryUid = categoryEntryUid;
         this.anonymous = anonymous;
+    }
+
+    public QuestionData(Parcel in) {
+        text = in.readString();
+        categoryEntryUid = in.readInt();
+        boolean[] b = new boolean[1];
+        in.readBooleanArray(b);
+        anonymous = b[0];
     }
 
     public String getText() {
         return text;
     }
 
-    public CategoryEntry getCategoryEntry() {
-        return categoryEntry;
+    public int getCategoryEntryUid() {
+        return categoryEntryUid;
     }
 
     public boolean isAnonymous() {
         return anonymous;
     }
 
-    public abstract String toJson();
+    public void setText(String text) {
+        this.text = text;
+    }
 
-    public abstract String createFingerprint();
+    public void setCategoryEntryUid(int categoryEntryUid) {
+        this.categoryEntryUid = categoryEntryUid;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject obj = new JSONObject();
+        obj.put("text", text.trim());
+        obj.put("category_id", categoryEntryUid);
+        return obj;
+    }
+
+    public String createFingerprint() {
+        return text.length() + "_" + Integer.toString(categoryEntryUid) + "_" + Boolean.toString(anonymous);
+    }
+
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(text);
+        dest.writeInt(categoryEntryUid);
+        dest.writeBooleanArray(new boolean[] {anonymous});
+    }
 }

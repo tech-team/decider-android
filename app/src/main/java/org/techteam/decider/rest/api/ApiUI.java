@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
 import org.techteam.decider.net2.HttpRequest;
@@ -46,7 +47,7 @@ public class ApiUI {
 
     public String getRefreshToken() {
         String key = "refresh_token"; // TODO
-        return prefs.getString(key, null);
+        return prefs.getString(key, "REFRESH_TOKEN");
     }
 
     public String getExpirationDate() {
@@ -111,7 +112,7 @@ public class ApiUI {
 
     public HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
-//        httpRequest.setUrl("http://192.168.43.25:4000");
+
         String accessToken = getAccessToken();
         if (accessToken == null) {
             throw new InvalidAccessTokenException("No access token found");
@@ -191,8 +192,9 @@ public class ApiUI {
     }
 
     public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+        QuestionData data = request.getQuestionData();
         UrlParams params = new UrlParams();
-        params.add("data", request.getQuestionDataJson());
+        params.add("data", data.toJson());
 
         HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
         if (response.getBody() == null) {
@@ -205,16 +207,23 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         UploadImageRequest.Image image = request.getImage();
 
-        File file = null;
-        FileInputStream fin = null;
-        BufferedInputStream bufin = null;
+        FileInputStream originalFin = null;
+        BufferedInputStream originalBufin = null;
+
+        FileInputStream previewFin = null;
+        BufferedInputStream previewBufin = null;
 
         try {
-            file = new File(image.getOriginalFilename());
-            fin = new FileInputStream(file);
-            bufin = new BufferedInputStream(fin);
+            File originalFile = new File(image.getOriginalFilename());
+            originalFin = new FileInputStream(originalFile);
+            originalBufin = new BufferedInputStream(originalFin);
 
-            params.add("image", new HttpFile(bufin, file.getName()));
+            File previewFile = new File(image.getPreviewFilename());
+            previewFin = new FileInputStream(previewFile);
+            previewBufin = new BufferedInputStream(previewFin);
+
+            params.add("image", new HttpFile(originalBufin, originalFile.getName()));
+            params.add("preview", new HttpFile(previewBufin, previewFile.getName()));
 
             HttpResponse response = makeProtectedMultipartPostCall(UploadImageRequest.URL, params);
             if (response.getBody() == null) {
@@ -222,11 +231,18 @@ public class ApiUI {
             }
             return new JSONObject(response.getBody());
         } finally {
-            if (bufin != null) {
-                bufin.close();
+            if (originalBufin != null) {
+                originalBufin.close();
             }
-            if (fin != null) {
-                fin.close();
+            if (originalFin != null) {
+                originalFin.close();
+            }
+
+            if (previewBufin != null) {
+                previewBufin.close();
+            }
+            if (previewFin != null) {
+                previewFin.close();
             }
         }
     }
@@ -251,13 +267,14 @@ public class ApiUI {
         if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
             String body = response.getBody();
             JSONObject resp = new JSONObject(body);
+            JSONObject data = resp.getJSONObject("data");
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("access_token", resp.getString("access_token"));
-            editor.putString("expires", resp.getString("expires"));
-            editor.putString("refresh_token", resp.getString("refresh_token"));
+            editor.putString("access_token", data.getString("access_token"));
+            editor.putString("expires", data.getString("expires"));
+            editor.putString("refresh_token", data.getString("refresh_token"));
             editor.apply();
         }
-        throw new TokenRefreshFailException();
+        throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
     }
 
     private String resolveApiUrl(String path) {

@@ -89,26 +89,12 @@ public class DeciderService extends IntentService {
                 processor = new CreateQuestionProcessor(getBaseContext(), request);
                 break;
             }
-            case UPLOAD_IMAGE:
+            case UPLOAD_IMAGE: {
                 UploadImageRequest request = UploadImageRequest.fromBundle(extras);
                 processor = new UploadImageProcessor(getBaseContext(), request);
                 break;
+            }
         }
-
-//        } else if (operation == OperationType.BASH_VOTE) {
-//
-//            int entryPosition = intent.getIntExtra(IntentExtras.BashVoteOperation.ENTRY_POSITION, -1);
-//            String entryId = extras.getString(IntentExtras.BashVoteOperation.ENTRY_ID);
-//            String rating = extras.getString(IntentExtras.BashVoteOperation.RATING);
-//            int direction = extras.getInt(IntentExtras.BashVoteOperation.DIRECTION, 100); // 100 is a value to break
-////            boolean bayaning = extras.getBoolean(IntentExtras.BashVoteOperation.BAYAN, false);
-//
-//            processor = new BashVoteProcessor(getBaseContext(), entryPosition, entryId, rating, direction);
-//        } else if (operation == OperationType.IT_VOTE) {
-//            // TODO
-//
-//            processor = null;
-//        }
 
         final Intent cbIntent = new Intent(ServiceHelper.ServiceBroadcastReceiverHelper.NAME);
         cbIntent.putExtra(CallbackIntentExtras.REQUEST_ID, requestId);

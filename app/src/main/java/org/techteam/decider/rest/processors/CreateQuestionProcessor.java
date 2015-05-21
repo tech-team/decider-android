@@ -20,6 +20,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import java.io.IOException;
 
 public class CreateQuestionProcessor extends Processor {
+    private static final String TAG = CreateQuestionProcessor.class.getName();
     private final CreateQuestionRequest request;
 
     public CreateQuestionProcessor(Context context, CreateQuestionRequest request) {
@@ -39,7 +40,6 @@ public class CreateQuestionProcessor extends Processor {
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
-                System.err.println("not ok!");
                 transactionError(operationType, requestId);
                 cb.onError("status is not ok. status = " + status, result);
                 return;

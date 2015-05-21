@@ -2,25 +2,27 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
+import org.techteam.decider.content.question.QuestionData;
+
 public class CreateQuestionRequest {
-    private final String questionDataJson;
+    private final QuestionData questionData;
 
     public static final String URL = "questions";
 
     public class IntentExtras {
-        public static final String QUESTION_DATA_JSON = "QUESTION_DATA_JSON";
+        public static final String QUESTION_DATA = "QUESTION_DATA";
     }
 
-    public CreateQuestionRequest(String questionDataJson) {
-        this.questionDataJson = questionDataJson;
+    public CreateQuestionRequest(QuestionData questionData) {
+        this.questionData = questionData;
     }
 
     public static CreateQuestionRequest fromBundle(Bundle bundle) {
-        String questionDataJson = bundle.getString(IntentExtras.QUESTION_DATA_JSON, null);
-        return new CreateQuestionRequest(questionDataJson);
+        QuestionData questionData = bundle.getParcelable(IntentExtras.QUESTION_DATA);
+        return new CreateQuestionRequest(questionData);
     }
 
-    public String getQuestionDataJson() {
-        return questionDataJson;
+    public QuestionData getQuestionData() {
+        return questionData;
     }
 }

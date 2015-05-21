@@ -141,6 +141,18 @@ public class AuthFragment
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        serviceHelper.init();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        serviceHelper.release();
+    }
+
     private void register() {
         String email = emailText.getText().toString().trim();
         String password = passwordText.getText().toString();

@@ -297,14 +297,12 @@ public class QuestionsListFragment
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("onResume");
         serviceHelper.init();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("onPause");
         serviceHelper.release();
     }
 

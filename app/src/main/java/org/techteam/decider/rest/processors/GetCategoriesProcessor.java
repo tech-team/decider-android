@@ -18,6 +18,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import java.io.IOException;
 
 public class GetCategoriesProcessor extends Processor {
+    private static final String TAG = GetCategoriesProcessor.class.getName();
     private final GetCategoriesRequest request;
 
     public GetCategoriesProcessor(Context context, GetCategoriesRequest request) {
@@ -43,7 +44,6 @@ public class GetCategoriesProcessor extends Processor {
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
-                System.err.println("not ok!");
                 transactionError(operationType, requestId);
                 cb.onError("status is not ok. status = " + status, result);
                 return;

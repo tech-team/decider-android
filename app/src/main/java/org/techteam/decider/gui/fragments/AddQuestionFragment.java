@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import com.android.camera.CropImageIntentBuilder;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.content.question.ImageQuestionData;
+import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
@@ -53,7 +56,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-public class AddQuestionFragment extends Fragment{
+public class AddQuestionFragment extends Fragment {
+    private static final String TAG = AddQuestionFragment.class.getName();
     private MainActivity activity;
 
     // child controls
@@ -92,16 +96,18 @@ public class AddQuestionFragment extends Fragment{
     private static final int CROPPED_WIDTH = 1280;
     private static final int CROPPED_HEIGHT = CROPPED_WIDTH * ASPECT_HEIGHT / ASPECT_WIDTH;
 
+    private static final String ORIGINAL_FILE_EXTENSION = ".original.jpg";
     private static final String CROPPED_FILE_EXTENSION = ".cropped.jpg";
-    private static final String FIXED_FILE_EXTENSION = ".fixed.jpg";
 
     private ImageHolder currentImageHolder;
 
+    private QuestionData currentQuestionData;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+        public static final String QUESTION_DATA = "QUESTION_DATA";
     }
 
     @Override
@@ -210,9 +216,8 @@ public class AddQuestionFragment extends Fragment{
         mQuestionTypeTabLayout.setDistributeEvenly(true);
         mQuestionTypeTabLayout.setViewPager(mQuestionTypePager);
 
-        if (savedInstanceState == null) {
-
-        } else {
+        if (savedInstanceState != null) {
+            currentQuestionData = savedInstanceState.getParcelable(BundleKeys.QUESTION_DATA);
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
@@ -222,29 +227,55 @@ public class AddQuestionFragment extends Fragment{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        currentQuestionData = gatherQuestionData();
+        outState.putParcelable(BundleKeys.QUESTION_DATA, currentQuestionData);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
-    private boolean createPost() {
-        // collect data
+    @Override
+    public void onResume() {
+        super.onResume();
+        serviceHelper.init();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        serviceHelper.release();
+    }
+
+    private QuestionData gatherQuestionData() {
         String message = postText.getText().toString();
         //TODO: get category from spinner's adapter
         //categoriesSpinner
-        boolean anonimity = anonymityCheckBox.isChecked();
+        boolean anonymous = anonymityCheckBox.isChecked();
 
         //TODO: check current question type
         // text choices
         String choice1 = textChoice1.getText().toString();
         String choice2 = textChoice2.getText().toString();
 
+        ImageQuestionData data = new ImageQuestionData();
+        data.setPicture1("pic1");  // TODO
+        data.setPicture2("pic2");  // TODO
+
+        data.setText(message);
+        data.setAnonymous(anonymous);
+        data.setCategoryEntryUid(0);
+
+        return data;
+    }
+
+    private boolean createPost() {
+        currentQuestionData = gatherQuestionData();
+
         // validate data
-        if (message.isEmpty() || choice1.isEmpty() || choice2.isEmpty()) {
+        if (currentQuestionData.getText().isEmpty()) {
             Toaster.toast(getActivity(), R.string.fill_all_fields);
             return false;
         }
 
-        // send if valid
-        //TODO: send question
+        serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.CREATE_QUESTION));
 
         return true;
     }
@@ -365,6 +396,11 @@ public class AddQuestionFragment extends Fragment{
                     currentImageHolder.setSource(selectedImage);
                 }
 
+                if (selectedImage == null) {
+                    Log.e(TAG, "selectedImage is still null even after fixUri");
+                    return;
+                }
+
                 // generate cropped path
                 File cacheDir = getActivity().getCacheDir();
                 File croppedFile = new File(cacheDir,
@@ -418,10 +454,6 @@ public class AddQuestionFragment extends Fragment{
         InputStream is = null;
         FileOutputStream out = null;
 
-//        if (!uri.toString().startsWith("content://com.google.android.apps.photos.content")) {
-//            return uri;
-//        }
-
         try {
             is = getActivity().getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapUtils.loadBitmap(is);
@@ -429,7 +461,7 @@ public class AddQuestionFragment extends Fragment{
             // generate fixed path
             File cacheDir = getActivity().getCacheDir();
             File fixedPath = new File(cacheDir,
-                    UUID.randomUUID().toString() + FIXED_FILE_EXTENSION);
+                    UUID.randomUUID().toString() + ORIGINAL_FILE_EXTENSION);
 
             if (fixedPath.exists()) {
                 fixedPath.delete();
@@ -441,7 +473,7 @@ public class AddQuestionFragment extends Fragment{
             return Uri.fromFile(fixedPath);
 
         } catch (FileNotFoundException e) {
-            System.err.println("[fixUri Error]: " + e.getMessage());
+            Log.e(TAG, "[fixUri Error]: " + e.getMessage());
             e.printStackTrace();
         } finally {
             if (is != null) {

@@ -18,6 +18,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import java.io.IOException;
 
 public class UploadImageProcessor extends Processor {
+    private static final String TAG = UploadImageProcessor.class.getName();
     private final UploadImageRequest request;
 
     public UploadImageProcessor(Context context, UploadImageRequest request) {
@@ -37,7 +38,6 @@ public class UploadImageProcessor extends Processor {
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
-                System.err.println("not ok!");
                 transactionError(operationType, requestId);
                 cb.onError("status is not ok. status = " + status, result);
                 return;
