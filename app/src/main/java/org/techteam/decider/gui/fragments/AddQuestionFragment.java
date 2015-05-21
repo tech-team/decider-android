@@ -248,8 +248,7 @@ public class AddQuestionFragment extends Fragment {
         activity.unlockDrawer();
     }
 
-    private boolean createPost() {
-        // collect data
+    private QuestionData gatherQuestionData() {
         String message = postText.getText().toString();
         //TODO: get category from spinner's adapter
         //categoriesSpinner
