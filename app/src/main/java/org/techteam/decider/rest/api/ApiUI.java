@@ -26,12 +26,25 @@ public class ApiUI {
     private SharedPreferences prefs;
 
 //    private static final String API_URL = "http://localhost:8888/api/v1/";
-//    private static final String API_URL = "http://188.166.126.79/api/v1/";
-    private static final String API_URL = "http://decidr.ru/api/v1/";
 //    private static final String API_URL = "http://private-954f0e-decider.apiary-mock.com/";
 
+    public static final String BASE_URL = "http://decidr.ru/";
+    public static final URI BASE_URI;
+    public static final String API_PATH = "api/v1/";
+    private static final URI API_URL;
 
-    public static final String REFRESH_TOKEN_URL = "refresh_token";
+    private static final String REFRESH_TOKEN_PATH = "refresh_token";
+
+    static {
+        URI uri;
+        try {
+            BASE_URI = new URI(BASE_URL);
+            uri = new URI(BASE_URL);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        API_URL = uri.resolve(API_PATH);
+    }
 
     private class PrefsKeys {
         public static final String PREFS_NAME = "TOKENS_PREFS";
@@ -243,7 +256,7 @@ public class ApiUI {
     }
 
     private void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_URL));
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_PATH));
         UrlParams params = new UrlParams();
         params.add("refresh_token", getRefreshToken());
         HttpResponse response = HttpDownloader.httpPost(httpRequest);
@@ -258,13 +271,10 @@ public class ApiUI {
     }
 
     private String resolveApiUrl(String path) {
-        URI uri;
-        try {
-            uri = new URI(API_URL);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return API_URL.resolve(path).toString();
+    }
 
-        return uri.resolve(path).toString();
+    public static String resolveUrl(String path) {
+        return BASE_URI.resolve(path).toString();
     }
 }
