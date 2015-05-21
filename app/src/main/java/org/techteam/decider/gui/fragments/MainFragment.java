@@ -18,8 +18,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
@@ -46,9 +55,7 @@ public class MainFragment
     public static final String TAG = MainFragment.class.toString();
     private MainActivity activity;
 
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-
+    private Toolbar toolbar;
     private CategoriesListAdapter categoriesListAdapter;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -56,9 +63,6 @@ public class MainFragment
     private SlidingTabLayout mSlidingTabLayout;
 
     private FloatingActionButton createPostButton;
-
-    private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView recyclerView;
 
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
@@ -118,7 +122,7 @@ public class MainFragment
             serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
         }
 
-        Toolbar toolbar = (Toolbar) this.activity.findViewById(R.id.main_toolbar);
+        toolbar = (Toolbar) this.activity.findViewById(R.id.main_toolbar);
         this.activity.setSupportActionBar(toolbar);
 
 //        ActionBar actionBar = this.activity.getSupportActionBar();
@@ -128,46 +132,8 @@ public class MainFragment
 //        }
 
         // setup drawer
-        mDrawerLayout = (DrawerLayout) this.activity.findViewById(R.id.drawer_layout);
-//        mDrawerList = (ListView) this.activity.findViewById(R.id.categories_list);
-        recyclerView = (RecyclerView) this.activity.findViewById(R.id.categories_recycler);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
-
-        // Set the adapter for the list view
-        //TODO: load categories via CursorLoader from server
-//        List<Category> categories = new ArrayList<>();
-//        categories.add(new Category(new CategoryEntry(1, "Test 1"), false));
-//        categories.add(new Category(new CategoryEntry(2, "Test 2"), false));
-
-        categoriesListAdapter = new CategoriesListAdapter(null, this.activity.getBaseContext(), this);
-        recyclerView.setAdapter(categoriesListAdapter);
-
-        // Set the list's click listener
-//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this.activity,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                toolbar,  /* nav drawer icon to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description */
-                R.string.drawer_close  /* "close drawer" description */
-        ) {
-
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-            }
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-        };
-
-        // Set the drawer toggle as the DrawerListener
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        categoriesListAdapter = new CategoriesListAdapter(null, this.getActivity(), this);
+        activity.createDrawer(toolbar, categoriesListAdapter);
 
         // sections
         mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());

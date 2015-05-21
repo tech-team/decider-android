@@ -225,6 +225,18 @@ public class AddQuestionFragment extends Fragment{
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        activity.lockDrawer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        activity.unlockDrawer();
+    }
+
     private boolean createPost() {
         // collect data
         String message = postText.getText().toString();

@@ -4,13 +4,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
+import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.AuthFragment;
 import org.techteam.decider.gui.fragments.MainFragment;
 
@@ -18,7 +31,9 @@ import org.techteam.decider.gui.fragments.MainFragment;
 public class MainActivity extends ActionBarActivity {
     public static final String TOKEN_PREF_KEY = "token";
 
-
+    // drawer related stuff
+    private AccountHeader.Result headerResult;
+    private Drawer.Result drawerResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,5 +127,71 @@ public class MainActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void createDrawer(Toolbar toolbar, CategoriesListAdapter categoriesListAdapter) {
+        // Create the AccountHeader
+        headerResult = new AccountHeader()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(
+                        new ProfileDrawerItem()
+                                .withName("Alekseyl")
+                                .withEmail("alekseyl@list.ru")
+                                .withIcon(this
+                                        .getResources()
+                                        .getDrawable(R.drawable.profile))
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
+
+        //Now create your drawer and pass the AccountHeader.Result
+        drawerResult = new Drawer()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(headerResult)
+                .addDrawerItems(
+                        new CategoriesDrawerItem(categoriesListAdapter),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_logout)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                        // do something with the clicked item :D
+                    }
+                })
+                .build();
+    }
+
+    public AccountHeader.Result getHeaderResult() {
+        return headerResult;
+    }
+
+    public Drawer.Result getDrawerResult() {
+        return drawerResult;
+    }
+
+    public void lockDrawer() {
+        if (drawerResult == null)
+            return;
+
+        drawerResult
+                .getDrawerLayout()
+                .setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    public void unlockDrawer() {
+        if (drawerResult == null)
+            return;
+
+        drawerResult
+                .getDrawerLayout()
+                .setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 }

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="AppTheme"
-    android:orientation="vertical">
+    style="AppTheme" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/main_toolbar"
@@ -17,71 +16,31 @@
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         />
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
+    <org.techteam.decider.gui.widget.SlidingTabLayout
+        android:id="@+id/sections_pager_tabs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_toolbar"
+        />
 
-        <!-- The main content view -->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/sections_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sections_pager_tabs">
+    </android.support.v4.view.ViewPager>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <org.techteam.decider.gui.widget.SlidingTabLayout
-                android:id="@+id/sections_pager_tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/sections_pager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/sections_pager_tabs">
-            </android.support.v4.view.ViewPager>
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                xmlns:fab="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/create_post_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_icon="@drawable/plus"
-                fab:fab_colorNormal="@color/accent"
-                fab:fab_colorPressed="@color/accent_dark"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="16dp" />
-
-        </RelativeLayout>
-
-        <!-- The navigation drawer -->
-        <LinearLayout
-            android:id="@+id/left_drawer"
-            android:layout_width="240dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_gravity="start"
-            android:background="@android:color/white"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-                android:text="@string/categories_label" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/categories_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="6dp"
-                android:paddingRight="6dp"
-                android:overScrollMode="never"/>
-
-        </LinearLayout>
-    </android.support.v4.widget.DrawerLayout>
-</LinearLayout>
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        xmlns:fab="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/create_post_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        fab:fab_icon="@drawable/plus"
+        fab:fab_colorNormal="@color/accent"
+        fab:fab_colorPressed="@color/accent_dark"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp" />
+</RelativeLayout>

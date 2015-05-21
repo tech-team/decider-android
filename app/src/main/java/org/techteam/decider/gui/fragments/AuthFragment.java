@@ -3,6 +3,7 @@ package org.techteam.decider.gui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -139,6 +140,18 @@ public class AuthFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        activity.lockDrawer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        activity.unlockDrawer();
     }
 
     private void register() {
