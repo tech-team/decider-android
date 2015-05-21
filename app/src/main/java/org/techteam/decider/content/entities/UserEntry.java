@@ -15,7 +15,7 @@ import org.techteam.decider.content.Entry;
 public class UserEntry extends Model {
 
     @Column(name="uid", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
-    public int uid;
+    public String uid;
 
     @Column(name="username")
     public String username;
@@ -30,7 +30,7 @@ public class UserEntry extends Model {
         super();
     }
 
-    public int getUid() {
+    public String getUid() {
         return uid;
     }
 
@@ -46,13 +46,18 @@ public class UserEntry extends Model {
         return avatar;
     }
 
+    public static UserEntry byUId(String uid) {
+        return new Select().from(UserEntry.class).where("uid = ?", uid).executeSingle();
+    }
+
     public static UserEntry fromJson(JSONObject obj) throws JSONException {
         UserEntry entry = new UserEntry();
-        entry.uid = obj.getInt("id");
-        UserEntry e = new Select().from(UserEntry.class).where("uid = ?", entry.uid).executeSingle(); // TODO: probably need to rewrite this without extra select
+        String uid = obj.getString("uid");
+        UserEntry e = byUId(uid); // TODO: probably need to rewrite this without extra select
         if (e != null) {
             return e;
         }
+        entry.uid = uid;
         entry.username = obj.getString("username");
         entry.name = String.format("%s %s", obj.getString("first_name"), obj.getString("last_name"));
         entry.avatar = obj.getString("avatar");

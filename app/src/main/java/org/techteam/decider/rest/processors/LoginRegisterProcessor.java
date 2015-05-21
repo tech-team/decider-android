@@ -12,6 +12,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import java.io.IOException;
 
 public class LoginRegisterProcessor extends Processor {
+    private static final String TAG = LoginRegisterProcessor.class.getName();
     private final RegisterRequest request;
 
     public LoginRegisterProcessor(Context context, RegisterRequest request) {
@@ -32,7 +33,6 @@ public class LoginRegisterProcessor extends Processor {
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
-                System.err.println("not ok!");
                 transactionError(operationType, requestId);
                 cb.onError("status is not ok. status = " + status, result);
                 return;

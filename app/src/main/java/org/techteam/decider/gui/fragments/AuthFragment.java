@@ -104,6 +104,7 @@ public class AuthFragment
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(activity.getBaseContext(), "LoginRegister: ok");
+                openMainFragment();
             }
 
             @Override
@@ -146,12 +147,14 @@ public class AuthFragment
     public void onResume() {
         super.onResume();
         activity.lockDrawer();
+        serviceHelper.init();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         activity.unlockDrawer();
+        serviceHelper.release();
     }
 
     private void register() {
@@ -208,11 +211,15 @@ public class AuthFragment
                 Toaster.toast(activity, newToken.userId);
 
                 // open main fragment
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.content_frame, new MainFragment()).commit();
+                openMainFragment();
             }
         }, VK_APP_ID);
 
         VKSdk.authorize(VK_AUTH_SCOPE);
+    }
+
+    private void openMainFragment() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new MainFragment()).commit();
     }
 }

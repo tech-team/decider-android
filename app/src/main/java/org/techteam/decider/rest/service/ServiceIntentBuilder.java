@@ -2,7 +2,6 @@ package org.techteam.decider.rest.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
@@ -57,15 +56,16 @@ public final class ServiceIntentBuilder {
 
     public static Intent createQuestionIntent(Context context, String requestId, QuestionData questionData) {
         Intent intent = getBasicIntent(context, requestId, OperationType.CREATE_QUESTION);
-        intent.putExtra(CreateQuestionRequest.IntentExtras.QUESTION_DATA_JSON, questionData.toJson());
+        intent.putExtra(CreateQuestionRequest.IntentExtras.QUESTION_DATA, questionData);
         return intent;
     }
 
 
-    public static Intent uploadImageIntent(Context context, String requestId, UploadImageRequest.Image image) {
+    public static Intent uploadImageIntent(Context context, String requestId, UploadImageRequest.Image image, int imageOrdinalId) {
         Intent intent = getBasicIntent(context, requestId, OperationType.UPLOAD_IMAGE);
         intent.putExtra(UploadImageRequest.IntentExtras.ORIGINAL_IMAGE, image.getOriginalFilename());
         intent.putExtra(UploadImageRequest.IntentExtras.PREVIEW_IMAGE, image.getPreviewFilename());
+        intent.putExtra(UploadImageRequest.IntentExtras.IMAGE_ORDINAL_ID, imageOrdinalId);
         return intent;
     }
 }

@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ServiceHelper {
+    private static final String TAG = ServiceHelper.class.getName();
     private final Context context;
     private CallbackHelper<String, ServiceCallback> callbackHelper = new CallbackHelper<String, ServiceCallback>();
     private Map<String, PendingOperation> pendingOperations = new HashMap<>();
@@ -78,14 +80,14 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.LOGIN_REGISTER, requestId));
     }
 
-    public void uploadImage(UploadImageRequest.Image image, ServiceCallback cb) {
+    public void uploadImage(UploadImageRequest.Image image, int imageOrdinalId, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.UPLOAD_IMAGE + "__" + image.getOriginalFilename().toString().replace("_", "");
+        String requestId = OperationType.UPLOAD_IMAGE + "__" + imageOrdinalId + "__" + image.getOriginalFilename().replace("__", "");
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, requestId, image);
+            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, requestId, image, imageOrdinalId);
             context.startService(intent);
         }
 
@@ -116,7 +118,7 @@ public class ServiceHelper {
     public boolean restoreOperationsState(Bundle savedInstanceState, String key, CallbacksKeeper callbacksKeeper) {
         ArrayList<PendingOperation> operations = savedInstanceState.getParcelableArrayList(key);
         if (operations == null) {
-            System.err.println("Operations are null!!!");
+            Log.wtf(TAG, "Operations are null!");
             return false;
         }
         for (PendingOperation op : operations) {

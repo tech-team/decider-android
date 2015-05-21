@@ -19,5 +19,6 @@ public interface ServiceCallback {
 
     class ImageUploadExtras {
         public static final String UID = "UID";
+        public static final String IMAGE_ORDINAL_ID = "IMAGE_ORDINAL_ID";
     }
 }

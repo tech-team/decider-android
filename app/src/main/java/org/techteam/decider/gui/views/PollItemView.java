@@ -14,6 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
+import org.techteam.decider.rest.api.ApiUI;
 
 public class PollItemView extends FrameLayout {
     // children
@@ -82,7 +83,7 @@ public class PollItemView extends FrameLayout {
         if (!imageLoader.isInited())
             imageLoader.init(ImageLoaderConfiguration.createDefault(getContext()));
 
-        imageLoader.displayImage(entry.getImageUrl(), imageView);
+        imageLoader.displayImage(ApiUI.resolveUrl(entry.getImageUrl()), imageView);
         ratingText.setText(Integer.toString(entry.getVotesCount()));
     }
 
