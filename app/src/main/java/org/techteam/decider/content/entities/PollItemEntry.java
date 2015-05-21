@@ -5,6 +5,7 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,5 +52,9 @@ public class PollItemEntry extends Model {
         entry.imageUrl = obj.getString("image_url");
         entry.votesCount = obj.getInt("votes_count");
         return entry;
+    }
+
+    public static PollItemEntry byPId(int pid) {
+        return new Select().from(PollItemEntry.class).where("pid = ?", pid).executeSingle();
     }
 }

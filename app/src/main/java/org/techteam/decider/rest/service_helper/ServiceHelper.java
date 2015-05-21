@@ -41,7 +41,7 @@ public class ServiceHelper {
     public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.GET_QUESTIONS + "__" + limit + "__" + offset;
+        String requestId = OperationType.GET_QUESTIONS + "__" + contentSection.toString() + "__" + limit + "__" + offset;
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -108,6 +108,34 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(OperationType.CREATE_QUESTION, requestId));
     }
 
+    public void pollVote(int questionId, int pollItemId, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.POLL_VOTE + "__" + questionId + "__" + pollItemId;
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.pollVoteIntent(context, requestId, questionId, pollItemId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.POLL_VOTE, requestId));
+    }
+
+    public void getComments(int questionId, int limit, int offset, int loadIntention, ServiceCallback cb) {
+        init();
+
+        String requestId = OperationType.GET_COMMENTS + "__" + questionId + "__" + limit + "__" + offset;
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.getCommentsIntent(context, requestId, questionId, limit, offset, loadIntention);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_COMMENTS, requestId));
+    }
+
     public void saveOperationsState(Bundle outState, String key) {
         outState.putParcelableArrayList(key, new ArrayList<>(pendingOperations.values()));
     }
@@ -128,9 +156,10 @@ public class ServiceHelper {
         boolean isRefreshing = false;
 
         // callbacks are subscribed again to restored pending operations
+        // TODO: seems like incorrect
         for (String opId : pendingOperations.keySet()) {
             PendingOperation op = pendingOperations.get(opId);
-            if (op.getOperationType() == OperationType.GET_QUESTIONS)
+            if (op.getOperationType() == OperationType.GET_QUESTIONS || op.getOperationType() == OperationType.GET_COMMENTS)
                 isRefreshing = true;
 
             addCallback(op.getOperationId(), callbacksKeeper.getCallback(op.getOperationType()));
