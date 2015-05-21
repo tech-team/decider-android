@@ -172,11 +172,6 @@ public class AddQuestionFragment extends Fragment {
         
         anonymityCheckBox = (CheckBox) v.findViewById(R.id.add_post_anonymity_checkbox);
 
-        // text choices
-        textChoice1 = (EditText) v.findViewById(R.id.add_post_text_choice1);
-        textChoice2 = (EditText) v.findViewById(R.id.add_post_text_choice2);
-
-        // image choices
         imageChoice1 = (ImageView) v.findViewById(R.id.add_post_image_choice1);
         imageChoice2 = (ImageView) v.findViewById(R.id.add_post_image_choice2);
 
@@ -207,16 +202,6 @@ public class AddQuestionFragment extends Fragment {
                 0);
 
         categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
-
-        // Set up the ViewPager with the adapter
-        mQuestionTypePagerAdapter = new QuestionTypePagerAdapter();
-
-        mQuestionTypePager = (WrappingViewPager) v.findViewById(R.id.question_type_pager);
-        mQuestionTypePager.setAdapter(mQuestionTypePagerAdapter);
-
-        mQuestionTypeTabLayout = (SlidingTabLayout) v.findViewById(R.id.question_type_pager_tabs);
-        mQuestionTypeTabLayout.setDistributeEvenly(true);
-        mQuestionTypeTabLayout.setViewPager(mQuestionTypePager);
 
         if (savedInstanceState != null) {
             currentQuestionData = savedInstanceState.getParcelable(BundleKeys.QUESTION_DATA);
