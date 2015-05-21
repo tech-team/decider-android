@@ -107,10 +107,33 @@ public class ApiUI {
             throw new InvalidAccessTokenException("Access token is probably expired");
         }
         return httpResponse;
-//        if (code == HttpURLConnection.HTTP_OK) {
-//        }
-//        return null;
     }
+
+    public HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+//        httpRequest.setUrl("http://192.168.43.25:4000");
+        String accessToken = getAccessToken();
+        if (accessToken == null) {
+            throw new InvalidAccessTokenException("No access token found");
+        }
+        params.add("access_token", accessToken);
+        httpRequest.setParams(params);
+
+        HttpResponse httpResponse = HttpDownloader.httpMultipartPost(httpRequest);
+        int code = httpResponse.getResponseCode();
+
+        if (code == HttpURLConnection.HTTP_FORBIDDEN) {
+            refreshToken();
+            httpResponse = HttpDownloader.httpPost(httpRequest);
+            code = httpResponse.getResponseCode();
+            if (code != HttpURLConnection.HTTP_FORBIDDEN) {
+                return httpResponse;
+            }
+            throw new InvalidAccessTokenException("Access token is probably expired");
+        }
+        return httpResponse;
+    }
+
 
     public HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
@@ -193,7 +216,7 @@ public class ApiUI {
 
             params.add("image", new HttpFile(bufin, file.getName()));
 
-            HttpResponse response = makeProtectedPostCall(UploadImageRequest.URL, params);
+            HttpResponse response = makeProtectedMultipartPostCall(UploadImageRequest.URL, params);
             if (response.getBody() == null) {
                 return null;
             }

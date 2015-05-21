@@ -377,7 +377,7 @@ public class AddQuestionFragment extends Fragment{
 
     private void sendImage(ImageHolder imageHolder) {
         String original = uriToPath(imageHolder.getSource());
-        String preview = uriToPath(imageHolder.getCropped());
+        String preview = imageHolder.getCropped().getPath();
         UploadImageRequest.Image image = new UploadImageRequest.Image(original, preview);
         serviceHelper.uploadImage(image, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
     }

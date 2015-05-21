@@ -16,7 +16,7 @@ public class HttpDownloader {
 
     private static final String USER_AGENT = "Decider-App v0.1";
 
-    private static final String MULTIPART_BOUNDARY = "DeciderBoundary";
+    private static final String MULTIPART_BOUNDARY = "--DeciderBoundary";
     private static final char[] MULTIPART_CHARS =
             "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     .toCharArray();
@@ -117,9 +117,11 @@ public class HttpDownloader {
             out = new BufferedOutputStream(connection.getOutputStream());
 
             for (UrlParams.UrlParam<?> p : request.getParams()) {
-                addPart(out, boundary, p);
+                addBoundary(out, boundary);
+                addPart(out, p);
+                out.write("\r\n".getBytes());
             }
-            addBoundary(out, boundary);
+            addLastBoundary(out, boundary);
 
             out.flush();
 
@@ -136,38 +138,40 @@ public class HttpDownloader {
     }
 
     private static void addBoundary(OutputStream out, String boundary) throws IOException {
-        out.write(("\r\n" + boundary + "\r\n").getBytes());
+        out.write(("--" + boundary + "\r\n").getBytes());
     }
 
-    private static void addPart(OutputStream out, String boundary, UrlParams.UrlParam<?> p) throws IOException {
+    private static void addLastBoundary(OutputStream out, String boundary) throws IOException {
+        out.write(("--" + boundary + "--\r\n").getBytes());
+    }
+
+    private static void addPart(OutputStream out, UrlParams.UrlParam<?> p) throws IOException {
         Class<?> c = p.getValue().getClass();
         if (c == String.class) {
-            addPart(out, boundary, p.getKey(), (String) p.getValue());
+            addPart(out, p.getKey(), (String) p.getValue());
         } else if (c == HttpFile.class) {
-            addPart(out, boundary, p.getKey(), (HttpFile) p.getValue());
+            addPart(out, p.getKey(), (HttpFile) p.getValue());
         } else {
             System.err.println("Unsupported UrlParam value type: " + c.toString());
         }
     }
 
-    private static void addPart(OutputStream out, String boundary, final String key, final String value) throws IOException {
-        addBoundary(out, boundary);
+    private static void addPart(OutputStream out, final String key, final String value) throws IOException {
         out.write(("Content-Disposition: form-data; name=\"" + key + "\"\r\n").getBytes());
         out.write("Content-Type: text/plain; charset=UTF-8\r\n".getBytes());
         out.write("Content-Transfer-Encoding: 8bit\r\n\r\n".getBytes());
         out.write(value.getBytes());
     }
 
-    private static void addPart(OutputStream out, String boundary, final String key, HttpFile httpFile) throws IOException {
-        addPart(out, boundary, key, httpFile.getFilename(), httpFile.getInputStream());
+    private static void addPart(OutputStream out, final String key, HttpFile httpFile) throws IOException {
+        addPart(out, key, httpFile.getFilename(), httpFile.getInputStream());
     }
 
-    private static void addPart(OutputStream out, String boundary, final String key, final String filename, final InputStream fin) throws IOException {
-        addPart(out, boundary, key, filename, fin, "application/octet-stream");
+    private static void addPart(OutputStream out, final String key, final String filename, final InputStream fin) throws IOException {
+        addPart(out, key, filename, fin, "application/octet-stream");
     }
 
-    public static void addPart(OutputStream out, String boundary, final String key, final String fileName, final InputStream fin, String type) throws IOException {
-        addBoundary(out, boundary);
+    public static void addPart(OutputStream out, final String key, final String fileName, final InputStream fin, String type) throws IOException {
         type = "Content-Type: " + type + "\r\n";
         out.write(("Content-Disposition: form-data; name=\""+ key+"\"; filename=\"" + fileName + "\"\r\n").getBytes());
         out.write(type.getBytes());
@@ -279,10 +283,6 @@ public class HttpDownloader {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpRequest req = new HttpRequest("https://www.linkedin.com");
-
-        HttpResponse r = HttpDownloader.httpGet(req);
-        CookieManager cookieManager = r.getCookieManager();
 
     }
 }
