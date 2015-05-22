@@ -50,6 +50,7 @@ public class PollVoteProcessor extends Processor {
             try {
                 PollItemEntry entry = PollItemEntry.byPId(request.getPollItemId());
                 entry.votesCount = votesCount;
+                entry.voted = true;
                 entry.save();
                 ActiveAndroid.setTransactionSuccessful();
             } finally {
