@@ -2,6 +2,7 @@ package org.techteam.decider.gui.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
@@ -23,9 +24,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
+import org.techteam.decider.gui.adapters.Category;
 import org.techteam.decider.gui.fragments.AuthFragment;
 import org.techteam.decider.gui.fragments.MainFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -34,6 +40,8 @@ public class MainActivity extends ActionBarActivity {
     // drawer related stuff
     private AccountHeader.Result headerResult;
     private Drawer.Result drawerResult;
+
+    private CategoriesListAdapter categoriesListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +138,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void createDrawer(Toolbar toolbar, CategoriesListAdapter categoriesListAdapter) {
+        this.categoriesListAdapter = categoriesListAdapter;
+
         // Create the AccountHeader
         headerResult = new AccountHeader()
                 .withActivity(this)
@@ -193,5 +203,27 @@ public class MainActivity extends ActionBarActivity {
         drawerResult
                 .getDrawerLayout()
                 .setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
+
+    public List<CategoryEntry> getSelectedCategories() {
+        if (categoriesListAdapter == null)
+            return null;
+
+        List<CategoryEntry> selectedCategories = new ArrayList<>();
+
+        Cursor cursor = categoriesListAdapter.getCursor();
+        if (cursor.moveToFirst()){
+            while(!cursor.isAfterLast()){
+                CategoryEntry categoryEntry = CategoryEntry.fromCursor(cursor);
+                if (categoryEntry.isSelected())
+                    selectedCategories.add(categoryEntry);
+
+                cursor.moveToNext();
+            }
+        }
+        // it was opened, so why should i close it?
+        //cursor.close();
+
+        return selectedCategories;
     }
 }

@@ -68,17 +68,17 @@ public class MainFragment
     private ServiceHelper serviceHelper;
 
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
-    private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
+    //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
 
     @Override
     public void categorySelected(CategoryEntry category, boolean isChecked) {
         Toaster.toast(getActivity(), "Selected");
         category.setSelectedAsync(isChecked);
-        if (!isChecked) {
-            selectedCategories.remove(category.getUid());
-        } else {
-            selectedCategories.put(category.getUid(), category);
-        }
+//        if (!isChecked) {
+//            selectedCategories.remove(category.getUid());
+//        } else {
+//            selectedCategories.put(category.getUid(), category);
+//        }
     }
 
     private static final class BundleKeys {
