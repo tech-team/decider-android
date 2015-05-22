@@ -14,11 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
-import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.rest.api.ApiUI;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class PollItemView extends FrameLayout {
     // children

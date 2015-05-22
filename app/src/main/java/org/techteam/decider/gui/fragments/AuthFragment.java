@@ -24,6 +24,7 @@ import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.Keyboard;
 import org.techteam.decider.util.Toaster;
 
 public class AuthFragment
@@ -158,6 +159,8 @@ public class AuthFragment
     }
 
     private void register() {
+        Keyboard.hideSoftKeyboard(getActivity(), getView());
+
         String email = emailText.getText().toString().trim();
         String password = passwordText.getText().toString();
 
@@ -172,6 +175,8 @@ public class AuthFragment
     }
 
     private void login() {
+        Keyboard.hideSoftKeyboard(getActivity(), getView());
+
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
@@ -185,6 +190,8 @@ public class AuthFragment
     }
 
     private void loginViaVK() {
+        Keyboard.hideSoftKeyboard(getActivity(), getView());
+
         final Activity activity = this.activity;
 
         VKSdk.initialize(new VKSdkListener() {
