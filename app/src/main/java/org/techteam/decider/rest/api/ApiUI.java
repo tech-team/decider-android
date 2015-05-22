@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
@@ -51,6 +52,7 @@ public class ApiUI {
         public static final String ACCESS_TOKEN = "access_token";
         public static final String REFRESH_TOKEN = "refresh_token";
         public static final String EXPIRES = "expires";
+        public static final String CURRENT_USER = "current_user";
     }
 
     public ApiUI(Context context) {
@@ -65,6 +67,16 @@ public class ApiUI {
 
     public String getRefreshToken() {
         return prefs.getString(PrefsKeys.REFRESH_TOKEN, "REFRESH_TOKEN");
+    }
+
+    public void setCurrentUserId(String userId) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PrefsKeys.CURRENT_USER, userId);
+        editor.apply();
+    }
+
+    public String getCurrentUserId() {
+        return prefs.getString(PrefsKeys.CURRENT_USER, null);
     }
 
     public int getExpires() {
@@ -98,12 +110,12 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject loginRegister(RegisterRequest request) throws IOException, JSONException {
+    public JSONObject loginRegister(LoginRegisterRequest request) throws IOException, JSONException {
         UrlParams params = new UrlParams();
         params.add("email", request.getEmail());
         params.add("password", request.getPassword());
 
-        HttpResponse response = makeAuthPostCall(RegisterRequest.URL, params);
+        HttpResponse response = makeAuthPostCall(LoginRegisterRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }

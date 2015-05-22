@@ -11,7 +11,7 @@ import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
-import org.techteam.decider.rest.api.RegisterRequest;
+import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
@@ -84,7 +84,7 @@ public class DeciderService extends IntentService {
                 break;
             }
             case LOGIN_REGISTER: {
-                RegisterRequest request = RegisterRequest.fromBundle(extras);
+                LoginRegisterRequest request = LoginRegisterRequest.fromBundle(extras);
                 processor = new LoginRegisterProcessor(getBaseContext(), request);
                 break;
             }

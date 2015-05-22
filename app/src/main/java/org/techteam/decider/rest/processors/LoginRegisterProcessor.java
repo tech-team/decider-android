@@ -3,19 +3,21 @@ package org.techteam.decider.rest.processors;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.activeandroid.ActiveAndroid;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.RegisterRequest;
-import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.rest.api.LoginRegisterRequest;
 
 import java.io.IOException;
 
 public class LoginRegisterProcessor extends Processor {
     private static final String TAG = LoginRegisterProcessor.class.getName();
-    private final RegisterRequest request;
+    private final LoginRegisterRequest request;
 
-    public LoginRegisterProcessor(Context context, RegisterRequest request) {
+    public LoginRegisterProcessor(Context context, LoginRegisterRequest request) {
         super(context);
         this.request = request;
     }
@@ -37,6 +39,21 @@ public class LoginRegisterProcessor extends Processor {
                 cb.onError("status is not ok. resp = " + response.toString(), result);
                 return;
             }
+
+            JSONObject data = response.getJSONObject("data");
+            JSONObject userJson = data.getJSONObject("user");
+
+            ActiveAndroid.beginTransaction();
+            try {
+                UserEntry entry = UserEntry.fromJson(userJson, true);
+                entry.save();
+                ActiveAndroid.setTransactionSuccessful();
+
+                apiUI.setCurrentUserId(entry.getUid());
+            } finally {
+                ActiveAndroid.endTransaction();
+            }
+
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);

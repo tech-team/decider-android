@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class RegisterRequest {
+public class LoginRegisterRequest {
     public static final String URL = "registration";
     private final String email;
     private final String password;
@@ -12,15 +12,15 @@ public class RegisterRequest {
         public static final String PASSWORD = "PASSWORD";
     }
 
-    public RegisterRequest(String email, String password) {
+    public LoginRegisterRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    public static RegisterRequest fromBundle(Bundle bundle) {
+    public static LoginRegisterRequest fromBundle(Bundle bundle) {
         String email = bundle.getString(IntentExtras.EMAIL, "");
         String password = bundle.getString(IntentExtras.PASSWORD, "");
-        return new RegisterRequest(email, password);
+        return new LoginRegisterRequest(email, password);
     }
 
     public String getEmail() {

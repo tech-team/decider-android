@@ -33,13 +33,13 @@ public class UserEntry extends Model {
     private String lastName;
 
     @Column(name="country")
-    private String country;
+    private String country = "";
 
     @Column(name="city")
-    private String city;
+    private String city = "";
 
     @Column(name="birthday")
-    private String birthday;
+    private String birthday = "";
 
     public UserEntry() {
         super();
@@ -62,22 +62,32 @@ public class UserEntry extends Model {
     }
 
     public static UserEntry fromJson(JSONObject obj) throws JSONException {
+        return fromJson(obj, false);
+    }
+
+    public static UserEntry fromJson(JSONObject obj, boolean forceRecreate) throws JSONException {
         UserEntry entry = new UserEntry();
         String uid = obj.getString("uid");
         UserEntry e = byUId(uid); // TODO: probably need to rewrite this without extra select
-        if (e != null) {
+        if (!forceRecreate && e != null) {
             return e;
         }
         entry.uid = uid;
         entry.username = obj.getString("username");
         entry.avatar = obj.getString("avatar");
         //TODO: new fields
-        entry.firstName = "";
-        entry.middleName = "";
-        entry.lastName = "";
-        entry.country = "";
-        entry.city = "";
-        entry.birthday = "";
+        entry.firstName = obj.getString("first_name");
+        entry.middleName = obj.getString("middle_name");
+        entry.lastName = obj.getString("last_name");
+        if (obj.has("country")) {
+            entry.country = obj.getString("country");
+        }
+        if (obj.has("city")) {
+            entry.city = obj.getString("city");
+        }
+        if (obj.has("birthday")) {
+            entry.birthday = obj.getString("birthday");
+        }
 
         return entry;
     }
