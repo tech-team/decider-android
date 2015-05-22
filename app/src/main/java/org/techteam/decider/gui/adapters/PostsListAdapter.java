@@ -27,6 +27,8 @@ public class PostsListAdapter
 
     private Context context;
 
+    private OnQuestionEventCallback onQuestionEventCallback;
+
     private static final int VIEW_TYPE_ENTRY = 0;
     private static final int VIEW_TYPE_FOOTER = 1;
 
@@ -93,6 +95,7 @@ public class PostsListAdapter
             scrolledDownCallback.onScrolledDown();
             return;
         }
+        holder.questionView.setOnQuestionEventCallback(onQuestionEventCallback);
 
         QuestionEntry entry = QuestionEntry.fromCursor(cursor);
 
@@ -145,5 +148,9 @@ public class PostsListAdapter
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
+    }
+
+    public void setOnQuestionEventCallback(OnQuestionEventCallback cb) {
+        onQuestionEventCallback = cb;
     }
 }

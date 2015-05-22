@@ -45,7 +45,7 @@ public class GetCategoriesProcessor extends Processor {
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
                 transactionError(operationType, requestId);
-                cb.onError("status is not ok. status = " + status, result);
+                cb.onError("status is not ok. resp = " + response.toString(), result);
                 return;
             }
 

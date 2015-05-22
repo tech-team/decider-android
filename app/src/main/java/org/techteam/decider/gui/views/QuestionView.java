@@ -17,10 +17,13 @@ import android.widget.TextView;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.fragments.AddQuestionFragment;
 import org.techteam.decider.gui.fragments.ProfileFragment;
 import org.techteam.decider.util.Toaster;
+
+import java.util.List;
 
 
 public class QuestionView extends PostView {
@@ -45,6 +48,8 @@ public class QuestionView extends PostView {
     // footer
     private Button likeButton;
     private Button commentsButton;
+
+    private OnQuestionEventCallback onQuestionEventCallback;
 
     public QuestionView(Context context) {
         super(context);
@@ -143,7 +148,9 @@ public class QuestionView extends PostView {
         pollView.setListener(new PollView.Listener() {
             @Override
             public void polled(int pollItemId) {
-                Toaster.toast(context, "Polled: " + pollItemId);
+                if (onQuestionEventCallback != null) {
+                    onQuestionEventCallback.onVote(entry, pollItemId);
+                }
             }
         });
 
@@ -230,5 +237,9 @@ public class QuestionView extends PostView {
                 ProfileFragment.create(activity, null);
             }
         });
+    }
+
+    public void setOnQuestionEventCallback(OnQuestionEventCallback cb) {
+        onQuestionEventCallback = cb;
     }
 }

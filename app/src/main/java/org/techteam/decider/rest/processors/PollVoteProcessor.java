@@ -40,12 +40,11 @@ public class PollVoteProcessor extends Processor {
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
                 transactionError(operationType, requestId);
-                cb.onError("status is not ok. status = " + status, result);
+                cb.onError("status is not ok. resp = " + response.toString(), result);
                 return;
             }
 
-            JSONObject data = response.getJSONObject("data");
-            int votesCount = data.getInt("votes_count");
+            int votesCount = response.getInt("votes_count");
 
             ActiveAndroid.beginTransaction();
             try {

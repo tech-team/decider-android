@@ -122,6 +122,18 @@ public class QuestionsListFragment
         recyclerView.setLayoutManager(mLayoutManager);
 
         adapter = new PostsListAdapter(null, getActivity(), QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
+        adapter.setOnQuestionEventCallback(new OnQuestionEventCallback() {
+            @Override
+            public void onLike(QuestionEntry post) {
+
+            }
+
+            @Override
+            public void onVote(QuestionEntry post, int voteId) {
+                Toaster.toast(activity.getBaseContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
+                serviceHelper.pollVote(post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         //this thing waits for user to stop scrolling and adds new data or refreshes existing data
@@ -187,6 +199,20 @@ public class QuestionsListFragment
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 mSwipeRefreshLayout.setRefreshing(false);
+                String msg = "Error. " + message;
+                Toaster.toastLong(getActivity().getApplicationContext(), msg);
+                System.out.println(msg);
+            }
+        });
+
+        callbacksKeeper.addCallback(OperationType.POLL_VOTE, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toastLong(getActivity().getApplicationContext(), "Successfully voted");
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
                 String msg = "Error. " + message;
                 Toaster.toastLong(getActivity().getApplicationContext(), msg);
                 System.out.println(msg);
