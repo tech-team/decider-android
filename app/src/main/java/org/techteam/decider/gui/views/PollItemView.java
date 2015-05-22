@@ -83,7 +83,9 @@ public class PollItemView extends FrameLayout {
         if (!imageLoader.isInited())
             imageLoader.init(ImageLoaderConfiguration.createDefault(getContext()));
 
-        imageLoader.displayImage(ApiUI.resolveUrl(entry.getImageUrl()), imageView);
+        if (entry.getPreviewUrl() != null) {
+            imageLoader.displayImage(ApiUI.resolveUrl(entry.getPreviewUrl()), imageView);
+        }
         ratingText.setText(Integer.toString(entry.getVotesCount()));
     }
 
