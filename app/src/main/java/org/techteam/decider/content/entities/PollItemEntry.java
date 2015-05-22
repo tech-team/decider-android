@@ -28,6 +28,9 @@ public class PollItemEntry extends Model {
     @Column(name="votes_count")
     public int votesCount;
 
+    @Column(name="voted")
+    public boolean voted;
+
     public PollItemEntry() {
         super();
     }
@@ -52,6 +55,10 @@ public class PollItemEntry extends Model {
         return votesCount;
     }
 
+    public boolean isVoted() {
+        return voted;
+    }
+
     public static PollItemEntry fromJson(JSONObject obj) throws JSONException {
         PollItemEntry entry = new PollItemEntry();
         entry.pid = obj.getInt("id");
@@ -59,6 +66,7 @@ public class PollItemEntry extends Model {
         entry.imageUrl = obj.getString("image_url");
         entry.previewUrl = obj.getString("preview_url");
         entry.votesCount = obj.getInt("votes_count");
+        entry.voted = obj.getBoolean("voted");
         return entry;
     }
 
