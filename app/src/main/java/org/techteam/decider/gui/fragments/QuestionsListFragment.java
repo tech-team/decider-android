@@ -52,7 +52,6 @@ public class QuestionsListFragment
     private static final int QUESTIONS_LIMIT = 30;
     private int questionsOffset = 0;
     private ContentSection currentSection = ContentSection.NEW;
-    private List<CategoryEntry> chosenCategories = new LinkedList<>();
 
     //see comment in onCreateView()
     private Queue<Runnable> delayedAdapterNotifications = new LinkedList<Runnable>();
@@ -238,7 +237,7 @@ public class QuestionsListFragment
         serviceHelper.getQuestions(currentSection,
                 QUESTIONS_LIMIT,
                 questionsOffset,
-                chosenCategories,
+                activity.getSelectedCategories(),
                 LoadIntention.REFRESH,
                 callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
     }

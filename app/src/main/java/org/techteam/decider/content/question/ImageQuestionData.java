@@ -51,8 +51,8 @@ public class ImageQuestionData extends QuestionData implements Parcelable {
         String[] pictures = new String[] { picture1Id, picture2Id };
         for (String p : pictures) {
             JSONObject pollItem = new JSONObject();
-            pollItem.put("text", "");
-            pollItem.put("picture", p);
+            pollItem.put("text", "STUB");
+            pollItem.put("image_uid", p);
             poll.put(pollItem);
         }
         obj.put("poll", poll);

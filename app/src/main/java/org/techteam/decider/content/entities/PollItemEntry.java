@@ -22,6 +22,9 @@ public class PollItemEntry extends Model {
     @Column(name="image_url")
     public String imageUrl;
 
+    @Column(name="preview_url")
+    public String previewUrl;
+
     @Column(name="votes_count")
     public int votesCount;
 
@@ -41,6 +44,10 @@ public class PollItemEntry extends Model {
         return imageUrl;
     }
 
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
     public int getVotesCount() {
         return votesCount;
     }
@@ -50,6 +57,7 @@ public class PollItemEntry extends Model {
         entry.pid = obj.getInt("id");
         entry.text = obj.getString("text");
         entry.imageUrl = obj.getString("image_url");
+        entry.previewUrl = obj.getString("preview_url");
         entry.votesCount = obj.getInt("votes_count");
         return entry;
     }

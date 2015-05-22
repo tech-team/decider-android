@@ -8,6 +8,7 @@ import com.activeandroid.ActiveAndroid;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.content.entities.UploadedImageEntry;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
@@ -42,25 +43,26 @@ public class UploadImageProcessor extends Processor {
                 cb.onError("status is not ok. status = " + status, result);
                 return;
             }
-
-//            ActiveAndroid.beginTransaction();
-//            try {
-//                QuestionEntry entry = QuestionEntry.fromJson(data);
-//                entry.saveTotal();
-//                ActiveAndroid.setTransactionSuccessful();
-
-//            } finally {
-//                ActiveAndroid.endTransaction();
-//            }
-
-
             JSONObject data = response.getJSONObject("data");
             String uid = data.getString("uid");
+
+            ActiveAndroid.beginTransaction();
+            try {
+                UploadedImageEntry entry = new UploadedImageEntry(uid, request.getImageOrdinalId());
+                entry.save();
+                ActiveAndroid.setTransactionSuccessful();
+
+            } finally {
+                ActiveAndroid.endTransaction();
+            }
+
+
             if (uid == null) {
                 transactionError(operationType, requestId);
                 cb.onError("Received a null image uid", result);
                 return;
             }
+
             result.putString(ServiceCallback.ImageUploadExtras.UID, uid);
 
             transactionFinished(operationType, requestId);

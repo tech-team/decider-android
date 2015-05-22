@@ -33,6 +33,7 @@ import com.android.camera.CropImageIntentBuilder;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.content.entities.UploadedImageEntry;
 import org.techteam.decider.content.question.ImageQuestionData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.gui.activities.MainActivity;
@@ -249,8 +250,16 @@ public class AddQuestionFragment extends Fragment {
         boolean anonymity = anonymityCheckBox.isChecked();
 
         ImageQuestionData data = new ImageQuestionData();
-        data.setPicture1(imageHolders[0].getUid());
-        data.setPicture2(imageHolders[0].getUid());
+
+        UploadedImageEntry pic1 = UploadedImageEntry.getLatestByOrdinalId(imageHolders[0].getOrdinal());
+        UploadedImageEntry pic2 = UploadedImageEntry.getLatestByOrdinalId(imageHolders[1].getOrdinal());
+
+        if (pic1 != null) {
+            data.setPicture1(pic1.getImageUid());
+        }
+        if (pic2 != null) {
+            data.setPicture2(pic2.getImageUid());
+        }
 
         data.setText(message);
         data.setAnonymous(anonymity);

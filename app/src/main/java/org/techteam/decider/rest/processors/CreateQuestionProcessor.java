@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.content.entities.UploadedImageEntry;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
@@ -47,6 +48,8 @@ public class CreateQuestionProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
+                UploadedImageEntry.deleteAll();
+
                 JSONObject data = response.getJSONObject("data");
                 QuestionEntry entry = QuestionEntry.fromJson(data);
                 entry.saveTotal();

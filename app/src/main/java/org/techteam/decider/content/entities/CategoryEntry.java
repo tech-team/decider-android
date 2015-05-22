@@ -12,6 +12,8 @@ import com.activeandroid.query.Select;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 @Table(name = "Categories", id = BaseColumns._ID)
 public class CategoryEntry extends Model {
 
@@ -65,6 +67,10 @@ public class CategoryEntry extends Model {
 
     public static CategoryEntry byUid(int uid) {
         return new Select().from(CategoryEntry.class).where("uid = ?", uid).executeSingle();
+    }
+
+    public static List<CategoryEntry> getSelected() {
+        return new Select().from(CategoryEntry.class).where("selected = 1").execute();
     }
 
     public static CategoryEntry fromJson(JSONObject obj) throws JSONException {
