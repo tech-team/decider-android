@@ -292,8 +292,9 @@ public class ApiUI {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_PATH));
         UrlParams params = new UrlParams();
         params.add("refresh_token", getRefreshToken());
+        httpRequest.setParams(params);
         HttpResponse response = HttpDownloader.httpPost(httpRequest);
-        if (response.getResponseCode() == HttpURLConnection.HTTP_OK) {
+        if (response.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
             String body = response.getBody();
             JSONObject resp = new JSONObject(body);
             JSONObject data = resp.getJSONObject("data");

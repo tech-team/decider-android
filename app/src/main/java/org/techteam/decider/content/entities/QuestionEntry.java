@@ -15,7 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.Entry;
 
-@Table(name = "QuestionsNew", id = BaseColumns._ID)
+@Table(name = "Questions", id = BaseColumns._ID)
 public class QuestionEntry extends Model {
     @Column(name="qid", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
     public int qid;
