@@ -1,5 +1,6 @@
 package org.techteam.decider.gui.activities;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -29,6 +30,7 @@ import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.Category;
 import org.techteam.decider.gui.fragments.AuthFragment;
 import org.techteam.decider.gui.fragments.MainFragment;
+import org.techteam.decider.gui.fragments.ProfileFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,6 +157,9 @@ public class MainActivity extends ActionBarActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        //TODO: pass uid
+                        ProfileFragment.create(MainActivity.this, null);
+
                         return false;
                     }
                 })

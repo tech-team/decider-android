@@ -1,5 +1,6 @@
 package org.techteam.decider.gui.views;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -16,6 +17,9 @@ import android.widget.TextView;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.fragments.AddQuestionFragment;
+import org.techteam.decider.gui.fragments.ProfileFragment;
 import org.techteam.decider.util.Toaster;
 
 
@@ -215,6 +219,15 @@ public class QuestionView extends PostView {
             public void onClick(View v) {
                 if (questionInteractor != null)
                     questionInteractor.onLikeClick(entry);
+            }
+        });
+
+        avatarImage.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: evil things
+                MainActivity activity = (MainActivity) getContext();
+                ProfileFragment.create(activity, null);
             }
         });
     }

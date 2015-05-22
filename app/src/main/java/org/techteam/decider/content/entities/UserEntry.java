@@ -20,11 +20,26 @@ public class UserEntry extends Model {
     @Column(name="username")
     public String username;
 
-    @Column(name="name")
-    public String name;
-
     @Column(name="avatar")
     public String avatar;
+
+    @Column(name="firstName")
+    private String firstName;
+
+    @Column(name="middleName")
+    private String middleName;
+
+    @Column(name="lastName")
+    private String lastName;
+
+    @Column(name="country")
+    private String country;
+
+    @Column(name="city")
+    private String city;
+
+    @Column(name="birthday")
+    private String birthday;
 
     public UserEntry() {
         super();
@@ -36,10 +51,6 @@ public class UserEntry extends Model {
 
     public String getUsername() {
         return username;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAvatar() {
@@ -59,8 +70,39 @@ public class UserEntry extends Model {
         }
         entry.uid = uid;
         entry.username = obj.getString("username");
-        entry.name = String.format("%s %s", obj.getString("first_name"), obj.getString("last_name"));
         entry.avatar = obj.getString("avatar");
+        //TODO: new fields
+        entry.firstName = "";
+        entry.middleName = "";
+        entry.lastName = "";
+        entry.country = "";
+        entry.city = "";
+        entry.birthday = "";
+
         return entry;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getBirthday() {
+        return birthday;
     }
 }

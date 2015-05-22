@@ -60,8 +60,17 @@
     <string name="choose_from_gallery">Choose from gallery</string>
     <string name="send_comment">Send comment</string>
     <string name="comment_placeholder">Comment…</string>
-    <string name="drawer_item_home">To questions</string>
-    <string name="drawer_item_settings">Settings</string>
     <string name="drawer_item_logout">Logout</string>
+    <string name="full_name_placeholder">Vasja J Pupkin</string>
+    <string name="county_label">Country:</string>
+    <string name="country_placeholder">Russia</string>
+    <string name="city_label">City:</string>
+    <string name="city_placeholder">Moscow</string>
+    <string name="birthday_placeholder">12.12.1912</string>
+    <string name="birthday_label">Birthday:</string>
+    <string name="profile_image__desc">Profile image</string>
+    <string name="about_label">About:</string>
+    <string name="about_placeholder">My name is Vasja and i\'m am Pupkin from Russia</string>
+    <string name="profile_toolbar_title">Profile</string>
 
 </resources>
