@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.QuestionHelper;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
@@ -20,6 +22,7 @@ import java.util.List;
 
 public class PostsListAdapter
         extends CursorRecyclerViewAdapter<PostsListAdapter.ViewHolder> {
+    private final ContentSection currentSection;
     private final OnQuestionEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
     private final QuestionInteractor questionInteractor;
@@ -63,11 +66,13 @@ public class PostsListAdapter
 
     public PostsListAdapter(Cursor contentCursor,
                             Context context,
+                            ContentSection currentSection,
                             OnQuestionEventCallback eventCallback,
                             OnListScrolledDownCallback scrolledDownCallback,
                             QuestionInteractor questionInteractor) {
         super(contentCursor);
         this.context = context;
+        this.currentSection = currentSection;
         this.eventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
         this.questionInteractor = questionInteractor;
@@ -97,7 +102,7 @@ public class PostsListAdapter
         }
         holder.questionView.setOnQuestionEventCallback(onQuestionEventCallback);
 
-        QuestionEntry entry = QuestionEntry.fromCursor(cursor);
+        QuestionEntry entry = QuestionHelper.fromCursor(currentSection, cursor);
 
 
         holder.questionView.reuse(entry, questionInteractor);

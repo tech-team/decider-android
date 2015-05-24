@@ -7,11 +7,8 @@ import android.net.Uri;
 
 import com.activeandroid.content.ContentProvider;
 
-import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
-import org.techteam.decider.content.entities.QuestionEntry;
-
-import java.util.List;
+import org.techteam.decider.content.QuestionHelper;
 
 public class ContentLoader extends CursorLoader {
 
@@ -41,16 +38,7 @@ public class ContentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        // TODO: fill the missing branches.. i guess
-        switch (contentSection) {
-            case NEW:
-                break;
-            case POPULAR:
-                break;
-            case MY:
-                break;
-        }
-        Uri uri = ContentProvider.createUri(QuestionEntry.class, null);
+        Uri uri = ContentProvider.createUri(QuestionHelper.getClass(contentSection), null);
         return getContext().getContentResolver().query(uri, null, null, null, null);
     }
 

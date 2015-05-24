@@ -74,42 +74,42 @@ public class QuestionsListFragment
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
     }
 
-    @Deprecated
-    private void setPosts(ArrayList<QuestionEntry> entries) {
-        adapter.setAll(entries);
-        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-            adapter.notifyDataSetChanged();
-        } else {
-            delayedAdapterNotifications.add(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.notifyDataSetChanged();
-                }
-            });
-        }
-    }
-
-    @Deprecated
-    private void addPosts(ArrayList<QuestionEntry> entries) {
-        final int oldCount = adapter.getItemCount() - 1; //minus "Loading..." item
-        final int addedCount = entries.size();
-
-        final String str = Integer.toString(addedCount) + " posts added";
-
-        adapter.addAll(entries);
-        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-            adapter.notifyItemRangeInserted(oldCount, addedCount);
-            Toaster.toast(getActivity(), str + " (right away)");
-        } else {
-            delayedAdapterNotifications.add(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.notifyItemRangeInserted(oldCount, addedCount);
-                    Toaster.toast(getActivity(), str + " (after scroll)");
-                }
-            });
-        }
-    }
+//    @Deprecated
+//    private void setPosts(ArrayList<QuestionEntry> entries) {
+//        adapter.setAll(entries);
+//        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+//            adapter.notifyDataSetChanged();
+//        } else {
+//            delayedAdapterNotifications.add(new Runnable() {
+//                @Override
+//                public void run() {
+//                    adapter.notifyDataSetChanged();
+//                }
+//            });
+//        }
+//    }
+//
+//    @Deprecated
+//    private void addPosts(ArrayList<QuestionEntry> entries) {
+//        final int oldCount = adapter.getItemCount() - 1; //minus "Loading..." item
+//        final int addedCount = entries.size();
+//
+//        final String str = Integer.toString(addedCount) + " posts added";
+//
+//        adapter.addAll(entries);
+//        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+//            adapter.notifyItemRangeInserted(oldCount, addedCount);
+//            Toaster.toast(getActivity(), str + " (right away)");
+//        } else {
+//            delayedAdapterNotifications.add(new Runnable() {
+//                @Override
+//                public void run() {
+//                    adapter.notifyItemRangeInserted(oldCount, addedCount);
+//                    Toaster.toast(getActivity(), str + " (after scroll)");
+//                }
+//            });
+//        }
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -121,7 +121,7 @@ public class QuestionsListFragment
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new PostsListAdapter(null, getActivity(), QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
+        adapter = new PostsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
         adapter.setOnQuestionEventCallback(new OnQuestionEventCallback() {
             @Override
             public void onLike(QuestionEntry post) {

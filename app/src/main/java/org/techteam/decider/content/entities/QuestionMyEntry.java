@@ -8,23 +8,18 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-@Table(name = "QuestionsNew", id = BaseColumns._ID)
-public class QuestionNewEntry extends Model {
+@Table(name = "QuestionsMy", id = BaseColumns._ID)
+public class QuestionMyEntry extends Model {
 
     @Column(name="question", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     public QuestionEntry question;
 
-    public QuestionNewEntry() {
+    public QuestionMyEntry() {
         super();
     }
 
-    public QuestionNewEntry(QuestionEntry question) {
+    public QuestionMyEntry(QuestionEntry question) {
         super();
         this.question = question;
     }
@@ -35,12 +30,12 @@ public class QuestionNewEntry extends Model {
     }
 
     public static QuestionEntry fromCursor(Cursor cursor) {
-        QuestionNewEntry entry = new QuestionNewEntry();
+        QuestionMyEntry entry = new QuestionMyEntry();
         entry.loadFromCursor(cursor);
         return entry.question;
     }
 
     public static void deleteAll() {
-        new Delete().from(QuestionNewEntry.class).execute();
+        new Delete().from(QuestionMyEntry.class).execute();
     }
 }

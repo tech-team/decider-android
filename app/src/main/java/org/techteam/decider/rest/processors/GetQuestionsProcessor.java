@@ -9,8 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.db.resolvers.AbstractContentResolver;
-import org.techteam.decider.db.resolvers.ContentResolver;
+import org.techteam.decider.content.QuestionHelper;
+import org.techteam.decider.content.entities.QuestionNewEntry;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
@@ -40,7 +40,7 @@ public class GetQuestionsProcessor extends Processor {
             System.out.println(response);
 
             if (request.getLoadIntention() == LoadIntention.REFRESH) {
-                QuestionEntry.deleteAll();
+                QuestionHelper.deleteAll(request.getContentSection());
             }
 
             String status = response.getString("status");
@@ -55,8 +55,9 @@ public class GetQuestionsProcessor extends Processor {
                 JSONArray data = response.getJSONArray("data");
                 for (int i = 0; i < data.length(); ++i) {
                     JSONObject q = data.getJSONObject(i);
-                    QuestionEntry entry = QuestionEntry.fromJson(q);
-                    entry.saveTotal();
+                    QuestionEntry question = QuestionEntry.fromJson(q);
+
+                    QuestionHelper.saveQuestion(request.getContentSection(), question);
                 }
                 ActiveAndroid.setTransactionSuccessful();
 
