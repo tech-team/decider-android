@@ -21,11 +21,11 @@ public class PendingOperation implements Parcelable {
     }
 
     public PendingOperation(Parcel in) {
-        String opId = in.readString();
         String opType = in.readString();
+        String opId = in.readString();
 
-        this.operationId = opId;
         this.operationType = Enum.valueOf(OperationType.class, opType);
+        this.operationId = opId;
     }
 
     @Override

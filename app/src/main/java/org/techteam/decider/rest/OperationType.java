@@ -1,13 +1,26 @@
 package org.techteam.decider.rest;
 
 public enum OperationType {
-    GET_QUESTIONS,
+    GET_QUESTIONS(true),
     GET_CATEGORIES,
     LOGIN_REGISTER,
     CREATE_QUESTION,
     UPLOAD_IMAGE,
     POLL_VOTE,
-    GET_COMMENTS;
+    GET_COMMENTS(true);
+
+    private boolean canRefresh = false;
+
+    OperationType(boolean canRefresh) {
+        this.canRefresh = canRefresh;
+    }
+
+    OperationType() {
+    }
+
+    public boolean canRefresh() {
+        return canRefresh;
+    }
 
     private static OperationType[] cachedValues = values();
 

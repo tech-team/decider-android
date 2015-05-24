@@ -41,99 +41,113 @@ public class ServiceHelper {
     public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.GET_QUESTIONS + "__" + contentSection.toString() + "__" + limit + "__" + offset;
+        OperationType op = OperationType.GET_QUESTIONS;
+
+        String requestId = createRequestId(op, contentSection, limit, offset);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, requestId, contentSection, limit, offset, categories, loadIntention);
+            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, op, requestId, contentSection, limit, offset, categories, loadIntention);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_QUESTIONS, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void getCategories(String locale, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.GET_CATEGORIES + "__" + locale;
+        OperationType op = OperationType.GET_CATEGORIES;
+
+        String requestId = createRequestId(op, locale);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.getCategoriesIntent(context, requestId, locale);
+            Intent intent = ServiceIntentBuilder.getCategoriesIntent(context, op, requestId, locale);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_CATEGORIES, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void loginRegister(String email, String password, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.LOGIN_REGISTER + "__" + email;
+        OperationType op = OperationType.LOGIN_REGISTER;
+
+        String requestId = createRequestId(op, email);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.registerIntent(context, requestId, email, password);
+            Intent intent = ServiceIntentBuilder.registerIntent(context, op, requestId, email, password);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.LOGIN_REGISTER, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void uploadImage(UploadImageRequest.Image image, int imageOrdinalId, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.UPLOAD_IMAGE + "__" + imageOrdinalId + "__" + image.getOriginalFilename().replace("__", "");
+        OperationType op = OperationType.UPLOAD_IMAGE;
+
+        String requestId = createRequestId(op, imageOrdinalId, image.getOriginalFilename());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, requestId, image, imageOrdinalId);
+            Intent intent = ServiceIntentBuilder.uploadImageIntent(context, op, requestId, image, imageOrdinalId);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.UPLOAD_IMAGE, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void createQuestion(QuestionData questionData, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.CREATE_QUESTION + "__" + questionData.createFingerprint();
+        OperationType op = OperationType.CREATE_QUESTION;
+
+        String requestId = createRequestId(op, questionData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.createQuestionIntent(context, requestId, questionData);
+            Intent intent = ServiceIntentBuilder.createQuestionIntent(context, op, requestId, questionData);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.CREATE_QUESTION, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void pollVote(int questionId, int pollItemId, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.POLL_VOTE + "__" + questionId + "__" + pollItemId;
+        OperationType op = OperationType.POLL_VOTE;
+
+        String requestId = createRequestId(op, questionId, pollItemId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.pollVoteIntent(context, requestId, questionId, pollItemId);
+            Intent intent = ServiceIntentBuilder.pollVoteIntent(context, op, requestId, questionId, pollItemId);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.POLL_VOTE, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void getComments(int questionId, int limit, int offset, int loadIntention, ServiceCallback cb) {
         init();
 
-        String requestId = OperationType.GET_COMMENTS + "__" + questionId + "__" + limit + "__" + offset;
+        OperationType op = OperationType.GET_COMMENTS;
+
+        String requestId = createRequestId(op, questionId, limit, offset);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.getCommentsIntent(context, requestId, questionId, limit, offset, loadIntention);
+            Intent intent = ServiceIntentBuilder.getCommentsIntent(context, op, requestId, questionId, limit, offset, loadIntention);
             context.startService(intent);
         }
 
-        pendingOperations.put(requestId, new PendingOperation(OperationType.GET_COMMENTS, requestId));
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
     public void saveOperationsState(Bundle outState, String key) {
@@ -159,8 +173,9 @@ public class ServiceHelper {
         // TODO: seems like incorrect
         for (String opId : pendingOperations.keySet()) {
             PendingOperation op = pendingOperations.get(opId);
-            if (op.getOperationType() == OperationType.GET_QUESTIONS || op.getOperationType() == OperationType.GET_COMMENTS)
-                isRefreshing = true;
+            if (!isRefreshing) {
+                isRefreshing = op.getOperationType().canRefresh();
+            }
 
             addCallback(op.getOperationId(), callbacksKeeper.getCallback(op.getOperationType()));
         }
@@ -187,6 +202,16 @@ public class ServiceHelper {
 
     public void addCallback(String operationId, ServiceCallback cb) {
         callbackHelper.addCallback(operationId, cb);
+    }
+
+    private static String createRequestId(OperationType op, Object... args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(op.toString());
+        for (Object arg : args) {
+            sb.append("__");
+            sb.append(arg.toString().replace("__", ""));
+        }
+        return sb.toString();
     }
 
 
