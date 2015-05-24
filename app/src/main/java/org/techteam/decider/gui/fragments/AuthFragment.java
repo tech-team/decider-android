@@ -129,9 +129,7 @@ public class AuthFragment
             //actionBar.setHomeButtonEnabled(true);
         }
 
-        if (savedInstanceState == null) {
-
-        } else {
+        if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);

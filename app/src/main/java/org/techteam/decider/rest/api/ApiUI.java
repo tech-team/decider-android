@@ -199,6 +199,7 @@ public class ApiUI {
 
     public JSONObject getComments(GetCommentsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         UrlParams params = new UrlParams();
+        params.add("question_id", request.getQuestionId());
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
 

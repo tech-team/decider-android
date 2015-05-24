@@ -79,7 +79,7 @@ public final class ServiceIntentBuilder {
     }
 
     public static Intent getCommentsIntent(Context context, String requestId, int questionId, int limit, int offset, int loadIntention) {
-        Intent intent = getBasicIntent(context, requestId, OperationType.GET_QUESTIONS);
+        Intent intent = getBasicIntent(context, requestId, OperationType.GET_COMMENTS);
 
         intent.putExtra(GetCommentsRequest.IntentExtras.QUESTION_ID, questionId);
         intent.putExtra(GetCommentsRequest.IntentExtras.LIMIT, limit);

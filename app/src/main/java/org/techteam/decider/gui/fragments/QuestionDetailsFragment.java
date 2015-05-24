@@ -8,19 +8,22 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.method.CharacterPickerDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.android.camera.gallery.ImageListUber;
-
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.views.QuestionView;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsFragment extends Fragment {
     private MainActivity activity;
@@ -35,6 +38,16 @@ public class QuestionDetailsFragment extends Fragment {
     private RecyclerView commentsView;
     private EditText commentEdit;
     private ImageButton sendCommentButton;
+
+    private static final int COMMENTS_LIMIT = 30;
+    private int commentsOffset = 0;
+
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ServiceHelper serviceHelper;
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
 
     @Override
     public void setArguments(Bundle args) {
@@ -57,6 +70,19 @@ public class QuestionDetailsFragment extends Fragment {
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
+
+        serviceHelper = new ServiceHelper(activity);
+        callbacksKeeper.addCallback(OperationType.GET_COMMENTS, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "GetComments: ok");
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "GetComments: failed. " + message);
+            }
+        });
     }
 
     @Override
@@ -92,6 +118,30 @@ public class QuestionDetailsFragment extends Fragment {
                 sendComment();
             }
         });
+
+        if (savedInstanceState != null) {
+            serviceHelper.restoreOperationsState(savedInstanceState,
+                    BundleKeys.PENDING_OPERATIONS,
+                    callbacksKeeper);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        serviceHelper.init();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        serviceHelper.release();
     }
 
     private void sendComment() {
@@ -112,6 +162,11 @@ public class QuestionDetailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             questionView.reuse(entry, null);
+            serviceHelper.getComments(entry.getQId(),
+                    COMMENTS_LIMIT,
+                    commentsOffset,
+                    LoadIntention.REFRESH,
+                    callbacksKeeper.getCallback(OperationType.GET_COMMENTS));
         }
     }
 }

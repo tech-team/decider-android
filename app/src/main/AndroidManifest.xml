@@ -21,6 +21,7 @@
                            org.techteam.decider.content.entities.QuestionEntry,
                            org.techteam.decider.content.entities.TransactionEntry,
                            org.techteam.decider.content.entities.CategoryEntry,
+                           org.techteam.decider.content.entities.CommentEntry,
                            org.techteam.decider.content.entities.UploadedImageEntry
                            " />
 
