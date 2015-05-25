@@ -12,7 +12,7 @@ import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
-import org.techteam.decider.rest.api.LoginRegisterRequest;
+import org.techteam.decider.rest.api.RegisterRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
 
 import java.util.Collection;
@@ -49,10 +49,10 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
-    public static Intent registerIntent(Context context, OperationType op, String requestId, String email, String password) {
+    public static Intent loginRegisterIntent(Context context, OperationType op, String requestId, String email, String password) {
         Intent intent = getBasicIntent(context, requestId, op);
-        intent.putExtra(LoginRegisterRequest.IntentExtras.EMAIL, email);
-        intent.putExtra(LoginRegisterRequest.IntentExtras.PASSWORD, password);
+        intent.putExtra(RegisterRequest.IntentExtras.EMAIL, email);
+        intent.putExtra(RegisterRequest.IntentExtras.PASSWORD, password);
         return intent;
     }
 

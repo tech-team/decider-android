@@ -3,7 +3,8 @@ package org.techteam.decider.rest;
 public enum OperationType {
     GET_QUESTIONS(true),
     GET_CATEGORIES,
-    LOGIN_REGISTER,
+    LOGIN,
+    REGISTER,
     CREATE_QUESTION,
     UPLOAD_IMAGE,
     POLL_VOTE,

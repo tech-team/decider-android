@@ -3,7 +3,6 @@ package org.techteam.decider.gui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -101,16 +100,28 @@ public class AuthFragment
         this.activity = (MainActivity) activity;
 
         serviceHelper = new ServiceHelper(activity);
-        callbacksKeeper.addCallback(OperationType.LOGIN_REGISTER, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.LOGIN, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(activity.getBaseContext(), "LoginRegister: ok");
+                Toaster.toast(activity.getBaseContext(), "Login: ok");
                 openMainFragment();
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                Toaster.toast(activity.getBaseContext(), "LoginRegister: failed");
+                Toaster.toast(activity.getBaseContext(), "Login: failed. " + message);
+            }
+        });
+        callbacksKeeper.addCallback(OperationType.REGISTER, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(activity.getBaseContext(), "Register: ok");
+                openMainFragment();
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                Toaster.toast(activity.getBaseContext(), "Register: failed. " + message);
             }
         });
     }
@@ -169,7 +180,7 @@ public class AuthFragment
         }
 
         Toaster.toast(activity.getBaseContext(), email + " : " + password);
-        serviceHelper.loginRegister(email, password, callbacksKeeper.getCallback(OperationType.LOGIN_REGISTER));
+        serviceHelper.register(email, password, callbacksKeeper.getCallback(OperationType.REGISTER));
     }
 
     private void login() {
@@ -184,7 +195,7 @@ public class AuthFragment
         }
 
         Toaster.toast(activity.getBaseContext(), email + " : " + password);
-        serviceHelper.loginRegister(email, password, callbacksKeeper.getCallback(OperationType.LOGIN_REGISTER));
+        serviceHelper.login(email, password, callbacksKeeper.getCallback(OperationType.LOGIN));
     }
 
     private void loginViaVK() {

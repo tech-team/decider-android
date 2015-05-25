@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -70,17 +69,34 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void loginRegister(String email, String password, ServiceCallback cb) {
+    public void login(String email, String password, ServiceCallback cb) {
         init();
         email = email.trim();
 
-        OperationType op = OperationType.LOGIN_REGISTER;
+        OperationType op = OperationType.LOGIN;
 
         String requestId = createRequestId(op, email);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.registerIntent(context, op, requestId, email, password);
+            Intent intent = ServiceIntentBuilder.loginRegisterIntent(context, op, requestId, email, password);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
+    public void register(String email, String password, ServiceCallback cb) {
+        init();
+        email = email.trim();
+
+        OperationType op = OperationType.REGISTER;
+
+        String requestId = createRequestId(op, email);
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.loginRegisterIntent(context, op, requestId, email, password);
             context.startService(intent);
         }
 

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
@@ -110,12 +109,31 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject loginRegister(LoginRegisterRequest request) throws IOException, JSONException {
+    public JSONObject login(LoginRequest request) throws IOException, JSONException {
         UrlParams params = new UrlParams();
         params.add("email", request.getEmail());
         params.add("password", request.getPassword());
 
-        HttpResponse response = makeAuthPostCall(LoginRegisterRequest.URL, params);
+        HttpResponse response = makeAuthPostCall(LoginRequest.URL, params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        int code = response.getResponseCode();
+
+        JSONObject obj = new JSONObject(response.getBody());
+        if (code < 400) {
+            JSONObject objData = obj.getJSONObject("data");
+            saveToken(objData);
+        }
+        return obj;
+    }
+
+    public JSONObject register(RegisterRequest request) throws IOException, JSONException {
+        UrlParams params = new UrlParams();
+        params.add("email", request.getEmail());
+        params.add("password", request.getPassword());
+
+        HttpResponse response = makeAuthPostCall(RegisterRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
