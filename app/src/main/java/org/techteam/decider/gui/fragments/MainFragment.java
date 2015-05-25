@@ -187,7 +187,7 @@ public class MainFragment
         @Override
         public Fragment getItem(int position) {
             // TODO: static create() method with section arg
-            return new QuestionsListFragment();
+            return QuestionsListFragment.create(ContentSection.fromInt(position));
         }
 
         @Override

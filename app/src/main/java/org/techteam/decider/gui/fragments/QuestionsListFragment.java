@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,12 @@ public class QuestionsListFragment
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
+
+    public static QuestionsListFragment create(ContentSection section) {
+        QuestionsListFragment f = new QuestionsListFragment();
+        f.currentSection = section;
+        return f;
     }
 
 //    @Deprecated
@@ -218,6 +225,10 @@ public class QuestionsListFragment
                 System.out.println(msg);
             }
         });
+        Log.d(TAG, "restarting loader...");
+        Bundle args = new Bundle();
+        args.putInt(ContentLoader.BundleKeys.SECTION, currentSection.toInt());
+        getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
     }
 
     @Override
@@ -242,8 +253,6 @@ public class QuestionsListFragment
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         }
-
-        getLoaderManager().initLoader(LoaderIds.CONTENT_LOADER, null, contentDataLoaderCallbacks);
         initialized = true;
     }
 
@@ -352,6 +361,10 @@ public class QuestionsListFragment
 
             getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, null, contentDataLoaderCallbacks);
         }
+    }
+
+    public void setCurrentSection(ContentSection currentSection) {
+        this.currentSection = currentSection;
     }
 
     public boolean isInitialized() {

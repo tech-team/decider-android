@@ -66,12 +66,12 @@ public class UserEntry extends Model {
     }
 
     public static UserEntry fromJson(JSONObject obj, boolean forceRecreate) throws JSONException {
-        UserEntry entry = new UserEntry();
         String uid = obj.getString("uid");
-        UserEntry e = byUId(uid); // TODO: probably need to rewrite this without extra select
-        if (!forceRecreate && e != null) {
-            return e;
+        UserEntry entry = byUId(uid); // TODO: probably need to rewrite this without extra select
+        if (forceRecreate || entry == null) {
+            entry = new UserEntry();
         }
+
         entry.uid = uid;
         entry.username = obj.getString("username");
         entry.avatar = obj.getString("avatar");

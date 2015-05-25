@@ -98,8 +98,12 @@ public class QuestionEntry extends Model {
     }
 
     public static QuestionEntry fromJson(JSONObject obj) throws JSONException {
-        QuestionEntry entry = new QuestionEntry();
-        entry.qid = obj.getInt("id");
+        int qid = obj.getInt("id");
+        QuestionEntry entry = byQId(qid);
+        if (entry == null) {
+            entry = new QuestionEntry();
+        }
+        entry.qid = qid;
         entry.text = obj.getString("text");
         entry.creationDate = obj.getString("creation_date");
         entry.categoryId = obj.getInt("category_id");

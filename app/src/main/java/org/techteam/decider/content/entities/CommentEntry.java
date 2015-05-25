@@ -65,8 +65,12 @@ public class CommentEntry extends Model {
     }
 
     public static CommentEntry fromJson(JSONObject obj) throws JSONException {
-        CommentEntry entry = new CommentEntry();
-        entry.cid = obj.getInt("id");
+        int cid = obj.getInt("id");
+        CommentEntry entry = byCId(cid);
+        if (entry == null) {
+            entry = new CommentEntry();
+        }
+        entry.cid = cid;
         entry.text = obj.getString("text");
         entry.creationDate = obj.getString("creation_date");
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));

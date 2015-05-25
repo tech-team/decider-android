@@ -60,7 +60,11 @@ public class PollItemEntry extends Model {
     }
 
     public static PollItemEntry fromJson(JSONObject obj) throws JSONException {
-        PollItemEntry entry = new PollItemEntry();
+        int pid = obj.getInt("id");
+        PollItemEntry entry = byPId(pid);
+        if (entry == null) {
+            entry = new PollItemEntry();
+        }
         entry.pid = obj.getInt("id");
         entry.text = obj.getString("text");
         entry.imageUrl = obj.getString("image_url");

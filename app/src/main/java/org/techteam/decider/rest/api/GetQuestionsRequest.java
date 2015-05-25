@@ -31,6 +31,7 @@ public class GetQuestionsRequest {
 
     public static GetQuestionsRequest fromBundle(Bundle bundle) {
         ContentSection contentSection = ContentSection.fromInt(bundle.getInt(IntentExtras.CONTENT_SECTION, -1));
+        System.out.println("ContentSection = " + contentSection.toString());
         int limit = bundle.getInt(IntentExtras.LIMIT);
         int offset = bundle.getInt(IntentExtras.OFFSET);
         int loadIntention = bundle.getInt(IntentExtras.LOAD_INTENTION);
