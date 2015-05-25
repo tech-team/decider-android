@@ -11,6 +11,7 @@ import org.techteam.decider.net2.HttpFile;
 import org.techteam.decider.net2.HttpRequest;
 import org.techteam.decider.net2.HttpResponse;
 import org.techteam.decider.net2.UrlParams;
+import org.techteam.decider.rest.OperationType;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -109,12 +110,12 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject login(LoginRequest request) throws IOException, JSONException {
+    public JSONObject login(LoginRegisterRequest request) throws IOException, JSONException {
         UrlParams params = new UrlParams();
         params.add("email", request.getEmail());
         params.add("password", request.getPassword());
 
-        HttpResponse response = makeAuthPostCall(LoginRequest.URL, params);
+        HttpResponse response = makeAuthPostCall(LoginRegisterRequest.LOGIN_URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -128,12 +129,23 @@ public class ApiUI {
         return obj;
     }
 
-    public JSONObject register(RegisterRequest request) throws IOException, JSONException {
+    public JSONObject loginRegister(OperationType op, LoginRegisterRequest request) throws IOException, JSONException {
         UrlParams params = new UrlParams();
         params.add("email", request.getEmail());
         params.add("password", request.getPassword());
 
-        HttpResponse response = makeAuthPostCall(RegisterRequest.URL, params);
+        String path;
+        switch (op) {
+            case LOGIN:
+                path = LoginRegisterRequest.LOGIN_URL;
+                break;
+            case REGISTER:
+                path = LoginRegisterRequest.REGISTER_URL;
+                break;
+            default:
+                throw new RuntimeException(new IllegalArgumentException("unexpected operationType on loginRegister"));
+        }
+        HttpResponse response = makeAuthPostCall(path, params);
         if (response == null || response.getBody() == null) {
             return null;
         }

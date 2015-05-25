@@ -9,16 +9,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.LoginRequest;
-import org.techteam.decider.rest.api.RegisterRequest;
+import org.techteam.decider.rest.api.LoginRegisterRequest;
 
 import java.io.IOException;
 
-public class LoginProcessor extends Processor {
-    private static final String TAG = LoginProcessor.class.getName();
-    private final LoginRequest request;
+public class LoginRegiserProcessor extends Processor {
+    private static final String TAG = LoginRegiserProcessor.class.getName();
+    private final LoginRegisterRequest request;
 
-    public LoginProcessor(Context context, LoginRequest request) {
+    public LoginRegiserProcessor(Context context, LoginRegisterRequest request) {
         super(context);
         this.request = request;
     }
@@ -30,7 +29,8 @@ public class LoginProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.login(request);
+            JSONObject response = apiUI.loginRegister(operationType, request);
+
             System.out.println(response);
 
 
