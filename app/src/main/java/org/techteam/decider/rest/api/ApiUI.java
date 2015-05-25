@@ -229,12 +229,13 @@ public class ApiUI {
 
         if (code == HttpURLConnection.HTTP_FORBIDDEN) {
             refreshToken();
-            httpResponse = HttpDownloader.httpGet(httpRequest);
+            httpRequest.getParams().replace("access_token", getAccessToken());
+            httpResponse = HttpDownloader.exec(httpRequest);
             code = httpResponse.getResponseCode();
             if (code != HttpURLConnection.HTTP_FORBIDDEN) {
                 return httpResponse;
             }
-            throw new InvalidAccessTokenException();
+            throw new InvalidAccessTokenException(httpResponse.getBody());
         }
         return httpResponse;
     }
@@ -242,8 +243,9 @@ public class ApiUI {
     private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         prepareHttpRequest(httpRequest, params);
+        httpRequest.setRequestType(HttpRequest.Type.GET);
 
-        HttpResponse httpResponse = HttpDownloader.httpGet(httpRequest);
+        HttpResponse httpResponse = HttpDownloader.exec(httpRequest);
         httpResponse = checkResponse(httpResponse, httpRequest);
         return httpResponse;
     }
@@ -251,8 +253,9 @@ public class ApiUI {
     private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         prepareHttpRequest(httpRequest, params);
+        httpRequest.setRequestType(HttpRequest.Type.POST);
 
-        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
+        HttpResponse httpResponse = HttpDownloader.exec(httpRequest);
         httpResponse = checkResponse(httpResponse, httpRequest);
         return httpResponse;
     }
@@ -260,8 +263,9 @@ public class ApiUI {
     private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         prepareHttpRequest(httpRequest, params);
+        httpRequest.setRequestType(HttpRequest.Type.MULTIPART_POST);
 
-        HttpResponse httpResponse = HttpDownloader.httpMultipartPost(httpRequest);
+        HttpResponse httpResponse = HttpDownloader.exec(httpRequest);
         httpResponse = checkResponse(httpResponse, httpRequest);
         return httpResponse;
     }
@@ -270,8 +274,9 @@ public class ApiUI {
     private HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         httpRequest.setParams(params);
+        httpRequest.setRequestType(HttpRequest.Type.POST);
 
-        HttpResponse httpResponse = HttpDownloader.httpPost(httpRequest);
+        HttpResponse httpResponse = HttpDownloader.exec(httpRequest);
         int code = httpResponse.getResponseCode();
 
         return httpResponse;

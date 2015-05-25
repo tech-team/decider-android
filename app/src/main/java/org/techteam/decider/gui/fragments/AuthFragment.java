@@ -159,7 +159,7 @@ public class AuthFragment
     private void register() {
         Keyboard.hideSoftKeyboard(getActivity(), getView());
 
-        String email = emailText.getText().toString().trim();
+        String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
 

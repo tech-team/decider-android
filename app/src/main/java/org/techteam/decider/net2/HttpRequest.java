@@ -1,6 +1,12 @@
 package org.techteam.decider.net2;
 
 public class HttpRequest {
+    public static enum Type {
+        GET,
+        POST,
+        MULTIPART_POST
+    }
+
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     private String url;
@@ -10,6 +16,7 @@ public class HttpRequest {
     private boolean followRedirects = true;
     private CookieManager cookieManager = null;
     private boolean saveCookies = false;
+    private Type requestType = Type.GET;
 
     public HttpRequest(String url) {
         this(url, null, null);
@@ -62,6 +69,10 @@ public class HttpRequest {
         return saveCookies;
     }
 
+    public Type getRequestType() {
+        return requestType;
+    }
+
     public HttpRequest setUrl(String url) {
         this.url = url;
         return this;
@@ -94,5 +105,9 @@ public class HttpRequest {
 
     public void setSaveCookies(boolean saveCookies) {
         this.saveCookies = saveCookies;
+    }
+
+    public void setRequestType(Type requestType) {
+        this.requestType = requestType;
     }
 }

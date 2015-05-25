@@ -24,6 +24,14 @@ public class UrlParams implements Iterable<UrlParams.UrlParam<?>> {
             return value;
         }
 
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
+        }
+
         @Override
         public String toString() {
             return getKey() + ": " + getValue().toString();
@@ -64,6 +72,17 @@ public class UrlParams implements Iterable<UrlParams.UrlParam<?>> {
 
     public UrlParams add(UrlParam p) {
         params.add(p);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public UrlParams replace(String key, Object newValue) {
+        for (UrlParam p : params) {
+            if (p.getKey().equals(key)) {
+                p.setValue(newValue);
+                break;
+            }
+        }
         return this;
     }
 

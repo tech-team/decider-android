@@ -24,6 +24,18 @@ public class HttpDownloader {
     private static final int MULTIPART_BOUNDARY_MAX_SIZE = 40;
 
 
+    public static HttpResponse exec(HttpRequest httpRequest) throws IOException {
+        switch (httpRequest.getRequestType()) {
+            case GET:
+                return httpGet(httpRequest);
+            case POST:
+                return httpPost(httpRequest);
+            case MULTIPART_POST:
+                return httpMultipartPost(httpRequest);
+        }
+        throw new RuntimeException("Unexpected Request type");
+    }
+
     public static HttpResponse httpGet(String url) throws IOException {
         HttpRequest req = new HttpRequest(url);
         return httpGet(req);

@@ -72,6 +72,7 @@ public class ServiceHelper {
 
     public void loginRegister(String email, String password, ServiceCallback cb) {
         init();
+        email = email.trim();
 
         OperationType op = OperationType.LOGIN_REGISTER;
 
