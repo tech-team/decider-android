@@ -69,11 +69,9 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void login(String email, String password, ServiceCallback cb) {
+    private void loginRegister(String email, String password, OperationType op, ServiceCallback cb) {
         init();
         email = email.trim();
-
-        OperationType op = OperationType.LOGIN;
 
         String requestId = createRequestId(op, email);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -86,21 +84,14 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
+    public void login(String email, String password, ServiceCallback cb) {
+        OperationType op = OperationType.LOGIN;
+        loginRegister(email, password, op, cb);
+    }
+
     public void register(String email, String password, ServiceCallback cb) {
-        init();
-        email = email.trim();
-
         OperationType op = OperationType.REGISTER;
-
-        String requestId = createRequestId(op, email);
-        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
-
-        if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.loginRegisterIntent(context, op, requestId, email, password);
-            context.startService(intent);
-        }
-
-        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+        loginRegister(email, password, op, cb);
     }
 
     public void uploadImage(UploadImageRequest.Image image, int imageOrdinalId, ServiceCallback cb) {

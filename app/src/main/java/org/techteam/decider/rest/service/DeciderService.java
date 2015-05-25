@@ -10,19 +10,17 @@ import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
-import org.techteam.decider.rest.api.LoginRequest;
+import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
-import org.techteam.decider.rest.api.RegisterRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetCommentsProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
-import org.techteam.decider.rest.processors.LoginProcessor;
+import org.techteam.decider.rest.processors.LoginRegiserProcessor;
 import org.techteam.decider.rest.processors.PollVoteProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
-import org.techteam.decider.rest.processors.RegisterProcessor;
 import org.techteam.decider.rest.processors.UploadImageProcessor;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 
@@ -85,14 +83,10 @@ public class DeciderService extends IntentService {
                 processor = new GetCategoriesProcessor(getBaseContext(), request);
                 break;
             }
-            case LOGIN: {
-                LoginRequest request = LoginRequest.fromBundle(extras);
-                processor = new LoginProcessor(getBaseContext(), request);
-                break;
-            }
+            case LOGIN:
             case REGISTER: {
-                RegisterRequest request = RegisterRequest.fromBundle(extras);
-                processor = new RegisterProcessor(getBaseContext(), request);
+                LoginRegisterRequest request = LoginRegisterRequest.fromBundle(extras);
+                processor = new LoginRegiserProcessor(getBaseContext(), request);
                 break;
             }
             case CREATE_QUESTION: {
