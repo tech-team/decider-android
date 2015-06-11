@@ -1,9 +1,15 @@
 package org.techteam.decider.gui.views;
 
-import android.app.FragmentTransaction;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,16 +20,22 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.activities.MainActivity;
-import org.techteam.decider.gui.fragments.AddQuestionFragment;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.fragments.ProfileFragment;
-import org.techteam.decider.util.Toaster;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class QuestionView extends PostView {
@@ -46,6 +58,7 @@ public class QuestionView extends PostView {
     private PollView pollView;
 
     // footer
+    private ImageButton shareButton;
     private Button likeButton;
     private Button commentsButton;
 
@@ -82,6 +95,7 @@ public class QuestionView extends PostView {
         pollView = (PollView) v.findViewById(R.id.poll_view);
 
         // footer
+        shareButton = (ImageButton) v.findViewById(R.id.share_button);
         likeButton = (Button) v.findViewById(R.id.like_button);
         commentsButton = (Button) v.findViewById(R.id.comments_button);
 
@@ -212,7 +226,82 @@ public class QuestionView extends PostView {
         });
     }
 
+    //TODO: govnokod
+    private Uri leftImage;
+    private Uri rightImage;
+
     protected void attachCallbacks() {
+        shareButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ArrayList<String> texts = new ArrayList<>();
+                texts.add("test");
+
+                final Context context = v.getContext();
+
+                ImageLoader.getInstance().loadImage(
+                        "http://img3.wikia.nocookie.net/__cb20121227201208/jamesbond/images/6/61/Generic_Placeholder_-_Profile.jpg",
+                        new ImageLoadingListener() {
+                            @Override
+                            public void onLoadingStarted(String imageUri, View view) {
+
+                            }
+
+                            @Override
+                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+                            }
+
+                            @Override
+                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                //http://stackoverflow.com/questions/23830157/open-file-in-cache-directory-with-action-view
+                                //https://developer.android.com/reference/android/support/v4/content/FileProvider.html
+                                File imagePath = new File(context.getFilesDir(), "images");
+                                imagePath.mkdir();
+
+                                File file = new File(imagePath, "default_image.jpg");
+
+                                if (file.exists()) {
+                                    file.delete();
+                                }
+
+                                FileOutputStream out = null;
+                                try {
+                                    out = new FileOutputStream(file);
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+
+                                loadedImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                                try {
+                                    out.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Uri uri = FileProvider.getUriForFile(context, "org.techteam.decider", file);
+
+                                ArrayList<Uri> images = new ArrayList<>();
+                                images.add(uri);
+                                images.add(uri);
+
+                                Intent sendIntent = new Intent();
+                                sendIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                sendIntent.setType("image/jpeg");
+                                //sendIntent.putExtra(Intent.EXTRA_TEXT, texts);
+                                sendIntent.putExtra(Intent.EXTRA_STREAM, images);
+                                context.startActivity(sendIntent);
+                            }
+
+                            @Override
+                            public void onLoadingCancelled(String imageUri, View view) {
+
+                            }
+                        });
+            }
+        });
+
         commentsButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,6 +326,32 @@ public class QuestionView extends PostView {
                 ProfileFragment.create(activity, null);
             }
         });
+    }
+
+    private Uri getImageContentUri(File imageFile) {
+        Context context = getContext();
+
+        String filePath = imageFile.getAbsolutePath();
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[] { MediaStore.Images.Media._ID },
+                MediaStore.Images.Media.DATA + "=? ",
+                new String[] { filePath }, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor
+                    .getColumnIndex(MediaStore.MediaColumns._ID));
+            Uri baseUri = Uri.parse("content://media/external/images/media");
+            return Uri.withAppendedPath(baseUri, "" + id);
+        } else {
+            if (imageFile.exists()) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DATA, filePath);
+                return context.getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                return null;
+            }
+        }
     }
 
     public void setOnQuestionEventCallback(OnQuestionEventCallback cb) {

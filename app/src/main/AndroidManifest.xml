@@ -46,7 +46,20 @@
             android:exported="false" >
         </service>
 
-        <provider android:authorities="org.techteam.decider" android:exported="false" android:name="com.activeandroid.content.ContentProvider" />
+        <provider
+            android:authorities="org.techteam.decider"
+            android:exported="false"
+            android:name="com.activeandroid.content.ContentProvider" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="org.techteam.decider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <!--<provider-->
             <!--android:authorities="org.techteam.decider.db.providers.DeciderDbProvider"-->
