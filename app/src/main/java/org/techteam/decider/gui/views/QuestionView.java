@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -27,6 +29,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.WorkingFileProvider;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.fragments.ProfileFragment;
@@ -36,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class QuestionView extends PostView {
@@ -234,9 +238,6 @@ public class QuestionView extends PostView {
         shareButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ArrayList<String> texts = new ArrayList<>();
-                texts.add("test");
-
                 final Context context = v.getContext();
 
                 ImageLoader.getInstance().loadImage(
@@ -254,8 +255,6 @@ public class QuestionView extends PostView {
 
                             @Override
                             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                //http://stackoverflow.com/questions/23830157/open-file-in-cache-directory-with-action-view
-                                //https://developer.android.com/reference/android/support/v4/content/FileProvider.html
                                 File imagePath = new File(context.getFilesDir(), "images");
                                 imagePath.mkdir();
 
@@ -279,7 +278,7 @@ public class QuestionView extends PostView {
                                     e.printStackTrace();
                                 }
 
-                                Uri uri = FileProvider.getUriForFile(context, "org.techteam.decider", file);
+                                Uri uri = WorkingFileProvider.getUriForFile(context, "org.techteam.decider.lol", file);
 
                                 ArrayList<Uri> images = new ArrayList<>();
                                 images.add(uri);
@@ -288,10 +287,18 @@ public class QuestionView extends PostView {
                                 Intent sendIntent = new Intent();
                                 sendIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
                                 sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                sendIntent.setType("image/jpeg");
-                                //sendIntent.putExtra(Intent.EXTRA_TEXT, texts);
+                                sendIntent.setType("image/*");
+                                sendIntent.putExtra(Intent.EXTRA_TEXT, "test");
                                 sendIntent.putExtra(Intent.EXTRA_STREAM, images);
-                                context.startActivity(sendIntent);
+
+                                //grant permisions for all apps that can handle given intent
+                                List<ResolveInfo> resInfoList = context.getPackageManager().queryIntentActivities(sendIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                                for (ResolveInfo resolveInfo : resInfoList) {
+                                    String packageName = resolveInfo.activityInfo.packageName;
+                                    context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                }
+
+                                context.startActivity(Intent.createChooser(sendIntent, "Select app"));
                             }
 
                             @Override
