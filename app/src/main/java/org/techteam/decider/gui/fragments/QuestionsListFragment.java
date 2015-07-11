@@ -2,6 +2,7 @@ package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -309,6 +310,7 @@ public class QuestionsListFragment
         getFragmentManager()
                 .beginTransaction()
                 .add(R.id.content_frame, detailsFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack("mainFragment")
                 .commit();
     }

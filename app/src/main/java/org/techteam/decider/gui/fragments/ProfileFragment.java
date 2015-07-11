@@ -115,7 +115,10 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getFragmentManager().beginTransaction()
-                        .add(R.id.content_frame, new EditProfileFragment()).commit();
+                        .add(R.id.content_frame, new EditProfileFragment())
+                        .addToBackStack("profileFragment")
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .commit();
             }
         });
     }
