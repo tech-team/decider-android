@@ -72,5 +72,18 @@
     <string name="about_label">About:</string>
     <string name="about_placeholder">My name is Vasja and i\'m am Pupkin from Russia</string>
     <string name="profile_toolbar_title">Profile</string>
+    <string name="name">Name</string>
+    <string name="surname_hint">Surname...</string>
+    <string name="name_hint">Name...</string>
+    <string name="location_icon">Your location icon</string>
+    <string name="city_hint">City...</string>
+    <string name="country_hint">Country...</string>
+    <string name="about_hint">I am...</string>
+    <string name="about_icon">About icon</string>
+    <string name="date_hint">01.02.1992</string>
+    <string name="profile_edit_toolbar_title">Edit profile</string>
+    <string name="save_profile">Save</string>
+    <string name="save_profile_hint">Save profile</string>
+    <string name="edit_profile_hint">Edit profile</string>
 
 </resources>
