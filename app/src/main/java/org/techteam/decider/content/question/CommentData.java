@@ -6,24 +6,24 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class QuestionData implements Parcelable {
+public class CommentData implements Parcelable {
     private String text;
-    private int categoryEntryUid;
+    private int questionId;
     private boolean anonymous;
 
-    public QuestionData() {
+    public CommentData() {
 
     }
 
-    public QuestionData(String text, int categoryEntryUid, boolean anonymous) {
+    public CommentData(String text, int questionId, boolean anonymous) {
         this.text = text;
-        this.categoryEntryUid = categoryEntryUid;
+        this.questionId = questionId;
         this.anonymous = anonymous;
     }
 
-    public QuestionData(Parcel in) {
+    public CommentData(Parcel in) {
         text = in.readString();
-        categoryEntryUid = in.readInt();
+        questionId = in.readInt();
         boolean[] b = new boolean[1];
         in.readBooleanArray(b);
         anonymous = b[0];
@@ -33,8 +33,8 @@ public abstract class QuestionData implements Parcelable {
         return text;
     }
 
-    public int getCategoryEntryUid() {
-        return categoryEntryUid;
+    public int getQuestionId() {
+        return questionId;
     }
 
     public boolean isAnonymous() {
@@ -45,8 +45,8 @@ public abstract class QuestionData implements Parcelable {
         this.text = text;
     }
 
-    public void setCategoryEntryUid(int categoryEntryUid) {
-        this.categoryEntryUid = categoryEntryUid;
+    public void setQuestionId(int questionId) {
+        this.questionId = questionId;
     }
 
     public void setAnonymous(boolean anonymous) {
@@ -56,20 +56,36 @@ public abstract class QuestionData implements Parcelable {
     public JSONObject toJson() throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("text", text.trim());
-        obj.put("category_id", categoryEntryUid);
+        obj.put("question_id", questionId);
         obj.put("is_anonymous", anonymous);
         return obj;
     }
 
     public String createFingerprint() {
-        return text.length() + "_" + Integer.toString(categoryEntryUid) + "_" + Boolean.toString(anonymous);
+        return text.length() + "_" + Integer.toString(questionId) + "_" + Boolean.toString(anonymous);
     }
 
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(text);
-        dest.writeInt(categoryEntryUid);
+        dest.writeInt(questionId);
         dest.writeBooleanArray(new boolean[] {anonymous});
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Parcelable.Creator<CommentData> CREATOR
+            = new Parcelable.Creator<CommentData>() {
+        public CommentData createFromParcel(Parcel in) {
+            return new CommentData(in);
+        }
+
+        public CommentData[] newArray(int size) {
+            return new CommentData[size];
+        }
+    };
 }

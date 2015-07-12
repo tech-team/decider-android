@@ -9,10 +9,10 @@ import com.activeandroid.content.ContentProvider;
 
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.QuestionHelper;
+import org.techteam.decider.content.entities.CommentEntry;
 
-public class ContentLoader extends CursorLoader {
+public class CommentsLoader extends CursorLoader {
 
-    private ContentSection contentSection;
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
@@ -25,12 +25,10 @@ public class ContentLoader extends CursorLoader {
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
         public static final String INSERTED_COUNT = "INSERTED_COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
-        public static final String SECTION = "SECTION";
     }
 
-    public ContentLoader(Context context, ContentSection contentSection, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public CommentsLoader(Context context, Integer entryPosition, Integer insertedCount, int loadIntention) {
         super(context);
-        this.contentSection = contentSection;
         this.entryPosition = entryPosition;
         this.insertedCount = insertedCount;
         this.loadIntention = loadIntention;
@@ -38,7 +36,7 @@ public class ContentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        Uri uri = ContentProvider.createUri(QuestionHelper.getClass(contentSection), null);
+        Uri uri = ContentProvider.createUri(CommentEntry.class, null);
         return getContext().getContentResolver().query(uri, null, null, null, null);
     }
 

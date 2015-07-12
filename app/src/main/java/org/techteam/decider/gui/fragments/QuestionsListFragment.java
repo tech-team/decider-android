@@ -19,12 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.PostsListAdapter;
-import org.techteam.decider.gui.loaders.ContentLoader;
+import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.views.QuestionInteractor;
@@ -34,9 +33,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public class QuestionsListFragment
@@ -70,7 +67,7 @@ public class QuestionsListFragment
     private MainActivity activity;
     private boolean initialized = false;
 
-    private LoaderManager.LoaderCallbacks<Cursor> contentDataLoaderCallbacks = new LoaderCallbacksImpl();
+    private LoaderManager.LoaderCallbacks<Cursor> questionsLoaderCallbacks = new QuestionsLoaderCallbacksImpl();
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -81,43 +78,6 @@ public class QuestionsListFragment
         f.currentSection = section;
         return f;
     }
-
-//    @Deprecated
-//    private void setPosts(ArrayList<QuestionEntry> entries) {
-//        adapter.setAll(entries);
-//        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-//            adapter.notifyDataSetChanged();
-//        } else {
-//            delayedAdapterNotifications.add(new Runnable() {
-//                @Override
-//                public void run() {
-//                    adapter.notifyDataSetChanged();
-//                }
-//            });
-//        }
-//    }
-//
-//    @Deprecated
-//    private void addPosts(ArrayList<QuestionEntry> entries) {
-//        final int oldCount = adapter.getItemCount() - 1; //minus "Loading..." item
-//        final int addedCount = entries.size();
-//
-//        final String str = Integer.toString(addedCount) + " posts added";
-//
-//        adapter.addAll(entries);
-//        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-//            adapter.notifyItemRangeInserted(oldCount, addedCount);
-//            Toaster.toast(getActivity(), str + " (right away)");
-//        } else {
-//            delayedAdapterNotifications.add(new Runnable() {
-//                @Override
-//                public void run() {
-//                    adapter.notifyItemRangeInserted(oldCount, addedCount);
-//                    Toaster.toast(getActivity(), str + " (after scroll)");
-//                }
-//            });
-//        }
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -188,16 +148,18 @@ public class QuestionsListFragment
                 int loadIntention = data.getInt(GetQuestionsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
                 int loadedSection = data.getInt(GetQuestionsExtras.SECTION);
 
+                questionsOffset += insertedCount;
+
                 String msg;
                 if (isFeedFinished) {
                     msg = "No more posts";
                 } else {
                     msg = "Successfully fetched posts";
                     Bundle args = new Bundle();
-                    args.putInt(ContentLoader.BundleKeys.INSERTED_COUNT, insertedCount);
-                    args.putInt(ContentLoader.BundleKeys.LOAD_INTENTION, loadIntention);
-                    args.putInt(ContentLoader.BundleKeys.SECTION, loadedSection);
-                    getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
+                    args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
+                    args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
+                    args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
+                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
 
 //                Toaster.toast(getActivity().getApplicationContext(), msg);
@@ -228,8 +190,8 @@ public class QuestionsListFragment
         });
         Log.d(TAG, "restarting loader...");
         Bundle args = new Bundle();
-        args.putInt(ContentLoader.BundleKeys.SECTION, currentSection.toInt());
-        getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, args, contentDataLoaderCallbacks);
+        args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
+        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -361,7 +323,7 @@ public class QuestionsListFragment
 
             //cause posts to re-render
 
-            getLoaderManager().restartLoader(LoaderIds.CONTENT_LOADER, null, contentDataLoaderCallbacks);
+            getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
         }
     }
 
@@ -373,37 +335,37 @@ public class QuestionsListFragment
         return initialized;
     }
 
-    private class LoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
+    private class QuestionsLoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            if  (id == LoaderIds.CONTENT_LOADER) {
+            if  (id == LoaderIds.QUESTIONS_LOADER) {
                 Integer entryPos = null;
                 Integer insertedCount = null;
                 int loadIntention = LoadIntention.REFRESH;
                 ContentSection loadedSection = currentSection;
                 if (args != null) {
-                    entryPos = args.getInt(ContentLoader.BundleKeys.ENTRY_POSITION, -1);
+                    entryPos = args.getInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, -1);
                     entryPos = entryPos == -1 ? null : entryPos;
 
-                    insertedCount = args.getInt(ContentLoader.BundleKeys.INSERTED_COUNT, -1);
+                    insertedCount = args.getInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, -1);
                     insertedCount = insertedCount == -1 ? null : insertedCount;
 
-                    loadIntention = args.getInt(ContentLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
-                    loadedSection = ContentSection.fromInt(args.getInt(ContentLoader.BundleKeys.SECTION));
+                    loadIntention = args.getInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+                    loadedSection = ContentSection.fromInt(args.getInt(QuestionsLoader.BundleKeys.SECTION));
                 }
 
                 //TODO: you may ask: why don't just store section and categories here, as field? idk
-                return new ContentLoader(getActivity(), loadedSection, entryPos, insertedCount, loadIntention);
+                return new QuestionsLoader(getActivity(), loadedSection, entryPos, insertedCount, loadIntention);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
-            ContentLoader contentLoader = (ContentLoader) loader;
-            Integer entryPos = contentLoader.getEntryPosition();
-            Integer count = contentLoader.getInsertedCount();
-            int loadIntention = contentLoader.getLoadIntention();
+            QuestionsLoader questionsLoader = (QuestionsLoader) loader;
+            Integer entryPos = questionsLoader.getEntryPosition();
+            Integer count = questionsLoader.getInsertedCount();
+            int loadIntention = questionsLoader.getLoadIntention();
 
             if (loadIntention == LoadIntention.REFRESH) {
                 adapter.swapCursor(newCursor);

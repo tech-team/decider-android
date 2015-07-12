@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
@@ -165,6 +166,18 @@ public class ApiUI {
         params.add("data", data.toJson().toString());
 
         HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
+    public JSONObject createComment(CreateCommentRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+        CommentData data = request.getCommentData();
+        UrlParams params = new UrlParams();
+        params.add("data", data.toJson().toString());
+
+        HttpResponse response = makeProtectedPostCall(CreateCommentRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }

@@ -5,8 +5,10 @@ import android.content.Intent;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.CreateCommentRequest;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
@@ -85,6 +87,12 @@ public final class ServiceIntentBuilder {
         intent.putExtra(GetCommentsRequest.IntentExtras.LIMIT, limit);
         intent.putExtra(GetCommentsRequest.IntentExtras.OFFSET, offset);
         intent.putExtra(GetCommentsRequest.IntentExtras.LOAD_INTENTION, loadIntention);
+        return intent;
+    }
+
+    public static Intent createCommentIntent(Context context, OperationType op, String requestId, CommentData commentData) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(CreateCommentRequest.IntentExtras.COMMENT_DATA, commentData);
         return intent;
     }
 }

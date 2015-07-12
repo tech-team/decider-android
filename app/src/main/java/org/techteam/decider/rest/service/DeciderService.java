@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.CreateCommentRequest;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
@@ -13,11 +14,12 @@ import org.techteam.decider.rest.api.GetQuestionsRequest;
 import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
+import org.techteam.decider.rest.processors.CreateCommentProcessor;
 import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetCommentsProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
-import org.techteam.decider.rest.processors.LoginRegiserProcessor;
+import org.techteam.decider.rest.processors.LoginRegisterProcessor;
 import org.techteam.decider.rest.processors.PollVoteProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
@@ -86,7 +88,7 @@ public class DeciderService extends IntentService {
             case LOGIN:
             case REGISTER: {
                 LoginRegisterRequest request = LoginRegisterRequest.fromBundle(extras);
-                processor = new LoginRegiserProcessor(getBaseContext(), request);
+                processor = new LoginRegisterProcessor(getBaseContext(), request);
                 break;
             }
             case CREATE_QUESTION: {
@@ -107,6 +109,11 @@ public class DeciderService extends IntentService {
             case GET_COMMENTS: {
                 GetCommentsRequest request = GetCommentsRequest.fromBundle(extras);
                 processor = new GetCommentsProcessor(getBaseContext(), request);
+                break;
+            }
+            case CREATE_COMMENT: {
+                CreateCommentRequest request = CreateCommentRequest.fromBundle(extras);
+                processor = new CreateCommentProcessor(getBaseContext(), request);
                 break;
             }
 

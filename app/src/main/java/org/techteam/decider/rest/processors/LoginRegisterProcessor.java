@@ -2,6 +2,7 @@ package org.techteam.decider.rest.processors;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
@@ -13,11 +14,11 @@ import org.techteam.decider.rest.api.LoginRegisterRequest;
 
 import java.io.IOException;
 
-public class LoginRegiserProcessor extends Processor {
-    private static final String TAG = LoginRegiserProcessor.class.getName();
+public class LoginRegisterProcessor extends Processor {
+    private static final String TAG = LoginRegisterProcessor.class.getName();
     private final LoginRegisterRequest request;
 
-    public LoginRegiserProcessor(Context context, LoginRegisterRequest request) {
+    public LoginRegisterProcessor(Context context, LoginRegisterRequest request) {
         super(context);
         this.request = request;
     }
@@ -30,8 +31,7 @@ public class LoginRegiserProcessor extends Processor {
         Bundle result = getInitialBundle();
         try {
             JSONObject response = apiUI.loginRegister(operationType, request);
-
-            System.out.println(response);
+            Log.i(TAG, response.toString());
 
 
             String status = response.getString("status");
