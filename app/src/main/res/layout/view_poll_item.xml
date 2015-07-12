@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_frame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="4dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardElevation="6dp"
+    card_view:cardBackgroundColor="@color/md_green_100"
+    card_view:cardCornerRadius="12dp">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
         <ImageView
             android:id="@+id/poll_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:layout_gravity="center"
             android:src="@drawable/photo_placeholder"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/poll_item_image" />
 
-        <ImageView
-            android:id="@+id/poll_selection_mark"
+        <TextView
+            android:id="@+id/poll_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="20dp"
-            android:src="@android:drawable/btn_star_big_on"
-            android:contentDescription="@string/poll_item_selection_mark"
-            />
+            android:layout_gravity="center" />
 
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/poll_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-</LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

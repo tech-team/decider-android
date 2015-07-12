@@ -1,6 +1,7 @@
 package org.techteam.decider.gui.views;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +19,8 @@ import org.techteam.decider.rest.api.ApiUI;
 
 public class PollItemView extends FrameLayout {
     // children
+    protected CardView cardView;
     protected ImageView imageView;
-    protected ImageView selectedMarkView;
     protected TextView ratingText;
 
     // listener
@@ -59,8 +60,8 @@ public class PollItemView extends FrameLayout {
             }
         });
 
-        selectedMarkView = (ImageView) v.findViewById(R.id.poll_selection_mark);
-        selectedMarkView.setVisibility(INVISIBLE);
+        cardView = (CardView) v.findViewById(R.id.item_frame);
+        setMarked(false);
 
         ratingText = (TextView) v.findViewById(R.id.poll_rating);
     }
@@ -68,12 +69,16 @@ public class PollItemView extends FrameLayout {
     protected void onImageClick() {
         if (listener != null) {
             listener.polled(this, this.entry);
-            selectedMarkView.setVisibility(VISIBLE);
+            setMarked(true);
         }
     }
 
     public void setMarked(boolean marked) {
-        selectedMarkView.setVisibility(marked ? VISIBLE : INVISIBLE);
+        int color = getResources().getColor(android.R.color.white);
+        if (marked)
+            color = getResources().getColor(android.R.color.holo_green_light);
+
+        cardView.setBackgroundColor(color);
     }
 
     public void setEntry(PollItemEntry entry) {
