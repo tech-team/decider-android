@@ -2,6 +2,7 @@ package org.techteam.decider.rest.processors;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
@@ -37,7 +38,7 @@ public class GetQuestionsProcessor extends Processor {
         Bundle result = getInitialBundle();
         try {
             JSONObject response = apiUI.getQuestions(request);
-            System.out.println(response);
+            Log.i(TAG, response.toString());
 
             if (request.getLoadIntention() == LoadIntention.REFRESH) {
                 QuestionHelper.deleteAll(request.getContentSection());

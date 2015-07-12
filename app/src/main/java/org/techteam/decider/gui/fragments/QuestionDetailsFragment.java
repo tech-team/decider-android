@@ -2,6 +2,9 @@ package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -16,8 +19,12 @@ import android.widget.ImageButton;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.adapters.CommentsListAdapter;
+import org.techteam.decider.gui.loaders.CommentsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
+import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.views.QuestionView;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -25,7 +32,8 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-public class QuestionDetailsFragment extends Fragment {
+public class QuestionDetailsFragment extends Fragment
+            implements OnListScrolledDownCallback {
     private MainActivity activity;
     private QuestionEntry entry;
     private int qid;
@@ -39,11 +47,15 @@ public class QuestionDetailsFragment extends Fragment {
     private EditText commentEdit;
     private ImageButton sendCommentButton;
 
+    private CommentsListAdapter adapter;
+
     private static final int COMMENTS_LIMIT = 30;
     private int commentsOffset = 0;
 
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
+
+    private LoaderManager.LoaderCallbacks<Cursor> commentsLoaderCallbacks = new CommentsLoaderCallbacksImpl();
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -61,6 +73,10 @@ public class QuestionDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_question_details, container, false);
 
+        // TODO: adapter has to be attached to recyclerView probably
+        adapter = new CommentsListAdapter(null, getActivity(), null, QuestionDetailsFragment.this, null);
+//        recyclerView.setAdapter(adapter);
+
         return rootView;
     }
 
@@ -76,11 +92,40 @@ public class QuestionDetailsFragment extends Fragment {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "GetComments: ok");
+
+                boolean isFeedFinished = data.getBoolean(GetCommentsExtras.FEED_FINISHED, false);
+                int insertedCount = data.getInt(GetCommentsExtras.COUNT, -1);
+                int loadIntention = data.getInt(GetCommentsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
+
+                commentsOffset += insertedCount;
+
+                String msg;
+                if (isFeedFinished) {
+                    msg = "No more posts";
+                } else {
+                    msg = "Successfully fetched posts";
+                    Bundle args = new Bundle();
+                    args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
+                    args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
+                    getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
+                }
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "GetComments: failed. " + message);
+            }
+        });
+
+        callbacksKeeper.addCallback(OperationType.CREATE_COMMENT, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "CreateComment: ok");
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "CreateComment: failed. " + message);
             }
         });
     }
@@ -145,10 +190,27 @@ public class QuestionDetailsFragment extends Fragment {
     }
 
     private void sendComment() {
-        //TODO: sendComment
-
+        String text = commentEdit.getText().toString();
         commentEdit.setText("");
+
+        serviceHelper.createComment(new CommentData(text, entry.getQId(), false),
+                callbacksKeeper.getCallback(OperationType.CREATE_COMMENT));
     }
+
+    @Override
+    public void onScrolledDown() {
+        int intention;
+        if (adapter.getCursor().getCount() == 0) {
+            intention = LoadIntention.REFRESH;
+        } else {
+            intention = LoadIntention.APPEND;
+        }
+
+        // TODO
+    }
+
+
+
 
     class RetrieveEntryTask extends AsyncTask<Void, Void, Void> {
 
@@ -167,6 +229,57 @@ public class QuestionDetailsFragment extends Fragment {
                     commentsOffset,
                     LoadIntention.REFRESH,
                     callbacksKeeper.getCallback(OperationType.GET_COMMENTS));
+        }
+    }
+
+
+
+
+    private class CommentsLoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            if  (id == LoaderIds.COMMENTS_LOADER) {
+                Integer entryPos = null;
+                Integer insertedCount = null;
+                int loadIntention = LoadIntention.REFRESH;
+                if (args != null) {
+                    entryPos = args.getInt(CommentsLoader.BundleKeys.ENTRY_POSITION, -1);
+                    entryPos = entryPos == -1 ? null : entryPos;
+
+                    insertedCount = args.getInt(CommentsLoader.BundleKeys.INSERTED_COUNT, -1);
+                    insertedCount = insertedCount == -1 ? null : insertedCount;
+
+                    loadIntention = args.getInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+                }
+
+                return new CommentsLoader(getActivity(), entryPos, insertedCount, loadIntention);
+            }
+            throw new IllegalArgumentException("Loader with given id is not found");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+            CommentsLoader questionsLoader = (CommentsLoader) loader;
+            Integer entryPos = questionsLoader.getEntryPosition();
+            Integer count = questionsLoader.getInsertedCount();
+            int loadIntention = questionsLoader.getLoadIntention();
+
+            if (loadIntention == LoadIntention.REFRESH) {
+                adapter.swapCursor(newCursor);
+            } else {
+                if (entryPos != null) {
+                    adapter.swapCursor(newCursor, entryPos);
+                } else if (count != null) {
+                    adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
+                } else {
+                    adapter.swapCursor(newCursor);
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            adapter.swapCursor(null);
         }
     }
 }

@@ -29,10 +29,11 @@ public class CommentEntry extends Model {
     @Column(name="creation_date")
     public String creationDate; // TODO: change to DateTime
 
-    @Column(name="likes_count")
-    public int likesCount;
+    @Column(name="anonymous")
+    public boolean anonymous;
 
-    protected CommentEntry() {
+    public CommentEntry() {
+        super();
     }
 
     public int getCid() {
@@ -51,8 +52,8 @@ public class CommentEntry extends Model {
         return creationDate;
     }
 
-    public int getLikesCount() {
-        return likesCount;
+    public boolean isAnonymous() {
+        return anonymous;
     }
 
     public Long saveTotal() {
@@ -74,7 +75,9 @@ public class CommentEntry extends Model {
         entry.text = obj.getString("text");
         entry.creationDate = obj.getString("creation_date");
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));
-        entry.likesCount = obj.getInt("likes_count");
+        if (obj.has("is_anonymous")) {
+            entry.anonymous = obj.getBoolean("is_anonymous");
+        }
 
         return entry;
     }

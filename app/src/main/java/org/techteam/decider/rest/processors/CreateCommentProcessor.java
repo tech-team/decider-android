@@ -6,25 +6,25 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.CommentEntry;
-import org.techteam.decider.gui.loaders.LoadIntention;
+import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.content.entities.UploadedImageEntry;
+import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.GetCommentsRequest;
+import org.techteam.decider.rest.api.CreateCommentRequest;
+import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
-import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
-public class GetCommentsProcessor extends Processor {
-    private static final String TAG = GetCommentsProcessor.class.getName();
-    private final GetCommentsRequest request;
+public class CreateCommentProcessor extends Processor {
+    private static final String TAG = CreateCommentProcessor.class.getName();
+    private final CreateCommentRequest request;
 
-    public GetCommentsProcessor(Context context, GetCommentsRequest request) {
+    public CreateCommentProcessor(Context context, CreateCommentRequest request) {
         super(context);
         this.request = request;
     }
@@ -36,12 +36,8 @@ public class GetCommentsProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getComments(request);
+            JSONObject response = apiUI.createComment(request);
             Log.i(TAG, response.toString());
-
-            if (request.getLoadIntention() == LoadIntention.REFRESH) {
-                CommentEntry.deleteAll();
-            }
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
@@ -52,25 +48,23 @@ public class GetCommentsProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                JSONArray data = response.getJSONArray("data");
-                for (int i = 0; i < data.length(); ++i) {
-                    JSONObject q = data.getJSONObject(i);
-                    CommentEntry entry = CommentEntry.fromJson(q);
-                    entry.saveTotal();
-                }
+                UploadedImageEntry.deleteAll();
+
+                JSONObject data = response.getJSONObject("data");
+                CommentEntry entry = CommentEntry.fromJson(data);
+                entry.saveTotal();
                 ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
             } finally {
                 ActiveAndroid.endTransaction();
             }
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-        } catch (IOException | JSONException | InvalidAccessTokenException | TokenRefreshFailException e) {
+        } catch (IOException | JSONException | TokenRefreshFailException | InvalidAccessTokenException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
-            cb.onError(e.getMessage(), result);
+            cb.onError(null, result);
         }
 
     }
@@ -78,7 +72,6 @@ public class GetCommentsProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetCommentsExtras.LOAD_INTENTION, request.getLoadIntention());
         return data;
     }
 }

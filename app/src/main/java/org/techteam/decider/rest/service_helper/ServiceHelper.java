@@ -10,6 +10,7 @@ import android.util.Log;
 
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -158,6 +159,22 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
+    public void createComment(CommentData commentData, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.CREATE_COMMENT;
+
+        String requestId = createRequestId(op, commentData.createFingerprint());
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.createCommentIntent(context, op, requestId, commentData);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
     public void saveOperationsState(Bundle outState, String key) {
         outState.putParcelableArrayList(key, new ArrayList<>(pendingOperations.values()));
     }
@@ -239,15 +256,16 @@ public class ServiceHelper {
             List<ServiceCallback> callbacks = callbackHelper.getCallbacks(id);
             if (callbacks != null) {
                 for (ServiceCallback cb : callbacks) {
-                    if (status == DeciderService.CallbackIntentExtras.Status.OK) {
-                        cb.onSuccess(id, data);
-                    } else {
-                        cb.onError(id, data, errorMsg);
+                    if (cb != null) {
+                        if (status == DeciderService.CallbackIntentExtras.Status.OK) {
+                            cb.onSuccess(id, data);
+                        } else {
+                            cb.onError(id, data, errorMsg);
+                        }
                     }
-                    pendingOperations.remove(id);
                 }
             }
-
+            pendingOperations.remove(id);
             callbackHelper.removeCallbacks(id);
         }
     }

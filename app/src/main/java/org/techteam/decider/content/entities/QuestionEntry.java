@@ -44,6 +44,12 @@ public class QuestionEntry extends Model {
     @Column(name="comments_count")
     public int commentsCount;
 
+    @Column(name="anonymous")
+    public boolean anonymous;
+
+    @Column(name="voted")
+    public boolean voted;
+
     public QuestionEntry() {
         super();
     }
@@ -84,6 +90,14 @@ public class QuestionEntry extends Model {
         return commentsCount;
     }
 
+    public boolean isAnonymous() {
+        return anonymous;
+    }
+
+    public boolean isVoted() {
+        return voted;
+    }
+
     public Long saveTotal() {
         author.save();
         if (pollItem1 != null)
@@ -109,6 +123,8 @@ public class QuestionEntry extends Model {
         entry.categoryId = obj.getInt("category_id");
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));
         entry.likesCount = obj.getInt("likes_count");
+        entry.anonymous = obj.getBoolean("is_anonymous");
+        entry.voted = obj.getBoolean("voted");
 
         if (!obj.isNull("poll")) {
             JSONArray pollItems = obj.getJSONArray("poll");

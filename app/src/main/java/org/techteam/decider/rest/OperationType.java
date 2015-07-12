@@ -8,7 +8,8 @@ public enum OperationType {
     CREATE_QUESTION,
     UPLOAD_IMAGE,
     POLL_VOTE,
-    GET_COMMENTS(true);
+    GET_COMMENTS(true),
+    CREATE_COMMENT;
 
     private boolean canRefresh = false;
 
