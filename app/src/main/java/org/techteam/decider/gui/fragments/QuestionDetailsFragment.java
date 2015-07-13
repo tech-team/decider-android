@@ -59,13 +59,13 @@ public class QuestionDetailsFragment extends Fragment
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+        public static final String Q_ID = "qid";
     }
 
     @Override
     public void setArguments(Bundle args) {
-        //TODO: hardcoded key, bla-bla-bla...
         if (args != null) {
-            qid = args.getInt("qid");
+            qid = args.getInt(BundleKeys.Q_ID);
         }
     }
 
@@ -73,7 +73,35 @@ public class QuestionDetailsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_question_details, container, false);
 
-        // TODO: transfer all findings here from onActivityCreated
+        // setup toolbar
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.post_details_toolbar);
+        this.activity.setSupportActionBar(toolbar);
+
+        ActionBar actionBar = this.activity.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        // find children
+        questionView = (QuestionView) rootView.findViewById(R.id.post_view);
+        commentsView = (RecyclerView) rootView.findViewById(R.id.comments_recycler);
+
+        commentEdit = (EditText) rootView.findViewById(R.id.comment_edit);
+        sendCommentButton = (ImageButton) rootView.findViewById(R.id.comment_send);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        commentsView.setLayoutManager(layoutManager);
+
+
+        adapter = new CommentsListAdapter(null, getActivity(), null, QuestionDetailsFragment.this, null);
+        commentsView.setAdapter(adapter);
+
+        sendCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendComment();
+            }
+        });
 
         return rootView;
     }
@@ -132,52 +160,24 @@ public class QuestionDetailsFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // setup toolbar
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.post_details_toolbar);
-        this.activity.setSupportActionBar(toolbar);
-
-        ActionBar actionBar = this.activity.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-
-        // find children
-        questionView = (QuestionView) rootView.findViewById(R.id.post_view);
-        commentsView = (RecyclerView) rootView.findViewById(R.id.comments_recycler);
-
-        commentEdit = (EditText) rootView.findViewById(R.id.comment_edit);
-        sendCommentButton = (ImageButton) rootView.findViewById(R.id.comment_send);
-
-        // set data
-        retrieveEntryTask = new RetrieveEntryTask();
-        retrieveEntryTask.execute();
-
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        commentsView.setLayoutManager(layoutManager);
-
-
-        adapter = new CommentsListAdapter(null, getActivity(), null, QuestionDetailsFragment.this, null);
-        commentsView.setAdapter(adapter);
-
-
-        sendCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendComment();
-            }
-        });
-
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
+
+            qid = savedInstanceState.getInt(BundleKeys.Q_ID);
         }
+
+        // set data
+        retrieveEntryTask = new RetrieveEntryTask();
+        retrieveEntryTask.execute();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+        outState.putInt(BundleKeys.Q_ID, qid);
     }
 
     @Override
