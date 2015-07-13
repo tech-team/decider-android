@@ -317,6 +317,14 @@ public class QuestionView extends PostView {
             }
         });
 
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (questionInteractor != null)
+                    questionInteractor.onCommentsClick(entry);
+            }
+        });
+
         likeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

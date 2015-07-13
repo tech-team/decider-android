@@ -57,7 +57,7 @@ public class QuestionDetailsFragment extends Fragment
 
     private LoaderManager.LoaderCallbacks<Cursor> commentsLoaderCallbacks = new CommentsLoaderCallbacksImpl();
 
-    private static final class BundleKeys {
+    public static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String Q_ID = "qid";
     }

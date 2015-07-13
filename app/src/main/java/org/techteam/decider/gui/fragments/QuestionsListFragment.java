@@ -266,7 +266,7 @@ public class QuestionsListFragment
     public void onCommentsClick(QuestionEntry entry) {
         QuestionDetailsFragment detailsFragment = new QuestionDetailsFragment();
         Bundle detailsBundle = new Bundle();
-        detailsBundle.putInt("qid", entry.getQId());
+        detailsBundle.putInt(QuestionDetailsFragment.BundleKeys.Q_ID, entry.getQId());
         detailsFragment.setArguments(detailsBundle);
 
         getFragmentManager()
