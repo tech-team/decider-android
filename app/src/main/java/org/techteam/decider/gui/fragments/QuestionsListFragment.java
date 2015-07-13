@@ -234,7 +234,7 @@ public class QuestionsListFragment
 
         serviceHelper.getQuestions(currentSection,
                 QUESTIONS_LIMIT,
-                questionsOffset,
+                questionsOffset = 0,
                 activity.getSelectedCategories(),
                 LoadIntention.REFRESH,
                 callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
@@ -252,12 +252,12 @@ public class QuestionsListFragment
             intention = LoadIntention.APPEND;
         }
 
-//        serviceHelper.getQuestions(currentSection,
-//                QUESTIONS_LIMIT,
-//                questionsOffset = 0,
-//                chosenCategories,
-//                intention,
-//                callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
+        serviceHelper.getQuestions(currentSection,
+                QUESTIONS_LIMIT,
+                questionsOffset,
+                activity.getSelectedCategories(),
+                intention,
+                callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
 
 //        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, intention, callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
     }

@@ -50,22 +50,28 @@ public class GetCommentsProcessor extends Processor {
                 return;
             }
 
-            ActiveAndroid.beginTransaction();
-            try {
-                JSONArray data = response.getJSONArray("data");
-                for (int i = 0; i < data.length(); ++i) {
-                    JSONObject q = data.getJSONObject(i);
-                    CommentEntry entry = CommentEntry.fromJson(q);
-                    entry.saveTotal();
+            JSONArray data = response.getJSONArray("data");
+
+            if (data.length() == 0) {
+                result.putBoolean(ServiceCallback.GetCommentsExtras.FEED_FINISHED, true);
+            } else {
+
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (int i = 0; i < data.length(); ++i) {
+                        JSONObject q = data.getJSONObject(i);
+                        CommentEntry entry = CommentEntry.fromJson(q);
+                        entry.saveTotal();
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+
+                    result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
+                } finally {
+                    ActiveAndroid.endTransaction();
                 }
-                ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
-            } finally {
-                ActiveAndroid.endTransaction();
+                transactionFinished(operationType, requestId);
             }
-
-            transactionFinished(operationType, requestId);
             cb.onSuccess(result);
         } catch (IOException | JSONException | InvalidAccessTokenException | TokenRefreshFailException e) {
             e.printStackTrace();

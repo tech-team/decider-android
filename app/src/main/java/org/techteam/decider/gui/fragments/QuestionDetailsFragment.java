@@ -73,9 +73,7 @@ public class QuestionDetailsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_question_details, container, false);
 
-        // TODO: adapter has to be attached to recyclerView probably
-        adapter = new CommentsListAdapter(null, getActivity(), null, QuestionDetailsFragment.this, null);
-//        recyclerView.setAdapter(adapter);
+        // TODO: transfer all findings here from onActivityCreated
 
         return rootView;
     }
@@ -156,6 +154,11 @@ public class QuestionDetailsFragment extends Fragment
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         commentsView.setLayoutManager(layoutManager);
+
+
+        adapter = new CommentsListAdapter(null, getActivity(), null, QuestionDetailsFragment.this, null);
+        commentsView.setAdapter(adapter);
+
 
         sendCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override

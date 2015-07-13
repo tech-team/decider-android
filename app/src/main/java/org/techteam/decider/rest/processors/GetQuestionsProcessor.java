@@ -51,23 +51,28 @@ public class GetQuestionsProcessor extends Processor {
                 return;
             }
 
-            ActiveAndroid.beginTransaction();
-            try {
-                JSONArray data = response.getJSONArray("data");
-                for (int i = 0; i < data.length(); ++i) {
-                    JSONObject q = data.getJSONObject(i);
-                    QuestionEntry question = QuestionEntry.fromJson(q);
+            JSONArray data = response.getJSONArray("data");
+            if (data.length() == 0) {
+                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, 0);
+                result.putBoolean(ServiceCallback.GetQuestionsExtras.FEED_FINISHED, true);
+            } else {
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (int i = 0; i < data.length(); ++i) {
+                        JSONObject q = data.getJSONObject(i);
+                        QuestionEntry question = QuestionEntry.fromJson(q);
 
-                    QuestionHelper.saveQuestion(request.getContentSection(), question);
+                        QuestionHelper.saveQuestion(request.getContentSection(), question);
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+
+                    result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
+                } finally {
+                    ActiveAndroid.endTransaction();
                 }
-                ActiveAndroid.setTransactionSuccessful();
-
-                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
-            } finally {
-                ActiveAndroid.endTransaction();
+                transactionFinished(operationType, requestId);
             }
 
-            transactionFinished(operationType, requestId);
             cb.onSuccess(result);
         } catch (IOException | JSONException | InvalidAccessTokenException | TokenRefreshFailException e) {
             e.printStackTrace();
