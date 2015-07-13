@@ -10,6 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -85,8 +87,21 @@ public class PollItemView extends FrameLayout {
         this.entry = entry;
 
         ImageLoader imageLoader = ImageLoader.getInstance();
-        if (!imageLoader.isInited())
-            imageLoader.init(ImageLoaderConfiguration.createDefault(getContext()));
+        if (!imageLoader.isInited()) {
+            DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .build();
+
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getContext())
+                    .defaultDisplayImageOptions(defaultOptions)
+                    .memoryCache(new LruMemoryCache(50 * 1024 * 1024))
+                    .diskCacheSize(100 * 1024 * 1024)
+                    .diskCacheFileCount(300)
+                    .build();
+
+            imageLoader.init(config);
+        }
 
         if (entry.getPreviewUrl() != null) {
             imageLoader.displayImage(ApiUI.resolveUrl(entry.getPreviewUrl()), imageView);

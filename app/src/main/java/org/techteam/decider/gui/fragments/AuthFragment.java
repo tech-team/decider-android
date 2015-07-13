@@ -1,5 +1,7 @@
 package org.techteam.decider.gui.fragments;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -18,7 +20,7 @@ import com.vk.sdk.VKSdkListener;
 import com.vk.sdk.api.VKError;
 
 import org.techteam.decider.R;
-import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.activities.AuthActivity;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -30,7 +32,7 @@ public class AuthFragment
         extends Fragment {
 
     public static final String TAG = AuthFragment.class.toString();
-    private MainActivity activity;
+    private AuthActivity activity;
 
     // VK stuff
     private static final String VK_APP_ID = "4855698";
@@ -97,14 +99,14 @@ public class AuthFragment
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
-        this.activity = (MainActivity) activity;
+        this.activity = (AuthActivity) activity;
 
         serviceHelper = new ServiceHelper(activity);
         callbacksKeeper.addCallback(OperationType.LOGIN, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(activity.getBaseContext(), "Login: ok");
-                openMainFragment();
+                continueAuthorization();
             }
 
             @Override
@@ -116,7 +118,20 @@ public class AuthFragment
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(activity.getBaseContext(), "Register: ok");
-                openMainFragment();
+
+                AccountManager am = AccountManager.get(activity);
+                final String appName = getString(R.string.app_name);
+                Account[] accounts = am.getAccountsByType(appName);
+                if (accounts.length == 0) {
+                    //am.addAccountExplicitly(appName, null, null, null, activity, null, null);
+                } else {
+                    Account account = accounts[0];
+                    //am.set
+                    //am.renameAccount();
+                    //am.setPassword();
+                }
+
+                continueAuthorization();
             }
 
             @Override
@@ -156,15 +171,28 @@ public class AuthFragment
     @Override
     public void onResume() {
         super.onResume();
-        activity.lockDrawer();
         serviceHelper.init();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        activity.unlockDrawer();
         serviceHelper.release();
+    }
+
+    private void login() {
+        Keyboard.hideSoftKeyboard(getActivity(), getView());
+
+        String email = emailText.getText().toString();
+        String password = passwordText.getText().toString();
+
+        if (email.equals("") || password.equals("")) {
+            Toaster.toast(activity.getBaseContext(), "email or password are empty");
+            return;
+        }
+
+        Toaster.toast(activity.getBaseContext(), email + " : " + password);
+        serviceHelper.login(email, password, callbacksKeeper.getCallback(OperationType.LOGIN));
     }
 
     private void register() {
@@ -181,21 +209,6 @@ public class AuthFragment
 
         Toaster.toast(activity.getBaseContext(), email + " : " + password);
         serviceHelper.register(email, password, callbacksKeeper.getCallback(OperationType.REGISTER));
-    }
-
-    private void login() {
-        Keyboard.hideSoftKeyboard(getActivity(), getView());
-
-        String email = emailText.getText().toString();
-        String password = passwordText.getText().toString();
-
-        if (email.equals("") || password.equals("")) {
-            Toaster.toast(activity.getBaseContext(), "email or password are empty");
-            return;
-        }
-
-        Toaster.toast(activity.getBaseContext(), email + " : " + password);
-        serviceHelper.login(email, password, callbacksKeeper.getCallback(OperationType.LOGIN));
     }
 
     private void loginViaVK() {
@@ -227,15 +240,16 @@ public class AuthFragment
                 Toaster.toast(activity, newToken.userId);
 
                 // open main fragment
-                openMainFragment();
+                continueAuthorization();
             }
         }, VK_APP_ID);
 
         VKSdk.authorize(VK_AUTH_SCOPE);
     }
 
-    private void openMainFragment() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, new MainFragment()).commit();
+    private void continueAuthorization() {
+        Activity activity = getActivity();
+        activity.setResult(Activity.RESULT_OK);
+        activity.finish();
     }
 }

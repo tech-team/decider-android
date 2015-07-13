@@ -1,14 +1,18 @@
 package org.techteam.decider.gui.activities;
 
-import android.app.FragmentTransaction;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +21,6 @@ import android.widget.AdapterView;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -27,17 +30,17 @@ import com.vk.sdk.VKUIHelper;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
-import org.techteam.decider.gui.adapters.Category;
-import org.techteam.decider.gui.fragments.AuthFragment;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.gui.fragments.ProfileFragment;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
     public static final String TOKEN_PREF_KEY = "token";
+
+    public static final int AUTH_REQUEST_CODE = 101;
 
     // drawer related stuff
     private AccountHeader.Result headerResult;
@@ -57,17 +60,48 @@ public class MainActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             // show main fragment if user has token
             // or auth fragment otherwise
-            String token = sharedPrefs.getString(TOKEN_PREF_KEY, null);
-            if (token != null) {
-                getFragmentManager().beginTransaction()
-                        .add(R.id.content_frame, new MainFragment()).commit();
-            } else {
-                getFragmentManager().beginTransaction()
-                        .add(R.id.content_frame, new AuthFragment()).commit();
-            }
-        } else {
+            AccountManager am = AccountManager.get(this);
+            Account[] accounts = am.getAccountsByType(getString(R.string.app_name));
+            if (accounts.length == 0) {
+//                getFragmentManager().beginTransaction()
+//                        .add(R.id.content_frame, new AuthFragment()).commit();
+                Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+                startActivityForResult(intent, AUTH_REQUEST_CODE);
 
+            } else {
+                Account account = accounts[0];
+
+                am.getAuthToken(account, null, null, this, new AccountManagerCallback<Bundle>() {
+                    @Override
+                    public void run(AccountManagerFuture<Bundle> future) {
+                        try {
+                            Bundle bundle = future.getResult();
+                            Intent intent = (Intent) bundle.get(AccountManager.KEY_INTENT);
+                            if (intent != null) {
+                                startActivityForResult(intent, AUTH_REQUEST_CODE);
+                            } else {
+                                final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                                //ignore token...
+
+                                finishAuthorization();
+                            }
+
+                        } catch (OperationCanceledException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (AuthenticatorException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, null);
+            }
         }
+    }
+
+    private void finishAuthorization() {
+        getFragmentManager().beginTransaction()
+                .add(R.id.content_frame, new MainFragment()).commit();
     }
 
     @Override
@@ -75,34 +109,10 @@ public class MainActivity extends ActionBarActivity {
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
-    //
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     @Override
     protected void onResume() {
         super.onResume();
         VKUIHelper.onResume(this);
-
     }
 
     @Override
@@ -113,8 +123,11 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
+        if (requestCode == AUTH_REQUEST_CODE) {
+            finishAuthorization();
+        } else {
+            VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
+        }
     }
 
     @Override

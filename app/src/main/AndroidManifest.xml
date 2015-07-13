@@ -42,6 +42,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".gui.activities.AuthActivity"
+            android:label="@string/auth_title"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+        </activity>
+
         <activity android:name="com.vk.sdk.VKOpenAuthActivity" />
         <!-- Declare the bundled CropImage Activity -->
         <activity android:name="com.android.camera.CropImage"/>
