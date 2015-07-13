@@ -4,6 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:name="org.techteam.decider.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="org.techteam.decider.permission.C2D_MESSAGE" />
 
     <application
         android:name="com.activeandroid.app.Application"
@@ -62,16 +67,32 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!--<provider-->
-            <!--android:authorities="org.techteam.decider.db.providers.DeciderDbProvider"-->
-            <!--android:name=".db.providers.DeciderDbProvider"-->
-            <!--android:exported="false">-->
-        <!--</provider>-->
-        <!--<provider-->
-            <!--android:authorities="org.techteam.decider.db.providers.TransactionProvider"-->
-            <!--android:name=".db.providers.TransactionProvider"-->
-            <!--android:exported="false">-->
-        <!--</provider>-->
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="org.techteam.decider" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="org.techteam.decider.gcm.DeciderGcmListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.techteam.decider.gcm.DeciderInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
