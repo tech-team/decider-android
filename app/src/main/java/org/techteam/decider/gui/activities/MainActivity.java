@@ -7,7 +7,6 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
@@ -38,8 +37,6 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
-    public static final String TOKEN_PREF_KEY = "token";
-
     public static final int AUTH_REQUEST_CODE = 101;
 
     // drawer related stuff
@@ -51,10 +48,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
@@ -63,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
             AccountManager am = AccountManager.get(this);
             Account[] accounts = am.getAccountsByType(getString(R.string.app_name));
             if (accounts.length == 0) {
-//                getFragmentManager().beginTransaction()
-//                        .add(R.id.content_frame, new AuthFragment()).commit();
                 Intent intent = new Intent(MainActivity.this, AuthActivity.class);
                 startActivityForResult(intent, AUTH_REQUEST_CODE);
 

@@ -33,4 +33,10 @@ public interface ServiceCallback {
         public static final String COUNT = "COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
     }
+
+    class LoginRegisterExtras {
+        public static final String LOGIN = "LOGIN";
+        public static final String PASSWORD = "PASSWORD";
+        public static final String TOKEN = "TOKEN";
+    }
 }

@@ -9,6 +9,7 @@
 
     <permission android:name="org.techteam.decider.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="org.techteam.decider.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
     <application
         android:name="com.activeandroid.app.Application"
@@ -97,6 +98,13 @@
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
+        </service>
+        <service android:name="org.techteam.decider.auth.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
         </service>
 
     </application>
