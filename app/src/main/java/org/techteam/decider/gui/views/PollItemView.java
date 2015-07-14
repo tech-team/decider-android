@@ -1,11 +1,14 @@
 package org.techteam.decider.gui.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +17,11 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.LoadedFrom;
+import com.nostra13.universalimageloader.core.display.BitmapDisplayer;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
@@ -104,7 +112,14 @@ public class PollItemView extends FrameLayout {
         }
 
         if (entry.getPreviewUrl() != null) {
-            imageLoader.displayImage(ApiUI.resolveUrl(entry.getPreviewUrl()), imageView);
+            imageLoader.displayImage(ApiUI.resolveUrl(entry.getPreviewUrl()), imageView, new SimpleImageLoadingListener() {
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    Animation anim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
+                    imageView.setAnimation(anim);
+                    anim.start();
+                }
+            });
         }
         ratingText.setText(Integer.toString(entry.getVotesCount()));
         setMarked(entry.isVoted());

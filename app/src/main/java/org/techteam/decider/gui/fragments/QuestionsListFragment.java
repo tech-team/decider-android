@@ -71,6 +71,7 @@ public class QuestionsListFragment
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+        public static final String QUESTIONS_OFFSET = "QUESTIONS_OFFSET";
     }
 
     public static QuestionsListFragment create(ContentSection section) {
@@ -148,8 +149,6 @@ public class QuestionsListFragment
                 int loadIntention = data.getInt(GetQuestionsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
                 int loadedSection = data.getInt(GetQuestionsExtras.SECTION);
 
-                questionsOffset += insertedCount;
-
                 String msg;
                 if (isFeedFinished) {
                     msg = "No more posts";
@@ -201,10 +200,7 @@ public class QuestionsListFragment
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
         sharedPref.registerOnSharedPreferenceChangeListener(this);
 
-        if (savedInstanceState == null) {
-
-        } else {
-
+        if (savedInstanceState != null) {
             boolean isRefreshing = serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
@@ -215,6 +211,8 @@ public class QuestionsListFragment
             } else {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
+
+            questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET);
         }
         initialized = true;
     }
@@ -223,7 +221,7 @@ public class QuestionsListFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
-
+        outState.putInt(BundleKeys.QUESTIONS_OFFSET, questionsOffset);
     }
 
     @Override
@@ -368,11 +366,13 @@ public class QuestionsListFragment
             int loadIntention = questionsLoader.getLoadIntention();
 
             if (loadIntention == LoadIntention.REFRESH) {
+                questionsOffset += newCursor.getCount();
                 adapter.swapCursor(newCursor);
             } else {
                 if (entryPos != null) {
                     adapter.swapCursor(newCursor, entryPos);
                 } else if (count != null) {
+                    questionsOffset += newCursor.getCount();
                     adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
                 } else {
                     adapter.swapCursor(newCursor);
