@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             // show main fragment if user has token
             // or auth fragment otherwise
             AccountManager am = AccountManager.get(this);
+
             Account[] accounts = am.getAccountsByType(getString(R.string.app_name));
             if (accounts.length == 0) {
                 Intent intent = new Intent(MainActivity.this, AuthActivity.class);

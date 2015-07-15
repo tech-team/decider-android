@@ -24,7 +24,8 @@ import org.techteam.decider.util.Toaster;
 
 
 public class AuthActivity extends AccountAuthenticatorActivity {
-    public static final String TAG = AuthActivity.class.getSimpleName();
+    public static final String TAG = AuthActivity.class.getName();
+
     public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
     public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
     public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
@@ -36,7 +37,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private final int REQ_SIGNUP = 1;
 
-    private String appName;
+    private final static String appName = "org.techteam.decider";
 
     private AccountManager mAccountManager;
     private String mAuthTokenType;
@@ -64,7 +65,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         setContentView(R.layout.fragment_auth);
 
         mAccountManager = AccountManager.get(getBaseContext());
-        appName = "org.techteam.decider";
 
         // find controls
         emailText = (EditText) findViewById(R.id.email_text);
@@ -180,7 +180,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     }
 
     private void finishLogin(Bundle data) {
-        Log.d("decider", TAG + "> finishLogin");
+        Log.d(TAG, "> finishLogin");
 
         String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN); //AccountManager.KEY_ACCOUNT_NAME
         String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
@@ -190,14 +190,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         final Account account = new Account(login, appName);
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
-            Log.d("decider", TAG + "> finishLogin > addAccountExplicitly");
+            Log.d(TAG, "> finishLogin > addAccountExplicitly");
 
             // Creating the account on the device and setting the auth token we got
             // (Not setting the auth token will cause another call to the server to authenticate the user)
             mAccountManager.addAccountExplicitly(account, password, null);
             mAccountManager.setAuthToken(account, mAuthTokenType, token);
         } else {
-            Log.d("decider", TAG + "> finishLogin > setPassword");
+            Log.d(TAG, "> finishLogin > setPassword");
             mAccountManager.setPassword(account, password);
         }
 

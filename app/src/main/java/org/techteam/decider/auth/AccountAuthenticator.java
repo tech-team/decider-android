@@ -20,7 +20,7 @@ import static org.techteam.decider.auth.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY;
 import static org.techteam.decider.auth.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
 
 public class AccountAuthenticator extends AbstractAccountAuthenticator {
-    private String TAG = "UdinicAuthenticator";
+    private String TAG = AccountAuthenticator.class.getName();
     private final Context mContext;
 
     public AccountAuthenticator(Context context) {
@@ -32,7 +32,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
-        Log.d("decider", TAG + "> addAccount");
+        Log.d(TAG, "> addAccount");
 
         final Intent intent = new Intent(mContext, AuthActivity.class);
 
@@ -48,7 +48,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
-        Log.d("decider", TAG + "> getAuthToken");
+        Log.d(TAG, "> getAuthToken");
 
         // If the caller requested an authToken type we don't support, then
         // return an error
@@ -64,7 +64,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
         String authToken = am.peekAuthToken(account, authTokenType);
 
-        Log.d("decider", TAG + "> peekAuthToken returned - " + authToken);
+        Log.d(TAG, "> peekAuthToken returned - " + authToken);
 
         // Lets give another try to authenticate the user
         if (TextUtils.isEmpty(authToken)) {
