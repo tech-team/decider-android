@@ -1,12 +1,8 @@
 package org.techteam.decider.gui.activities;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
@@ -27,17 +23,19 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
+import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.gui.fragments.ProfileFragment;
 
-import java.io.IOException;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
     public static final int AUTH_REQUEST_CODE = 101;
+    public static String PACKAGE_NAME;
+
 
     // drawer related stuff
     private AccountHeader.Result headerResult;
@@ -48,47 +46,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PACKAGE_NAME = getApplicationContext().getPackageName();
+
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            // show main fragment if user has token
-            // or auth fragment otherwise
             AccountManager am = AccountManager.get(this);
-
-            Account[] accounts = am.getAccountsByType(getString(R.string.app_name));
-            if (accounts.length == 0) {
-                Intent intent = new Intent(MainActivity.this, AuthActivity.class);
-                startActivityForResult(intent, AUTH_REQUEST_CODE);
-
-            } else {
-                Account account = accounts[0];
-
-                am.getAuthToken(account, null, null, this, new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        try {
-                            Bundle bundle = future.getResult();
-                            Intent intent = (Intent) bundle.get(AccountManager.KEY_INTENT);
-                            if (intent != null) {
-                                startActivityForResult(intent, AUTH_REQUEST_CODE);
-                            } else {
-                                final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-                                //ignore token...
-
-                                finishAuthorization();
-                            }
-
-                        } catch (OperationCanceledException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (AuthenticatorException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, null);
-            }
+            am.getAuthTokenByFeatures(PACKAGE_NAME, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, this, null, null, new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    finishAuthorization();
+                }
+            }, null);
         }
     }
 
@@ -112,15 +82,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         VKUIHelper.onDestroy(this);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AUTH_REQUEST_CODE) {
-            finishAuthorization();
-        } else {
-            VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
-        }
     }
 
     @Override

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import org.techteam.decider.R;
+import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.gui.activities.lib.AccountAuthenticatorActivity;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -184,7 +185,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN); //AccountManager.KEY_ACCOUNT_NAME
         String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
-        String token = data.getString(AccountManager.KEY_AUTHTOKEN);
+        String token = data.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
         String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
         final Account account = new Account(login, appName);
@@ -195,7 +196,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             // Creating the account on the device and setting the auth token we got
             // (Not setting the auth token will cause another call to the server to authenticate the user)
             mAccountManager.addAccountExplicitly(account, password, null);
-            mAccountManager.setAuthToken(account, mAuthTokenType, token);
+            mAccountManager.setAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, token);
         } else {
             Log.d(TAG, "> finishLogin > setPassword");
             mAccountManager.setPassword(account, password);
