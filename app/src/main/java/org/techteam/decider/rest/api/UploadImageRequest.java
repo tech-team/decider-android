@@ -6,27 +6,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import org.techteam.decider.content.question.ImageData;
+
 public class UploadImageRequest {
-    public static class Image {
-        private final String originalFilename;
-        private final String previewFilename;
-
-        public Image(String originalFilename, String previewFilename) {
-            this.originalFilename = originalFilename;
-            this.previewFilename = previewFilename;
-        }
-
-        public String getOriginalFilename() {
-            return originalFilename;
-        }
-
-        public String getPreviewFilename() {
-            return previewFilename;
-        }
-    }
-
-    public static final String URL = "images";
-    private final Image image;
+        public static final String URL = "images";
+    private final ImageData image;
     private final int imageOrdinalId;
 
     public class IntentExtras {
@@ -35,7 +19,7 @@ public class UploadImageRequest {
         public static final String IMAGE_ORDINAL_ID = "IMAGE_ORDINAL_ID";
     }
 
-    public UploadImageRequest(Image image, int imageOrdinalId) {
+    public UploadImageRequest(ImageData image, int imageOrdinalId) {
         this.image = image;
         this.imageOrdinalId = imageOrdinalId;
     }
@@ -44,10 +28,10 @@ public class UploadImageRequest {
         String originalImage = bundle.getString(IntentExtras.ORIGINAL_IMAGE);
         String previewImage = bundle.getString(IntentExtras.PREVIEW_IMAGE);
         int imageOrdinalId = bundle.getInt(IntentExtras.IMAGE_ORDINAL_ID);
-        return new UploadImageRequest(new Image(originalImage, previewImage), imageOrdinalId);
+        return new UploadImageRequest(new ImageData(originalImage, previewImage), imageOrdinalId);
     }
 
-    public Image getImage() {
+    public ImageData getImage() {
         return image;
     }
 

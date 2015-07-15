@@ -14,6 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.content.question.CommentData;
+import org.techteam.decider.content.question.ImageData;
+import org.techteam.decider.content.question.ImageQuestionData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
@@ -25,6 +27,7 @@ import org.techteam.decider.rest.OperationType;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -176,15 +179,39 @@ public class ApiUI {
     }
 
     public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
-        QuestionData data = request.getQuestionData();
-        UrlParams params = new UrlParams();
-        params.add("data", data.toJson().toString());
-
-        HttpResponse response = makeProtectedPostCall(CreateQuestionRequest.URL, params);
-        if (response == null || response.getBody() == null) {
-            return null;
+        ImageQuestionData q = (ImageQuestionData) request.getQuestionData();
+        ImageData[] images = { q.getPicture1(), q.getPicture2() };
+        ImageParamFacade[] imageParamFacades = new ImageParamFacade[images.length];
+        for (int i = 0; i < images.length; ++i) {
+            imageParamFacades[i] = new ImageParamFacade(images[i]);
         }
-        return new JSONObject(response.getBody());
+
+        UrlParams params = new UrlParams();
+        params.add("text", q.getText());
+        params.add("category_id", Integer.toString(q.getCategoryEntryUid()));
+        params.add("items_count", Integer.toString(images.length));
+
+        try {
+            for (int i = 0; i < imageParamFacades.length; ++i) {
+                String pollStr = "poll_" + Integer.toString(i);
+                String textPicKey = pollStr + "_text";
+                String originalPicKey = pollStr + "_image";
+                String previewPicKey = pollStr + "_preview";
+
+                params.add(textPicKey, "");
+                imageParamFacades[i].write(params, originalPicKey, previewPicKey);
+            }
+
+            HttpResponse response = makeProtectedMultipartPostCall(CreateQuestionRequest.URL, params);
+            if (response == null || response.getBody() == null) {
+                return null;
+            }
+            return new JSONObject(response.getBody());
+        } finally {
+            for (ImageParamFacade imageParamFacade : imageParamFacades) {
+                imageParamFacade.close();
+            }
+        }
     }
 
     public JSONObject createComment(CreateCommentRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
@@ -201,25 +228,11 @@ public class ApiUI {
 
     public JSONObject uploadImage(UploadImageRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
-        UploadImageRequest.Image image = request.getImage();
-
-        FileInputStream originalFin = null;
-        BufferedInputStream originalBufin = null;
-
-        FileInputStream previewFin = null;
-        BufferedInputStream previewBufin = null;
+        ImageData image = request.getImage();
+        ImageParamFacade imageParamFacade = new ImageParamFacade(image);
 
         try {
-            File originalFile = new File(image.getOriginalFilename());
-            originalFin = new FileInputStream(originalFile);
-            originalBufin = new BufferedInputStream(originalFin);
-
-            File previewFile = new File(image.getPreviewFilename());
-            previewFin = new FileInputStream(previewFile);
-            previewBufin = new BufferedInputStream(previewFin);
-
-            params.add("image", new HttpFile(originalBufin, originalFile.getName()));
-            params.add("preview", new HttpFile(previewBufin, previewFile.getName()));
+            imageParamFacade.write(params, "image", "preview");
 
             HttpResponse response = makeProtectedMultipartPostCall(UploadImageRequest.URL, params);
             if (response == null || response.getBody() == null) {
@@ -227,19 +240,7 @@ public class ApiUI {
             }
             return new JSONObject(response.getBody());
         } finally {
-            if (originalBufin != null) {
-                originalBufin.close();
-            }
-            if (originalFin != null) {
-                originalFin.close();
-            }
-
-            if (previewBufin != null) {
-                previewBufin.close();
-            }
-            if (previewFin != null) {
-                previewFin.close();
-            }
+            imageParamFacade.close();
         }
     }
 
@@ -406,5 +407,55 @@ public class ApiUI {
 
     public static String resolveUrl(String path) {
         return BASE_URI.resolve(path).toString();
+    }
+
+
+
+
+
+    private static class ImageParamFacade {
+        private ImageData imageData;
+
+        FileInputStream originalFin = null;
+        BufferedInputStream originalBufin = null;
+
+        FileInputStream previewFin = null;
+        BufferedInputStream previewBufin = null;
+
+        File originalFile = null;
+        File previewFile = null;
+
+        public ImageParamFacade(ImageData imageData) {
+            this.imageData = imageData;
+        }
+
+        public void write(UrlParams params, String originalKey, String previewKey) throws FileNotFoundException {
+            originalFile = new File(imageData.getOriginalFilename());
+            originalFin = new FileInputStream(originalFile);
+            originalBufin = new BufferedInputStream(originalFin);
+
+            previewFile = new File(imageData.getPreviewFilename());
+            previewFin = new FileInputStream(previewFile);
+            previewBufin = new BufferedInputStream(previewFin);
+
+            params.add(originalKey, new HttpFile(originalBufin, originalFile.getName()));
+            params.add(previewKey, new HttpFile(previewBufin, previewFile.getName()));
+        }
+
+        public void close() throws IOException {
+            if (originalBufin != null) {
+                originalBufin.close();
+            }
+            if (originalFin != null) {
+                originalFin.close();
+            }
+
+            if (previewBufin != null) {
+                previewBufin.close();
+            }
+            if (previewFin != null) {
+                previewFin.close();
+            }
+        }
     }
 }
