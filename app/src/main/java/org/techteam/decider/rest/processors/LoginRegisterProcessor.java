@@ -56,7 +56,9 @@ public class LoginRegisterProcessor extends Processor {
             }
             transactionFinished(operationType, requestId);
 
-            result.putString(ServiceCallback.LoginRegisterExtras.TOKEN, apiUI.getAccessToken());
+            result.putString(ServiceCallback.LoginRegisterExtras.TOKEN, apiUI.extractToken(data));
+            result.putString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, apiUI.extractRefreshToken(data));
+
             cb.onSuccess(result);
         } catch (IOException | JSONException e) {
             e.printStackTrace();

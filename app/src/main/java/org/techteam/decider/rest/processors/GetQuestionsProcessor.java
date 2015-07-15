@@ -1,5 +1,7 @@
 package org.techteam.decider.rest.processors;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,9 +11,8 @@ import com.activeandroid.ActiveAndroid;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.QuestionHelper;
-import org.techteam.decider.content.entities.QuestionNewEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
@@ -78,6 +79,10 @@ public class GetQuestionsProcessor extends Processor {
             e.printStackTrace();
             transactionError(operationType, requestId);
             cb.onError(e.getMessage(), result);
+        } catch (AuthenticatorException e) {
+            e.printStackTrace();
+        } catch (OperationCanceledException e) {
+            e.printStackTrace();
         }
 
     }

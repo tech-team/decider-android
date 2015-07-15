@@ -38,10 +38,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private final int REQ_SIGNUP = 1;
 
-    private final static String appName = "org.techteam.decider";
+    private final static String PACKAGE_NAME = "org.techteam.decider";
 
     private AccountManager mAccountManager;
-    private String mAuthTokenType;
 
     // controls
     private EditText emailText;
@@ -183,12 +182,13 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private void finishLogin(Bundle data) {
         Log.d(TAG, "> finishLogin");
 
-        String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN); //AccountManager.KEY_ACCOUNT_NAME
+        String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN);
         String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
         String token = data.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
+        String refreshToken = data.getString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
         String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
-        final Account account = new Account(login, appName);
+        final Account account = new Account(login, PACKAGE_NAME);
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
             Log.d(TAG, "> finishLogin > addAccountExplicitly");
@@ -197,6 +197,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             // (Not setting the auth token will cause another call to the server to authenticate the user)
             mAccountManager.addAccountExplicitly(account, password, null);
             mAccountManager.setAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, token);
+            mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
         } else {
             Log.d(TAG, "> finishLogin > setPassword");
             mAccountManager.setPassword(account, password);

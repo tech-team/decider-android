@@ -1,5 +1,7 @@
 package org.techteam.decider.rest.processors;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +20,6 @@ import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class GetCommentsProcessor extends Processor {
     private static final String TAG = GetCommentsProcessor.class.getName();
@@ -77,6 +78,10 @@ public class GetCommentsProcessor extends Processor {
             e.printStackTrace();
             transactionError(operationType, requestId);
             cb.onError(e.getMessage(), result);
+        } catch (AuthenticatorException e) {
+            e.printStackTrace();
+        } catch (OperationCanceledException e) {
+            e.printStackTrace();
         }
 
     }

@@ -11,7 +11,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONObject;
 import org.techteam.decider.gui.activities.AuthActivity;
+import org.techteam.decider.rest.api.ApiUI;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.techteam.decider.auth.AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
@@ -23,8 +26,11 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     private String TAG = AccountAuthenticator.class.getName();
     private final Context mContext;
 
+    private ApiUI apiUI;
+
     public AccountAuthenticator(Context context) {
         super(context);
+        apiUI = new ApiUI(context);
 
         // I hate you! Google - set mContext as protected!
         this.mContext = context;
@@ -63,6 +69,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         final AccountManager am = AccountManager.get(mContext);
 
         String authToken = am.peekAuthToken(account, authTokenType);
+        String refreshToken = am.getUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
 
         Log.d(TAG, "> peekAuthToken returned - " + authToken);
 
@@ -73,8 +80,9 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                 try {
                     Log.d("decider", TAG + "> re-authenticating with the existing password");
 
-                    //TODO: refresh token here
-                    //authToken = sServerAuthenticate.userSignIn(account.name, password, authTokenType);
+                    JSONObject data = apiUI.refreshToken(refreshToken);
+                    authToken = apiUI.extractToken(data);
+                    refreshToken = apiUI.extractRefreshToken(data);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -87,6 +95,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+            result.putString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
             return result;
         }
 

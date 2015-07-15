@@ -1,5 +1,7 @@
 package org.techteam.decider.rest.processors;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,12 +11,10 @@ import com.activeandroid.ActiveAndroid;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.PollItemEntry;
-import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
-import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
@@ -65,6 +65,10 @@ public class PollVoteProcessor extends Processor {
             e.printStackTrace();
             transactionError(operationType, requestId);
             cb.onError(e.getMessage(), result);
+        } catch (AuthenticatorException e) {
+            e.printStackTrace();
+        } catch (OperationCanceledException e) {
+            e.printStackTrace();
         }
 
     }

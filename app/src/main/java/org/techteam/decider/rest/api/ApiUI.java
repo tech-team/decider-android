@@ -1,10 +1,18 @@
 package org.techteam.decider.rest.api;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
@@ -24,6 +32,7 @@ import java.net.URISyntaxException;
 
 public class ApiUI {
 
+    private static final String TAG = ApiUI.class.getName();
     private Context context;
     private SharedPreferences prefs;
 
@@ -58,12 +67,18 @@ public class ApiUI {
 
     public ApiUI(Context context) {
         this.context = context;
+
         prefs = this.context.getSharedPreferences(PrefsKeys.PREFS_NAME, Context.MODE_PRIVATE);
 //        saveToken("0atkeWZqnRq9GVxHNCCtJpOevUtrrN", 36000, "Z77gke1xm6xJ5xaAs7mTUB9fSm1RpO");
     }
 
-    public String getAccessToken() {
-        return prefs.getString(PrefsKeys.ACCESS_TOKEN, "ACCESS_TOKEN");
+    public String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
+        AccountManager am = AccountManager.get(this.context);
+        Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
+        AccountManagerFuture<Bundle> f = am.getAuthToken(accounts[0], AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, null, null, null);
+        Bundle res = f.getResult();
+        return res.getString(AccountManager.KEY_AUTHTOKEN);
+//        return prefs.getString(PrefsKeys.ACCESS_TOKEN, "ACCESS_TOKEN");
     }
 
     public String getRefreshToken() {
@@ -84,7 +99,7 @@ public class ApiUI {
         return prefs.getInt(PrefsKeys.EXPIRES, 0);
     }
 
-    public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+    public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
@@ -100,7 +115,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getCategories(GetCategoriesRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+    public JSONObject getCategories(GetCategoriesRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("locale", request.getLocale());
 
@@ -123,10 +138,10 @@ public class ApiUI {
         int code = response.getResponseCode();
 
         JSONObject obj = new JSONObject(response.getBody());
-        if (code < 400) {
-            JSONObject objData = obj.getJSONObject("data");
-            saveToken(objData);
-        }
+//        if (code < 400) {
+//            JSONObject objData = obj.getJSONObject("data");
+//            saveToken(objData);
+//        }
         return obj;
     }
 
@@ -155,12 +170,12 @@ public class ApiUI {
         JSONObject obj = new JSONObject(response.getBody());
         if (code < 400) {
             JSONObject objData = obj.getJSONObject("data");
-            saveToken(objData);
+//            saveToken(objData);
         }
         return obj;
     }
 
-    public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+    public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         QuestionData data = request.getQuestionData();
         UrlParams params = new UrlParams();
         params.add("data", data.toJson().toString());
@@ -172,7 +187,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject createComment(CreateCommentRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+    public JSONObject createComment(CreateCommentRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         CommentData data = request.getCommentData();
         UrlParams params = new UrlParams();
         params.add("data", data.toJson().toString());
@@ -184,7 +199,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject uploadImage(UploadImageRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+    public JSONObject uploadImage(UploadImageRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         UploadImageRequest.Image image = request.getImage();
 
@@ -228,7 +243,7 @@ public class ApiUI {
         }
     }
 
-    public JSONObject pollVote(PollVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+    public JSONObject pollVote(PollVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("question_id", request.getQuestionId());
         params.add("poll_item_id", request.getPollItemId());
@@ -240,7 +255,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getComments(GetCommentsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+    public JSONObject getComments(GetCommentsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("question_id", request.getQuestionId());
         params.add("limit", request.getLimit());
@@ -253,7 +268,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException {
+    private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, IOException {
         String accessToken = getAccessToken();
         if (accessToken == null) {
             throw new InvalidAccessTokenException();
@@ -263,7 +278,7 @@ public class ApiUI {
         return httpRequest;
     }
 
-    private HttpResponse checkResponse(HttpResponse httpResponse, HttpRequest httpRequest) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException {
+    private HttpResponse checkResponse(HttpResponse httpResponse, HttpRequest httpRequest) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         if (httpResponse == null) {
             return null;
         }
@@ -283,7 +298,7 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+    private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.GET);
@@ -293,7 +308,7 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+    private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.POST);
@@ -303,7 +318,7 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException {
+    private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.MULTIPART_POST);
@@ -325,19 +340,51 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private void saveToken(String accessToken, int expires, String refreshToken) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PrefsKeys.ACCESS_TOKEN, accessToken);
-        editor.putInt(PrefsKeys.EXPIRES, expires);
-        editor.putString(PrefsKeys.REFRESH_TOKEN, refreshToken);
-        editor.apply();
+//    private void saveToken(String accessToken, int expires, String refreshToken) {
+//        SharedPreferences.Editor editor = prefs.edit();
+//        editor.putString(PrefsKeys.ACCESS_TOKEN, accessToken);
+//        editor.putInt(PrefsKeys.EXPIRES, expires);
+//        editor.putString(PrefsKeys.REFRESH_TOKEN, refreshToken);
+//        editor.apply();
+//    }
+
+//    private void saveToken(JSONObject objData) throws JSONException {
+//        saveToken(extractToken(objData), extractTokenExpires(objData), extractRefreshToken(objData));
+//    }
+
+    public String extractToken(JSONObject objData) throws JSONException {
+        return objData.getString("access_token");
     }
 
-    private void saveToken(JSONObject objData) throws JSONException {
-        saveToken(objData.getString("access_token"), objData.getInt("expires"), objData.getString("refresh_token"));
+    public int extractTokenExpires(JSONObject objData) throws JSONException {
+        return objData.getInt("expires");
     }
 
-    private void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
+    public String extractRefreshToken(JSONObject objData) throws JSONException {
+        return objData.getString("refresh_token");
+    }
+
+    public JSONObject refreshToken(String refreshToken) throws IOException, JSONException, TokenRefreshFailException {
+        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_PATH));
+        UrlParams params = new UrlParams();
+        params.add("refresh_token", refreshToken);
+        httpRequest.setParams(params);
+        HttpResponse response = HttpDownloader.httpPost(httpRequest);
+        if (response.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+            String body = response.getBody();
+            JSONObject resp = new JSONObject(body);
+            JSONObject data = resp.getJSONObject("data");
+            return data;
+//            saveToken(data);
+        } else {
+            throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
+        }
+    }
+
+    @Deprecated
+    public void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
+        Log.e(TAG, "refreshToken() is deprecated");
+
         HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_PATH));
         UrlParams params = new UrlParams();
         params.add("refresh_token", getRefreshToken());
@@ -347,7 +394,7 @@ public class ApiUI {
             String body = response.getBody();
             JSONObject resp = new JSONObject(body);
             JSONObject data = resp.getJSONObject("data");
-            saveToken(data);
+//            saveToken(data);
         } else {
             throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
         }
