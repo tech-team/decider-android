@@ -11,6 +11,7 @@ import android.util.Log;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.question.CommentData;
+import org.techteam.decider.content.question.ImageData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -95,7 +96,7 @@ public class ServiceHelper {
         loginRegister(email, password, op, cb);
     }
 
-    public void uploadImage(UploadImageRequest.Image image, int imageOrdinalId, ServiceCallback cb) {
+    public void uploadImage(ImageData image, int imageOrdinalId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.UPLOAD_IMAGE;

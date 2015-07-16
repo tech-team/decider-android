@@ -62,7 +62,7 @@ public abstract class QuestionData implements Parcelable {
     }
 
     public String createFingerprint() {
-        return text.length() + "_" + Integer.toString(categoryEntryUid) + "_" + Boolean.toString(anonymous);
+        return text.length() + "__" + Integer.toString(categoryEntryUid) + "__" + Boolean.toString(anonymous);
     }
 
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.question.CommentData;
+import org.techteam.decider.content.question.ImageData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateCommentRequest;
@@ -65,7 +66,7 @@ public final class ServiceIntentBuilder {
     }
 
 
-    public static Intent uploadImageIntent(Context context, OperationType op, String requestId, UploadImageRequest.Image image, int imageOrdinalId) {
+    public static Intent uploadImageIntent(Context context, OperationType op, String requestId, ImageData image, int imageOrdinalId) {
         Intent intent = getBasicIntent(context, requestId, op);
         intent.putExtra(UploadImageRequest.IntentExtras.ORIGINAL_IMAGE, image.getOriginalFilename());
         intent.putExtra(UploadImageRequest.IntentExtras.PREVIEW_IMAGE, image.getPreviewFilename());

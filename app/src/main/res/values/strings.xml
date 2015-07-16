@@ -85,5 +85,6 @@
     <string name="save_profile">Save</string>
     <string name="save_profile_hint">Save profile</string>
     <string name="edit_profile_hint">Edit profile</string>
+    <string name="pictures_fil">Both pictures must be filled</string>
 
 </resources>
