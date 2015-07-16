@@ -9,6 +9,7 @@ import org.json.JSONObject;
 public abstract class QuestionData implements Parcelable {
     private String text;
     private int categoryEntryUid;
+    private int categoryEntrySpinnerId = 0;
     private boolean anonymous;
 
     public QuestionData() {
@@ -24,6 +25,7 @@ public abstract class QuestionData implements Parcelable {
     public QuestionData(Parcel in) {
         text = in.readString();
         categoryEntryUid = in.readInt();
+        categoryEntrySpinnerId = in.readInt();
         boolean[] b = new boolean[1];
         in.readBooleanArray(b);
         anonymous = b[0];
@@ -53,6 +55,14 @@ public abstract class QuestionData implements Parcelable {
         this.anonymous = anonymous;
     }
 
+    public int getCategoryEntrySpinnerId() {
+        return categoryEntrySpinnerId;
+    }
+
+    public void setCategoryEntrySpinnerId(int categoryEntrySpinnerId) {
+        this.categoryEntrySpinnerId = categoryEntrySpinnerId;
+    }
+
     public JSONObject toJson() throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("text", text.trim());
@@ -70,6 +80,7 @@ public abstract class QuestionData implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(text);
         dest.writeInt(categoryEntryUid);
+        dest.writeInt(categoryEntrySpinnerId);
         dest.writeBooleanArray(new boolean[] {anonymous});
     }
 }

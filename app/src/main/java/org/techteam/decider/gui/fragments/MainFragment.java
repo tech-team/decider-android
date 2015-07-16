@@ -107,11 +107,13 @@ public class MainFragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                String msg = "Error. " + message;
+                String msg = "Categories error. " + message;
                 Toaster.toast(getActivity().getApplicationContext(), msg);
                 System.out.println(msg);
             }
         });
+
+        serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.GET_CATEGORIES));
     }
 
     @Override
@@ -168,8 +170,6 @@ public class MainFragment
                         .commit();
             }
         });
-
-        serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.GET_CATEGORIES));
     }
 
     @Override

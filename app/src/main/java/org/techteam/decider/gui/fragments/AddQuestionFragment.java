@@ -12,12 +12,10 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,19 +33,13 @@ import com.android.camera.CropImageIntentBuilder;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
-import org.techteam.decider.content.entities.UploadedImageEntry;
 import org.techteam.decider.content.question.ImageData;
 import org.techteam.decider.content.question.ImageQuestionData;
-import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.gui.activities.MainActivity;
-import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
-import org.techteam.decider.gui.views.WrappingViewPager;
-import org.techteam.decider.gui.widget.SlidingTabLayout;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.BitmapUtils;
@@ -218,7 +210,7 @@ public class AddQuestionFragment extends Fragment {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
-            restoreImages();
+            restoreQuestion();
         }
     }
 
@@ -244,7 +236,14 @@ public class AddQuestionFragment extends Fragment {
         serviceHelper.release();
     }
 
-    private void restoreImages() {
+    private void restoreQuestion() {
+        // restoring text
+        postText.setText(currentQuestionData.getText());
+
+        // restoring category
+        categoriesSpinner.setSelection(currentQuestionData.getCategoryEntrySpinnerId());
+
+        // restoring images
         ImageData[] images = {currentQuestionData.getPicture1(), currentQuestionData.getPicture2()};
         for(int i = 0; i < images.length; ++i) {
             if (images[i] != null) {
@@ -254,6 +253,9 @@ public class AddQuestionFragment extends Fragment {
                 showImage(imageHolders[i]);
             }
         }
+
+        // restore anonymous
+        anonymityCheckBox.setSelected(currentQuestionData.isAnonymous());
     }
 
     private ImageQuestionData gatherQuestionData() {
@@ -273,6 +275,7 @@ public class AddQuestionFragment extends Fragment {
         data.setText(message);
         data.setAnonymous(anonymity);
         data.setCategoryEntryUid(categoryUid);
+        data.setCategoryEntrySpinnerId(categoriesSpinner.getSelectedItemPosition());
 
         return data;
     }
@@ -312,6 +315,9 @@ public class AddQuestionFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
             categoriesSpinnerAdapter.swapCursor(newCursor);
+            if (currentQuestionData != null) {
+                categoriesSpinner.setSelection(currentQuestionData.getCategoryEntrySpinnerId());
+            }
         }
 
         @Override
