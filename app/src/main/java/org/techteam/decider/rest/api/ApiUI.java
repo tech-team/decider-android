@@ -16,7 +16,6 @@ import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.question.ImageData;
 import org.techteam.decider.content.question.ImageQuestionData;
-import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
 import org.techteam.decider.net2.HttpRequest;

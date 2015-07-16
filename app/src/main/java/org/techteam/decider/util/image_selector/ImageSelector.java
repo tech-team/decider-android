@@ -108,10 +108,12 @@ public class ImageSelector implements View.OnClickListener {
             if (requestCode == SELECT_IMAGE || requestCode == TAKE_PICTURE) {
                 Uri selectedImage = imageHolder.getSource();
 
-                if (selectedImage == null) {
+                // we've just taken a photo
+                if (data != null) {
                     selectedImage = fixUri(data.getData());
-                    imageHolder.setSource(selectedImage);
                 }
+
+                imageHolder.setSource(selectedImage);
 
                 if (selectedImage == null) {
                     Log.e(TAG, "selectedImage is still null even after fixUri");
@@ -224,6 +226,9 @@ public class ImageSelector implements View.OnClickListener {
     }
 
     public void restoreFromImageData(ImageData imageData) {
+        if (imageData == null)
+            return;
+
         imageHolder.setSource(imageData.getOriginalUri());
         imageHolder.setPreview(imageData.getPreviewUri());
         showImage();
