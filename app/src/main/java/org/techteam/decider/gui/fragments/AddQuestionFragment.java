@@ -375,7 +375,6 @@ public class AddQuestionFragment extends Fragment {
                 cropImage(currentImageHolder);
             } else if (requestCode == CROP_IMAGE) {
                 showImage(currentImageHolder);
-//                sendImage(currentImageHolder);
             }
         }
     }

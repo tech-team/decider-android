@@ -190,15 +190,16 @@ public class ApiUI {
         params.add("text", q.getText());
         params.add("category_id", Integer.toString(q.getCategoryEntryUid()));
         params.add("items_count", Integer.toString(images.length));
+        params.add("is_anonymous", Boolean.toString(q.isAnonymous()));
 
         try {
             for (int i = 0; i < imageParamFacades.length; ++i) {
-                String pollStr = "poll_" + Integer.toString(i);
+                String pollStr = "poll_" + Integer.toString(i + 1);
                 String textPicKey = pollStr + "_text";
                 String originalPicKey = pollStr + "_image";
                 String previewPicKey = pollStr + "_preview";
 
-                params.add(textPicKey, "");
+                params.add(textPicKey, "DUMMY");
                 imageParamFacades[i].write(params, originalPicKey, previewPicKey);
             }
 
