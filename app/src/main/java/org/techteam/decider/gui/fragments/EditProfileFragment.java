@@ -10,10 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.EditText;
-
-import com.nostra13.universalimageloader.core.ImageLoader;
+import android.widget.ImageView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.UserEntry;
@@ -96,6 +94,7 @@ public class EditProfileFragment extends Fragment {
 
         // find children
         profileImage = (ImageView) rootView.findViewById(R.id.profile_image);
+        //TODO: ImageSelector
 
         nameText = (EditText) rootView.findViewById(R.id.name);
         surnameText = (EditText) rootView.findViewById(R.id.surname);

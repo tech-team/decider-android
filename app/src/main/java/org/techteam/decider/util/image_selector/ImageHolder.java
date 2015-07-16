@@ -1,11 +1,11 @@
-package org.techteam.decider.gui.fragments;
+package org.techteam.decider.util.image_selector;
 
 import android.net.Uri;
 import android.widget.ImageView;
 
-class ImageHolder {
+public class ImageHolder {
     private Uri source;
-    private Uri cropped;
+    private Uri preview;
     private int ordinal;  // left or right
     private String uid;
     private ImageView imageView;
@@ -23,12 +23,12 @@ class ImageHolder {
         this.source = source;
     }
 
-    public Uri getCropped() {
-        return cropped;
+    public Uri getPreview() {
+        return preview;
     }
 
-    public void setCropped(Uri cropped) {
-        this.cropped = cropped;
+    public void setPreview(Uri preview) {
+        this.preview = preview;
     }
 
     public ImageView getImageView() {

@@ -1,4 +1,4 @@
-package org.techteam.decider.util;
+package org.techteam.decider.util.image_selector;
 
 import android.content.ContentResolver;
 import android.content.Context;
