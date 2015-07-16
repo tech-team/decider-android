@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -216,6 +218,7 @@ public class AddQuestionFragment extends Fragment {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
+            restoreImages();
         }
     }
 
@@ -239,6 +242,18 @@ public class AddQuestionFragment extends Fragment {
         super.onPause();
         activity.unlockDrawer();
         serviceHelper.release();
+    }
+
+    private void restoreImages() {
+        ImageData[] images = {currentQuestionData.getPicture1(), currentQuestionData.getPicture2()};
+        for(int i = 0; i < images.length; ++i) {
+            if (images[i] != null) {
+                imageHolders[i].setSource(images[i].getOriginalUri());
+                imageHolders[i].setCropped(images[i].getPreviewUri());
+                currentImageHolder = imageHolders[i];
+                showImage(imageHolders[i]);
+            }
+        }
     }
 
     private ImageQuestionData gatherQuestionData() {
@@ -390,22 +405,32 @@ public class AddQuestionFragment extends Fragment {
     }
 
     private void showImage(ImageHolder imageHolder) {
-        currentImageHolder.getImageView()
-                .setImageURI(imageHolder.getCropped());
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 2;
+        Bitmap myBitmap = BitmapFactory.decodeFile(imageHolder.getCropped().getPath(), options);
+        currentImageHolder.getImageView().setImageBitmap(myBitmap);
+//        currentImageHolder.getImageView()
+//                .setImageURI(imageHolder.getCropped());
     }
 
     private ImageData getImageData(ImageHolder imageHolder) {
-        if (imageHolder.getSource() == null || imageHolder.getCropped().getPath() == null) {
-            // TODO: probably incorrect condition
+        if (imageHolder.getSource() == null || (imageHolder.getCropped() != null && imageHolder.getCropped().getPath() == null)) {
             return null;
         }
 
         String original = uriToPath(imageHolder.getSource());
-        String preview = imageHolder.getCropped().getPath();
-        return new ImageData(original, preview);
+        String preview = imageHolder.getCropped() != null ? imageHolder.getCropped().getPath() : null;
+        ImageData image = new ImageData(original, preview);
+        image.setOriginalUri(imageHolder.getSource());
+        image.setPreviewUri(imageHolder.getCropped());
+        return image;
     }
 
     private String uriToPath(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
+
         if (!uri.getPath().startsWith("/media")) {
             return uri.getPath();
         }
