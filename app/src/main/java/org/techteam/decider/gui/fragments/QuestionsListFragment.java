@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.PostsListAdapter;
@@ -43,7 +44,8 @@ public class QuestionsListFragment
         OnQuestionEventCallback,
         OnListScrolledDownCallback,
         QuestionInteractor,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        OnCategorySelectedListener {
 
     public static final String TAG = QuestionsListFragment.class.toString();
 
@@ -161,8 +163,7 @@ public class QuestionsListFragment
                     getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
 
-//                Toaster.toast(getActivity().getApplicationContext(), msg);
-                System.out.println(msg);
+                Log.i(TAG, msg);
             }
 
             @Override
@@ -240,7 +241,7 @@ public class QuestionsListFragment
 
     @Override
     public void onScrolledDown() {
-//        Toaster.toast(getActivity().getBaseContext(), "Bottom reached");
+        Toaster.toast(getActivity().getBaseContext(), "Bottom reached");
 
         System.out.println("Load has begun");
         int intention;
@@ -288,6 +289,12 @@ public class QuestionsListFragment
     @Override
     public void onVote(QuestionEntry post, int voteId) {
         Toaster.toast(getActivity(), "Voted successfully");
+    }
+
+    @Override
+    public void categorySelected(CategoryEntry category, boolean isChecked) {
+        // TODO:
+        // onRefresh();
     }
 
     @Override
