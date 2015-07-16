@@ -14,7 +14,7 @@
         android:minHeight="?attr/actionBarSize"
         style="@style/HeaderBar"
         app:title="@string/comments_toolbar_title"
-        app:theme="@style/ActionBarThemeOverlay"
+        android:theme="@style/ActionBarThemeOverlay"
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         />
 

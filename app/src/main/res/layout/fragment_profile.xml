@@ -14,7 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         style="@style/HeaderBar"
         app:title="@string/profile_toolbar_title"
-        app:theme="@style/ActionBarThemeOverlay"
+        android:theme="@style/ActionBarThemeOverlay"
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         >
 
@@ -40,7 +40,7 @@
         android:layout_height="32dp"
         style="@style/HeaderBar"
         app:title=""
-        app:theme="@style/ActionBarThemeOverlay"
+        android:theme="@style/ActionBarThemeOverlay"
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         />
 
