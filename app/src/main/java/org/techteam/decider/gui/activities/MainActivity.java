@@ -182,22 +182,5 @@ public class MainActivity extends AppCompatActivity {
             return null;
 
         return CategoryEntry.getSelected();
-
-//        List<CategoryEntry> selectedCategories = new ArrayList<>();
-//
-//        Cursor cursor = categoriesListAdapter.getCursor();
-//        if (cursor.moveToFirst()){
-//            while(!cursor.isAfterLast()){
-//                CategoryEntry categoryEntry = CategoryEntry.fromCursor(cursor);
-//                if (categoryEntry.isSelected())
-//                    selectedCategories.add(categoryEntry);
-//
-//                cursor.moveToNext();
-//            }
-//        }
-//        // it was opened, so why should i close it?
-//        //cursor.close();
-//
-//        return selectedCategories;
     }
 }

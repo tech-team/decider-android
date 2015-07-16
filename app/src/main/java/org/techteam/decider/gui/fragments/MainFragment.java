@@ -57,6 +57,7 @@ public class MainFragment
 
     private Toolbar toolbar;
     private CategoriesListAdapter categoriesListAdapter;
+    private OnCategorySelectedListener onCategorySelectedListener;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -69,17 +70,6 @@ public class MainFragment
 
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
     //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
-
-    @Override
-    public void categorySelected(CategoryEntry category, boolean isChecked) {
-        Toaster.toast(getActivity(), "Selected");
-        category.setSelectedAsync(isChecked);
-//        if (!isChecked) {
-//            selectedCategories.remove(category.getUid());
-//        } else {
-//            selectedCategories.put(category.getUid(), category);
-//        }
-    }
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -178,6 +168,15 @@ public class MainFragment
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
+    @Override
+    public void categorySelected(CategoryEntry category, boolean isChecked) {
+        Toaster.toast(getActivity(), "Selected");
+        category.setSelectedAsync(isChecked);
+        if (onCategorySelectedListener != null) {
+            onCategorySelectedListener.categorySelected(category, isChecked);
+        }
+    }
+
     //TODO: refactor this out
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -187,7 +186,9 @@ public class MainFragment
         @Override
         public Fragment getItem(int position) {
             // TODO: static create() method with section arg
-            return QuestionsListFragment.create(ContentSection.fromInt(position));
+            QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
+            onCategorySelectedListener = f;
+            return f;
         }
 
         @Override
