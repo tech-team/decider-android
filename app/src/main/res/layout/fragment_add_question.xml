@@ -95,9 +95,11 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:padding="4dp"
                     android:drawingCacheQuality="low"
                     android:scaleType="centerInside"
                     android:src="@drawable/photo_placeholder"
+                    android:adjustViewBounds="true"
                     android:contentDescription="@string/add_post_image_choice1" />
 
                 <ImageView
@@ -105,9 +107,11 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:padding="4dp"
                     android:drawingCacheQuality="low"
                     android:scaleType="centerInside"
                     android:src="@drawable/photo_placeholder"
+                    android:adjustViewBounds="true"
                     android:contentDescription="@string/add_post_image_choice2" />
 
             </LinearLayout>
