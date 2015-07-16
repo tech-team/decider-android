@@ -34,6 +34,7 @@ import com.android.camera.CropImageIntentBuilder;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.UploadedImageEntry;
+import org.techteam.decider.content.question.ImageData;
 import org.techteam.decider.content.question.ImageQuestionData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.gui.activities.MainActivity;
@@ -93,7 +94,7 @@ public class AddQuestionFragment extends Fragment {
     private ImageHolder imageHolders[] = new ImageHolder[2];  // left and right
     private ImageHolder currentImageHolder;
 
-    private QuestionData currentQuestionData;
+    private ImageQuestionData currentQuestionData;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
@@ -240,7 +241,7 @@ public class AddQuestionFragment extends Fragment {
         serviceHelper.release();
     }
 
-    private QuestionData gatherQuestionData() {
+    private ImageQuestionData gatherQuestionData() {
         String message = postText.getText().toString();
 
         Cursor categoryCursor = (Cursor) categoriesSpinner.getSelectedItem();
@@ -251,15 +252,8 @@ public class AddQuestionFragment extends Fragment {
 
         ImageQuestionData data = new ImageQuestionData();
 
-        UploadedImageEntry pic1 = UploadedImageEntry.getLatestByOrdinalId(imageHolders[0].getOrdinal());
-        UploadedImageEntry pic2 = UploadedImageEntry.getLatestByOrdinalId(imageHolders[1].getOrdinal());
-
-        if (pic1 != null) {
-            data.setPicture1(pic1.getImageUid());
-        }
-        if (pic2 != null) {
-            data.setPicture2(pic2.getImageUid());
-        }
+        data.setPicture1(getImageData(imageHolders[0]));
+        data.setPicture2(getImageData(imageHolders[1]));
 
         data.setText(message);
         data.setAnonymous(anonymity);
@@ -274,6 +268,10 @@ public class AddQuestionFragment extends Fragment {
         // validate data
         if (currentQuestionData.getText().isEmpty()) {
             Toaster.toast(getActivity(), R.string.fill_all_fields);
+            return false;
+        }
+        if (currentQuestionData.getPicture1() == null || currentQuestionData.getPicture2() == null) {
+            Toaster.toast(getActivity(), R.string.pictures_fil);
             return false;
         }
 
@@ -377,7 +375,6 @@ public class AddQuestionFragment extends Fragment {
                 cropImage(currentImageHolder);
             } else if (requestCode == CROP_IMAGE) {
                 showImage(currentImageHolder);
-                sendImage(currentImageHolder);
             }
         }
     }
@@ -397,12 +394,15 @@ public class AddQuestionFragment extends Fragment {
                 .setImageURI(imageHolder.getCropped());
     }
 
-    private void sendImage(ImageHolder imageHolder) {
+    private ImageData getImageData(ImageHolder imageHolder) {
+        if (imageHolder.getSource() == null || imageHolder.getCropped().getPath() == null) {
+            // TODO: probably incorrect condition
+            return null;
+        }
+
         String original = uriToPath(imageHolder.getSource());
         String preview = imageHolder.getCropped().getPath();
-        UploadImageRequest.Image image = new UploadImageRequest.Image(original, preview);
-        int imageOrdinalId = imageHolder.getOrdinal();
-        serviceHelper.uploadImage(image, imageOrdinalId, callbacksKeeper.getCallback(OperationType.UPLOAD_IMAGE));
+        return new ImageData(original, preview);
     }
 
     private String uriToPath(Uri uri) {

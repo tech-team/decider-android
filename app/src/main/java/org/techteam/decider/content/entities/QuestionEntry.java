@@ -122,9 +122,9 @@ public class QuestionEntry extends Model {
         entry.creationDate = obj.getString("creation_date");
         entry.categoryId = obj.getInt("category_id");
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));
-        entry.likesCount = obj.getInt("likes_count");
-        entry.anonymous = obj.getBoolean("is_anonymous");
-        entry.voted = obj.getBoolean("voted");
+        entry.likesCount = obj.has("likes_count") ? obj.getInt("likes_count") : 0;
+        entry.anonymous = obj.has("is_anonymous") && obj.getBoolean("is_anonymous");
+        entry.voted = obj.has("voted") && obj.getBoolean("voted");
 
         if (!obj.isNull("poll")) {
             JSONArray pollItems = obj.getJSONArray("poll");
@@ -140,9 +140,7 @@ public class QuestionEntry extends Model {
             }
         }
 
-        if (obj.has("comments_count")) {
-            entry.commentsCount = obj.getInt("comments_count");
-        }
+        entry.commentsCount = obj.has("comments_count") ? obj.getInt("comments_count") : 0;
         return entry;
     }
 
