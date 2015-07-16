@@ -38,6 +38,7 @@ public interface ServiceCallback {
         public static final String LOGIN = "LOGIN";
         public static final String PASSWORD = "PASSWORD";
         public static final String TOKEN = "TOKEN";
+        public static final String EXPIRES = "EXPIRES";
         public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
     }
 }

@@ -5,6 +5,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -69,20 +70,24 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         final AccountManager am = AccountManager.get(mContext);
 
         String authToken = am.peekAuthToken(account, authTokenType);
+        String expiresStr = am.getUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES);
+        Long expires = expiresStr != null ? Long.parseLong(expiresStr) : null;
         String refreshToken = am.getUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
 
         Log.d(TAG, "> peekAuthToken returned - " + authToken);
-
-        // Lets give another try to authenticate the user
-        if (TextUtils.isEmpty(authToken)) {
-            final String password = am.getPassword(account);
-            if (password != null) {
+        if (TextUtils.isEmpty(authToken) || (expires != null && System.currentTimeMillis() > expires)) { // Token is expired
+            if (refreshToken != null) {
                 try {
-                    Log.d("decider", TAG + "> re-authenticating with the existing password");
+                    Log.d(TAG, "> refreshing token");
 
                     JSONObject data = apiUI.refreshToken(refreshToken);
                     authToken = apiUI.extractToken(data);
+                    expires = (long) apiUI.extractTokenExpires(data);
                     refreshToken = apiUI.extractRefreshToken(data);
+
+                    am.setAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
+                    am.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(System.currentTimeMillis() + expires * 1000));
+                    am.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -95,6 +100,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+            result.putLong(ServiceCallback.LoginRegisterExtras.EXPIRES, expires != null ? expires : 0);
             result.putString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
             return result;
         }

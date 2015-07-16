@@ -288,8 +288,12 @@ public class ApiUI {
         int code = httpResponse.getResponseCode();
 
         if (code == HttpURLConnection.HTTP_FORBIDDEN) {
-            refreshToken();
-            httpRequest.getParams().replace("access_token", getAccessToken());
+            String oldAccessToken = getAccessToken();
+            AccountManager am = AccountManager.get(context);
+            am.invalidateAuthToken(context.getApplicationContext().getPackageName(), oldAccessToken);
+            String newAccessToken = getAccessToken();
+
+            httpRequest.getParams().replace("access_token", newAccessToken);
             httpResponse = HttpDownloader.exec(httpRequest);
             code = httpResponse.getResponseCode();
             if (code != HttpURLConnection.HTTP_FORBIDDEN) {
@@ -372,14 +376,15 @@ public class ApiUI {
         params.add("refresh_token", refreshToken);
         httpRequest.setParams(params);
         HttpResponse response = HttpDownloader.httpPost(httpRequest);
+
+        String body = response.getBody();
         if (response.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
-            String body = response.getBody();
             JSONObject resp = new JSONObject(body);
             JSONObject data = resp.getJSONObject("data");
             return data;
 //            saveToken(data);
         } else {
-            throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
+            throw new TokenRefreshFailException("Response code = " + response.getResponseCode() + "; response = " + body + "; refreshToken = " + refreshToken);
         }
     }
 

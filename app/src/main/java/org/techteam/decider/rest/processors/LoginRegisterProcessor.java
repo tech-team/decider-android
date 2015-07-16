@@ -57,6 +57,7 @@ public class LoginRegisterProcessor extends Processor {
             transactionFinished(operationType, requestId);
 
             result.putString(ServiceCallback.LoginRegisterExtras.TOKEN, apiUI.extractToken(data));
+            result.putLong(ServiceCallback.LoginRegisterExtras.EXPIRES, System.currentTimeMillis() + apiUI.extractTokenExpires(data) * 1000);
             result.putString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, apiUI.extractRefreshToken(data));
 
             cb.onSuccess(result);

@@ -185,6 +185,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN);
         String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
         String token = data.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
+        long expires = data.getLong(ServiceCallback.LoginRegisterExtras.EXPIRES);
         String refreshToken = data.getString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
         String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
@@ -197,11 +198,13 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             // (Not setting the auth token will cause another call to the server to authenticate the user)
             mAccountManager.addAccountExplicitly(account, password, null);
             mAccountManager.setAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, token);
-            mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
         } else {
             Log.d(TAG, "> finishLogin > setPassword");
             mAccountManager.setPassword(account, password);
         }
+        mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(expires));
+        mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
+
 
         data.putString(AccountManager.KEY_ACCOUNT_NAME, login);
         data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);

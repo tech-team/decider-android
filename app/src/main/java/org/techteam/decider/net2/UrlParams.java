@@ -86,6 +86,16 @@ public class UrlParams implements Iterable<UrlParams.UrlParam<?>> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    public Object get(String key) {
+        for (UrlParam p : params) {
+            if (p.getKey().equals(key)) {
+                return p.getValue();
+            }
+        }
+        return null;
+    }
+
     public boolean isEmpty() {
         return params.isEmpty();
     }
