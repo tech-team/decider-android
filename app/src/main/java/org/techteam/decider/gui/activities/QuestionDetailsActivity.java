@@ -1,27 +1,25 @@
-package org.techteam.decider.gui.fragments;
+package org.techteam.decider.gui.activities;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
+import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
@@ -32,15 +30,13 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-public class QuestionDetailsFragment extends Fragment
+public class QuestionDetailsActivity extends AppCompatActivity
             implements OnListScrolledDownCallback {
-    private MainActivity activity;
     private QuestionEntry entry;
     private int qid;
 
     private RetrieveEntryTask retrieveEntryTask;
 
-    private View rootView;
     // children
     private QuestionView questionView;
     private RecyclerView commentsView;
@@ -63,37 +59,35 @@ public class QuestionDetailsFragment extends Fragment
     }
 
     @Override
-    public void setArguments(Bundle args) {
-        if (args != null) {
-            qid = args.getInt(BundleKeys.Q_ID);
-        }
-    }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_question_details, container, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        setContentView(R.layout.fragment_question_details);
 
+        qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+        
         // setup toolbar
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.post_details_toolbar);
-        this.activity.setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.post_details_toolbar);
+        setSupportActionBar(toolbar);
 
-        ActionBar actionBar = this.activity.getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
         // find children
-        questionView = (QuestionView) rootView.findViewById(R.id.post_view);
-        commentsView = (RecyclerView) rootView.findViewById(R.id.comments_recycler);
+        questionView = (QuestionView) findViewById(R.id.post_view);
+        commentsView = (RecyclerView) findViewById(R.id.comments_recycler);
 
-        commentEdit = (EditText) rootView.findViewById(R.id.comment_edit);
-        sendCommentButton = (ImageButton) rootView.findViewById(R.id.comment_send);
+        commentEdit = (EditText) findViewById(R.id.comment_edit);
+        sendCommentButton = (ImageButton) findViewById(R.id.comment_send);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         commentsView.setLayoutManager(layoutManager);
 
 
-        adapter = new CommentsListAdapter(null, getActivity(), null, QuestionDetailsFragment.this, null);
+        adapter = new CommentsListAdapter(null, this, null, QuestionDetailsActivity.this, null);
         commentsView.setAdapter(adapter);
 
         sendCommentButton.setOnClickListener(new View.OnClickListener() {
@@ -103,21 +97,11 @@ public class QuestionDetailsFragment extends Fragment
             }
         });
 
-        return rootView;
-    }
-
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        this.activity = (MainActivity) activity;
-
-        serviceHelper = new ServiceHelper(activity);
+        serviceHelper = new ServiceHelper(this);
         callbacksKeeper.addCallback(OperationType.GET_COMMENTS, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "GetComments: ok");
+                Toaster.toast(QuestionDetailsActivity.this, "GetComments: ok");
 
                 boolean isFeedFinished = data.getBoolean(GetCommentsExtras.FEED_FINISHED, false);
                 int insertedCount = data.getInt(GetCommentsExtras.COUNT, -1);
@@ -139,26 +123,21 @@ public class QuestionDetailsFragment extends Fragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "GetComments: failed. " + message);
+                Toaster.toast(QuestionDetailsActivity.this, "GetComments: failed. " + message);
             }
         });
 
         callbacksKeeper.addCallback(OperationType.CREATE_COMMENT, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "CreateComment: ok");
+                Toaster.toast(QuestionDetailsActivity.this, "CreateComment: ok");
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                Toaster.toast(QuestionDetailsFragment.this.activity.getBaseContext(), "CreateComment: failed. " + message);
+                Toaster.toast(QuestionDetailsActivity.this, "CreateComment: failed. " + message);
             }
         });
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
@@ -213,12 +192,11 @@ public class QuestionDetailsFragment extends Fragment
     }
 
 
-
-
     class RetrieveEntryTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
+            qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
             entry = QuestionEntry.byQId(qid);
 
             return null;
@@ -234,8 +212,6 @@ public class QuestionDetailsFragment extends Fragment
                     callbacksKeeper.getCallback(OperationType.GET_COMMENTS));
         }
     }
-
-
 
 
     private class CommentsLoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -255,7 +231,7 @@ public class QuestionDetailsFragment extends Fragment
                     loadIntention = args.getInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
                 }
 
-                return new CommentsLoader(getActivity(), entryPos, insertedCount, loadIntention);
+                return new CommentsLoader(QuestionDetailsActivity.this, entryPos, insertedCount, loadIntention);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }

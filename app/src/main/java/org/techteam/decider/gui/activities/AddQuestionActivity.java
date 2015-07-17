@@ -119,24 +119,6 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
 
         categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
 
-        //TODO: is this needed? i thought posting now is only 1 request?
-        callbacksKeeper.addCallback(OperationType.UPLOAD_IMAGE, new ServiceCallback() {
-            @Override
-            public void onSuccess(String operationId, Bundle data) {
-                String uid = data.getString(ImageUploadExtras.UID);
-                int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
-                getImageHolderById(imageOrdinalId).setUid(uid);
-
-                Toaster.toastLong(AddQuestionActivity.this, "Upload ok. Image uid = " + uid + ". OrdinalId = " + imageOrdinalId);
-            }
-
-            @Override
-            public void onError(String operationId, Bundle data, String message) {
-                int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
-                Toaster.toastLong(AddQuestionActivity.this, "Upload failed: " + message + ". OrdinalId = " + imageOrdinalId);
-            }
-        });
-
         callbacksKeeper.addCallback(OperationType.CREATE_QUESTION, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {

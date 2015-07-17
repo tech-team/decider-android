@@ -17,14 +17,11 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.LoadedFrom;
-import com.nostra13.universalimageloader.core.display.BitmapDisplayer;
-import com.nostra13.universalimageloader.core.imageaware.ImageAware;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
+import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.rest.api.ApiUI;
 
 public class PollItemView extends FrameLayout {
@@ -115,6 +112,12 @@ public class PollItemView extends FrameLayout {
             imageLoader.displayImage(ApiUI.resolveUrl(entry.getPreviewUrl()), imageView, new SimpleImageLoadingListener() {
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    // animation lags on QuestionDetailsActivity
+                    // any way image is in the cache (it was clicked in the list)
+                    // so animation is not needed
+                    if (getContext().getClass() == QuestionDetailsActivity.class)
+                        return;
+
                     Animation anim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
                     imageView.setAnimation(anim);
                     anim.start();

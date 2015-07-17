@@ -60,6 +60,11 @@
             android:label="@string/add_post_toolbar_title"
             android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
+        <activity
+            android:name=".gui.activities.QuestionDetailsActivity"
+            android:label="@string/add_post_toolbar_title"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+        </activity>
 
         <activity android:name="com.vk.sdk.VKOpenAuthActivity" />
         <!-- Declare the bundled CropImage Activity -->
