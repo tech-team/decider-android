@@ -1,31 +1,33 @@
 package org.techteam.decider.util.image_selector;
 
-// value = |imageId|requestCode|
+// value = |android_stuff|imageId|requestCode|
+//         31            15      7           0
+
 class CompoundRequestCode {
-    private short imageId;
-    private short requestCode;
+    private byte imageId;
+    private byte requestCode;
     private int value;
 
-    public CompoundRequestCode(short imageId, short requestCode) {
+    public CompoundRequestCode(byte imageId, byte requestCode) {
         this.imageId = imageId;
         this.requestCode = requestCode;
 
-        this.value = imageId << 16;
+        this.value = imageId << 8;
         this.value |= requestCode;
     }
 
     public CompoundRequestCode(int value) {
         this.value = value;
 
-        this.requestCode = (short) value;
-        this.imageId = (short) (value >> 16);
+        this.requestCode = (byte) value;
+        this.imageId = (byte) (value >> 8);
     }
 
-    public short getImageId() {
+    public byte getImageId() {
         return imageId;
     }
 
-    public short getRequestCode() {
+    public byte getRequestCode() {
         return requestCode;
     }
 

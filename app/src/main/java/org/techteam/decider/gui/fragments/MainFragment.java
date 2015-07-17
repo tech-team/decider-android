@@ -5,34 +5,23 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
@@ -45,14 +34,12 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MainFragment
         extends Fragment
         implements OnCategorySelectedListener {
 
     public static final String TAG = MainFragment.class.toString();
+    private static final int ADD_QUESTION = 0;
     private MainActivity activity;
 
     private Toolbar toolbar;
@@ -153,11 +140,8 @@ public class MainFragment
         createPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().beginTransaction()
-                        .add(R.id.content_frame, new AddQuestionFragment())
-                        .addToBackStack("mainFragment")
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit();
+                Intent intent = new Intent(getActivity(), AddQuestionActivity.class);
+                startActivityForResult(intent, ADD_QUESTION);
             }
         });
     }
@@ -166,6 +150,24 @@ public class MainFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
+            int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
+            QuestionDetailsFragment detailsFragment = new QuestionDetailsFragment();
+            Bundle detailsBundle = new Bundle();
+            detailsBundle.putInt(QuestionDetailsFragment.BundleKeys.Q_ID, qid);
+            detailsFragment.setArguments(detailsBundle);
+
+            getFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.content_frame, detailsFragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack("mainFragment")
+                    .commit();
+        }
     }
 
     @Override

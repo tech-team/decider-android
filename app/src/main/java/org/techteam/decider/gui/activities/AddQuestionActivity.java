@@ -1,19 +1,17 @@
-package org.techteam.decider.gui.fragments;
+package org.techteam.decider.gui.activities;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -24,7 +22,6 @@ import android.widget.Spinner;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.question.ImageQuestionData;
-import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.rest.CallbacksKeeper;
@@ -36,9 +33,10 @@ import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageHolder;
 import org.techteam.decider.util.image_selector.ImageSelector;
 
-public class AddQuestionFragment extends Fragment implements ActivityStarter {
-    private static final String TAG = AddQuestionFragment.class.getName();
-    private MainActivity activity;
+public class AddQuestionActivity extends AppCompatActivity implements ActivityStarter {
+    private static final String TAG = AddQuestionActivity.class.getName();
+
+    public static final String QUESTION_ID = "QUESTION_ID";
 
     // child controls
     private EditText postText;
@@ -70,17 +68,55 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_add_question, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        return rootView;
-    }
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        setContentView(R.layout.fragment_add_question);
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+        // setup toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.post_add_toolbar);
+        setSupportActionBar(toolbar);
 
-        this.activity = (MainActivity) activity;
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        // find controls
+        postText = (EditText) findViewById(R.id.add_post_text);
+        categoriesSpinner = (Spinner) findViewById(R.id.add_post_category_spinner);
+        
+        anonymityCheckBox = (CheckBox) findViewById(R.id.add_post_anonymity_checkbox);
+
+        imageChoice1 = (ImageView) findViewById(R.id.add_post_image_choice1);
+        imageChoice2 = (ImageView) findViewById(R.id.add_post_image_choice2);
+
+
+        //TODO: fix ordinals, they maybe wrong
+        leftImageSelector = new ImageSelector(this, this, imageChoice1, (byte) 0);
+        rightImageSelector = new ImageSelector(this, this, imageChoice2, (byte) 1);
+
+        createButton = (Button) findViewById(R.id.add_post_send_button);
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createPost();
+            }
+        });
+
+        // setup categories list
+        serviceHelper = new ServiceHelper(this);
+        getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+
+        categoriesSpinnerAdapter = new SimpleCursorAdapter(
+                this,
+                R.layout.categories_spinner_item,
+                null,
+                new String[] {CategoryEntry.LOCALIZED_LABEL_FIELD},
+                new int[] {R.id.category_title},
+                0);
+
+        categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
 
         //TODO: is this needed? i though posting now is only 1 request?
         callbacksKeeper.addCallback(OperationType.UPLOAD_IMAGE, new ServiceCallback() {
@@ -90,13 +126,13 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
                 int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
                 getImageHolderById(imageOrdinalId).setUid(uid);
 
-                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload ok. Image uid = " + uid + ". OrdinalId = " + imageOrdinalId);
+                Toaster.toastLong(AddQuestionActivity.this, "Upload ok. Image uid = " + uid + ". OrdinalId = " + imageOrdinalId);
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 int imageOrdinalId = data.getInt(ImageUploadExtras.IMAGE_ORDINAL_ID);
-                Toaster.toastLong(AddQuestionFragment.this.activity.getBaseContext(), "Upload failed: " + message + ". OrdinalId = " + imageOrdinalId);
+                Toaster.toastLong(AddQuestionActivity.this, "Upload failed: " + message + ". OrdinalId = " + imageOrdinalId);
             }
         });
 
@@ -104,76 +140,23 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
-                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question ok");
-                getActivity().onBackPressed();
+                Toaster.toast(AddQuestionActivity.this, "Create question ok");
+
+                Intent result = new Intent();
+                //TODO: qid
+                result.putExtra(QUESTION_ID, 0);
+
+                setResult(Activity.RESULT_OK, result);
+                finish();
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 waitDialog.dismiss();
-                Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question failed: " + message);
+                Toaster.toast(AddQuestionActivity.this,
+                "Create question failed: " + message);
             }
         });
-    }
-
-    private ImageHolder getImageHolderById(int id) {
-        if (leftImageSelector.getImageHolder().getOrdinal() == id)
-            return leftImageSelector.getImageHolder();
-        else
-            return rightImageSelector.getImageHolder();
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        View v = getView();
-        assert v != null;
-
-        // setup toolbar
-        Toolbar toolbar = (Toolbar) v.findViewById(R.id.post_add_toolbar);
-        this.activity.setSupportActionBar(toolbar);
-
-        ActionBar actionBar = this.activity.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-
-        // find controls
-        postText = (EditText) v.findViewById(R.id.add_post_text);
-        categoriesSpinner = (Spinner) v.findViewById(R.id.add_post_category_spinner);
-        
-        anonymityCheckBox = (CheckBox) v.findViewById(R.id.add_post_anonymity_checkbox);
-
-        imageChoice1 = (ImageView) v.findViewById(R.id.add_post_image_choice1);
-        imageChoice2 = (ImageView) v.findViewById(R.id.add_post_image_choice2);
-
-
-        //TODO: fix ordinals, they maybe wrong
-        leftImageSelector = new ImageSelector(activity, this, imageChoice1, (short) 0);
-        rightImageSelector = new ImageSelector(activity, this, imageChoice2, (short) 1);
-
-        createButton = (Button) v.findViewById(R.id.add_post_send_button);
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createPost();
-            }
-        });
-
-        // setup categories list
-        Context context = v.getContext();
-        serviceHelper = new ServiceHelper(context);
-        getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
-
-        categoriesSpinnerAdapter = new SimpleCursorAdapter(
-                context,
-                R.layout.categories_spinner_item,
-                null,
-                new String[] {CategoryEntry.LOCALIZED_LABEL_FIELD},
-                new int[] {R.id.category_title},
-                0);
-
-        categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
 
         if (savedInstanceState != null) {
             currentQuestionData = savedInstanceState.getParcelable(BundleKeys.QUESTION_DATA);
@@ -195,14 +178,12 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
     @Override
     public void onResume() {
         super.onResume();
-        activity.lockDrawer();
         serviceHelper.init();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        activity.unlockDrawer();
         serviceHelper.release();
     }
 
@@ -211,6 +192,13 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
         // call both, they will compare ordinals
         leftImageSelector.onActivityResult(requestCode, resultCode, data);
         rightImageSelector.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private ImageHolder getImageHolderById(int id) {
+        if (leftImageSelector.getImageHolder().getOrdinal() == id)
+            return leftImageSelector.getImageHolder();
+        else
+            return rightImageSelector.getImageHolder();
     }
 
     private void restoreQuestion() {
@@ -255,15 +243,15 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
 
         // validate data
         if (currentQuestionData.getText().isEmpty()) {
-            Toaster.toast(getActivity(), R.string.fill_all_fields);
+            Toaster.toast(this, R.string.fill_all_fields);
             return false;
         }
         if (currentQuestionData.getPicture1() == null || currentQuestionData.getPicture2() == null) {
-            Toaster.toast(getActivity(), R.string.pictures_fil);
+            Toaster.toast(this, R.string.pictures_fil);
             return false;
         }
 
-        waitDialog = ProgressDialog.show(activity, getString(R.string.creating_post), getString(R.string.please_wait), true);
+        waitDialog = ProgressDialog.show(this, getString(R.string.creating_post), getString(R.string.please_wait), true);
         serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.CREATE_QUESTION));
 
         return true;
@@ -274,7 +262,7 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             if  (id == LoaderIds.CATEGORIES_LOADER) {
-                return new CategoriesLoader(getActivity());
+                return new CategoriesLoader(AddQuestionActivity.this);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }

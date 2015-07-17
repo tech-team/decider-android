@@ -20,7 +20,7 @@ import com.android.camera.CropImageIntentBuilder;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.question.ImageData;
-import org.techteam.decider.gui.fragments.AddQuestionFragment;
+import org.techteam.decider.gui.activities.AddQuestionActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,15 +30,15 @@ import java.io.InputStream;
 import java.util.UUID;
 
 public class ImageSelector implements View.OnClickListener {
-    private static final String TAG = AddQuestionFragment.class.getName();
+    private static final String TAG = AddQuestionActivity.class.getName();
 
-    private static final short TAKE_PICTURE = 1;
-    private static final short SELECT_IMAGE = 2;
-    private static final short CROP_IMAGE = 3;
+    private static final byte TAKE_PICTURE = 1;
+    private static final byte SELECT_IMAGE = 2;
+    private static final byte CROP_IMAGE = 3;
 
     private static final String ORIGINAL_FILE_EXTENSION = ".original.jpg";
     private static final String PREVIEW_FILE_EXTENSION = ".preview.jpg";
-    private final short imageId;
+    private final byte imageId;
 
     private final Context context;
     private final ActivityStarter activityStarter;
@@ -50,7 +50,7 @@ public class ImageSelector implements View.OnClickListener {
     private int previewWidth = 1280;
     private int previewHeight = previewWidth * aspectHeight / aspectWidth;
 
-    public ImageSelector(Context context, ActivityStarter activityStarter, ImageView imageView, short imageId) {
+    public ImageSelector(Context context, ActivityStarter activityStarter, ImageView imageView, byte imageId) {
         this.context = context;
         this.activityStarter = activityStarter;
         this.imageId = imageId;
@@ -60,7 +60,7 @@ public class ImageSelector implements View.OnClickListener {
     }
 
     public ImageSelector(Context context, ActivityStarter activityStarter, ImageView imageView) {
-        this(context, activityStarter, imageView, (short) 0);
+        this(context, activityStarter, imageView, (byte) 0);
     }
 
     public void setParams(int aspectWidth, int aspectHeight, int previewWidth, int previewHeight) {
@@ -109,7 +109,7 @@ public class ImageSelector implements View.OnClickListener {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         CompoundRequestCode rc = new CompoundRequestCode(requestCode);
-        short requestImageId = rc.getImageId();
+        byte requestImageId = rc.getImageId();
         requestCode = rc.getRequestCode();
 
         if (requestImageId != imageId)
