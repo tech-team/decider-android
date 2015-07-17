@@ -20,8 +20,8 @@ import org.techteam.decider.gui.views.QuestionView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostsListAdapter
-        extends CursorRecyclerViewAdapter<PostsListAdapter.ViewHolder> {
+public class QuestionsListAdapter
+        extends CursorRecyclerViewAdapter<QuestionsListAdapter.ViewHolder> {
     private final ContentSection currentSection;
     private final OnQuestionEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
@@ -64,12 +64,12 @@ public class PostsListAdapter
         }
     }
 
-    public PostsListAdapter(Cursor contentCursor,
-                            Context context,
-                            ContentSection currentSection,
-                            OnQuestionEventCallback eventCallback,
-                            OnListScrolledDownCallback scrolledDownCallback,
-                            QuestionInteractor questionInteractor) {
+    public QuestionsListAdapter(Cursor contentCursor,
+                                Context context,
+                                ContentSection currentSection,
+                                OnQuestionEventCallback eventCallback,
+                                OnListScrolledDownCallback scrolledDownCallback,
+                                QuestionInteractor questionInteractor) {
         super(contentCursor);
         this.context = context;
         this.currentSection = currentSection;
@@ -80,7 +80,7 @@ public class PostsListAdapter
 
     // Create new views (invoked by the layout manager)
     @Override
-    public PostsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public QuestionsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                             int viewType) {
         View v;
         if (viewType == VIEW_TYPE_ENTRY) {
@@ -149,7 +149,7 @@ public class PostsListAdapter
 
     @Override
     public int getItemViewType(int position) {
-        if (position < PostsListAdapter.this.getItemCount() - 1)
+        if (position < QuestionsListAdapter.this.getItemCount() - 1)
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;

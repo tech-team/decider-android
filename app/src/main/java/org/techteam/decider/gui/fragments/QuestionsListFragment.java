@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -22,8 +23,10 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
-import org.techteam.decider.gui.adapters.PostsListAdapter;
+import org.techteam.decider.gui.activities.QuestionDetailsActivity;
+import org.techteam.decider.gui.adapters.QuestionsListAdapter;
 import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
@@ -60,7 +63,7 @@ public class QuestionsListFragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView recyclerView;
-    private PostsListAdapter adapter;
+    private QuestionsListAdapter adapter;
 
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
@@ -92,7 +95,7 @@ public class QuestionsListFragment
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new PostsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
+        adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
         adapter.setOnQuestionEventCallback(new OnQuestionEventCallback() {
             @Override
             public void onLike(QuestionEntry post) {
@@ -263,17 +266,9 @@ public class QuestionsListFragment
 
     @Override
     public void onCommentsClick(QuestionEntry entry) {
-        QuestionDetailsFragment detailsFragment = new QuestionDetailsFragment();
-        Bundle detailsBundle = new Bundle();
-        detailsBundle.putInt(QuestionDetailsFragment.BundleKeys.Q_ID, entry.getQId());
-        detailsFragment.setArguments(detailsBundle);
-
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.content_frame, detailsFragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack("mainFragment")
-                .commit();
+        Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
+        intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, entry.getQId());
+        startActivity(intent);
     }
 
     @Override

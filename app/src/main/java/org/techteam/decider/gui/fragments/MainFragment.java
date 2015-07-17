@@ -3,7 +3,6 @@ package org.techteam.decider.gui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
@@ -23,6 +22,7 @@ import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
@@ -156,17 +156,9 @@ public class MainFragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
             int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
-            QuestionDetailsFragment detailsFragment = new QuestionDetailsFragment();
-            Bundle detailsBundle = new Bundle();
-            detailsBundle.putInt(QuestionDetailsFragment.BundleKeys.Q_ID, qid);
-            detailsFragment.setArguments(detailsBundle);
-
-            getFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.content_frame, detailsFragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack("mainFragment")
-                    .commit();
+            Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
+            intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, qid);
+            startActivity(intent);
         }
     }
 

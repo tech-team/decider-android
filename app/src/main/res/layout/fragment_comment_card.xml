@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="1dp"
-    tools:context="org.techteam.decider.gui.fragments.QuestionDetailsFragment" >
+    tools:context="org.techteam.decider.gui.activities.QuestionDetailsActivity" >
 
     <org.techteam.decider.gui.views.CommentView
         android:id="@+id/comment_view"
