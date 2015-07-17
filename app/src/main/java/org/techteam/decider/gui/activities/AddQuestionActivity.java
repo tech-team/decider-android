@@ -119,7 +119,7 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
 
         categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
 
-        //TODO: is this needed? i though posting now is only 1 request?
+        //TODO: is this needed? i thought posting now is only 1 request?
         callbacksKeeper.addCallback(OperationType.UPLOAD_IMAGE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
