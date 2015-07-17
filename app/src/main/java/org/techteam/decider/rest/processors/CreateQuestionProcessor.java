@@ -16,6 +16,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
@@ -52,6 +53,7 @@ public class CreateQuestionProcessor extends Processor {
                 JSONObject data = response.getJSONObject("data");
                 QuestionEntry entry = QuestionEntry.fromJson(data);
                 entry.saveTotal();
+                result.putInt(ServiceCallback.CreateQuestionExtras.QID, entry.getQId());
                 ActiveAndroid.setTransactionSuccessful();
 
             } finally {

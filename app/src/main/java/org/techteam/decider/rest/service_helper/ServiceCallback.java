@@ -34,6 +34,10 @@ public interface ServiceCallback {
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
     }
 
+    class CreateQuestionExtras {
+        public static final String QID = "QID";
+    }
+
     class LoginRegisterExtras {
         public static final String LOGIN = "LOGIN";
         public static final String PASSWORD = "PASSWORD";

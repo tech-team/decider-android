@@ -105,6 +105,12 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
                 Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question ok");
+                int qid = data.getInt(CreateQuestionExtras.QID, -1);
+                if (qid == -1) {
+                    // do something in this shitty situation
+                } else {
+
+                }
                 getActivity().onBackPressed();
             }
 
