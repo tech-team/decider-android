@@ -3,6 +3,7 @@ package org.techteam.decider.gui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -61,6 +62,8 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
+    private ProgressDialog waitDialog;
+
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String QUESTION_DATA = "QUESTION_DATA";
@@ -79,6 +82,7 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
 
         this.activity = (MainActivity) activity;
 
+        //TODO: is this needed? i though posting now is only 1 request?
         callbacksKeeper.addCallback(OperationType.UPLOAD_IMAGE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
@@ -99,11 +103,14 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
         callbacksKeeper.addCallback(OperationType.CREATE_QUESTION, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
+                waitDialog.dismiss();
                 Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question ok");
+                getActivity().onBackPressed();
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                waitDialog.dismiss();
                 Toaster.toast(AddQuestionFragment.this.activity.getBaseContext(), "Create question failed: " + message);
             }
         });
@@ -149,9 +156,7 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (createPost()) {
-                    getActivity().onBackPressed();
-                }
+                createPost();
             }
         });
 
@@ -258,6 +263,7 @@ public class AddQuestionFragment extends Fragment implements ActivityStarter {
             return false;
         }
 
+        waitDialog = ProgressDialog.show(activity, getString(R.string.creating_post), getString(R.string.please_wait), true);
         serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.CREATE_QUESTION));
 
         return true;
