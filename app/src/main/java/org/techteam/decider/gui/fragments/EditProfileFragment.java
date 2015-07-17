@@ -3,6 +3,7 @@ package org.techteam.decider.gui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -16,8 +17,10 @@ import android.widget.ImageView;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.util.image_selector.ActivityStarter;
+import org.techteam.decider.util.image_selector.ImageSelector;
 
-public class EditProfileFragment extends Fragment {
+public class EditProfileFragment extends Fragment implements ActivityStarter {
     private MainActivity activity;
     private UserEntry entry;
     private String uid;
@@ -27,6 +30,7 @@ public class EditProfileFragment extends Fragment {
     private View rootView;
     // children
     private ImageView profileImage;
+    private ImageSelector imageSelector;
 
     private EditText nameText;
     private EditText surnameText;
@@ -94,13 +98,24 @@ public class EditProfileFragment extends Fragment {
 
         // find children
         profileImage = (ImageView) rootView.findViewById(R.id.profile_image);
-        //TODO: ImageSelector
+
+        final int aspectWidth = 1;
+        final int aspectHeight = 1;
+        final int previewWidth = 1280;
+        final int previewHeight = 1280;
+        imageSelector = new ImageSelector(activity, this, profileImage);
+        imageSelector.setParams(aspectWidth, aspectHeight, previewWidth, previewHeight);
 
         nameText = (EditText) rootView.findViewById(R.id.name);
         surnameText = (EditText) rootView.findViewById(R.id.surname);
         countryText = (EditText) rootView.findViewById(R.id.country);
         cityText = (EditText) rootView.findViewById(R.id.city);
         birthdayText = (EditText) rootView.findViewById(R.id.birthday);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        imageSelector.onActivityResult(requestCode, resultCode, data);
     }
 
     class RetrieveEntryTask extends AsyncTask<Void, Void, UserEntry> {
@@ -114,7 +129,7 @@ public class EditProfileFragment extends Fragment {
 
         @Override
         protected void onPostExecute(UserEntry entry) {
-            // populate gui with data
+            //TODO: populate gui with data
 //            ImageLoader.getInstance().displayImage(entry.getAvatar(), profileImage);
 //
 //            fullNameText.setText(

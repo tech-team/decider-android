@@ -36,12 +36,6 @@ public class ImageSelector implements View.OnClickListener {
     private static final short SELECT_IMAGE = 2;
     private static final short CROP_IMAGE = 3;
 
-    private static final int ASPECT_WIDTH = 9;
-    private static final int ASPECT_HEIGHT = 16;
-
-    private static final int PREVIEW_WIDTH = 1280;
-    private static final int PREVIEW_HEIGHT = PREVIEW_WIDTH * ASPECT_HEIGHT / ASPECT_WIDTH;
-
     private static final String ORIGINAL_FILE_EXTENSION = ".original.jpg";
     private static final String PREVIEW_FILE_EXTENSION = ".preview.jpg";
     private final short imageId;
@@ -50,6 +44,12 @@ public class ImageSelector implements View.OnClickListener {
     private final ActivityStarter activityStarter;
     private final ImageHolder imageHolder;
 
+    //TODO: aren't they messed up?
+    private int aspectWidth = 9;
+    private int aspectHeight = 16;
+    private int previewWidth = 1280;
+    private int previewHeight = previewWidth * aspectHeight / aspectWidth;
+
     public ImageSelector(Context context, ActivityStarter activityStarter, ImageView imageView, short imageId) {
         this.context = context;
         this.activityStarter = activityStarter;
@@ -57,6 +57,17 @@ public class ImageSelector implements View.OnClickListener {
         imageHolder = new ImageHolder(imageView);
 
         imageView.setOnClickListener(this);
+    }
+
+    public ImageSelector(Context context, ActivityStarter activityStarter, ImageView imageView) {
+        this(context, activityStarter, imageView, (short) 0);
+    }
+
+    public void setParams(int aspectWidth, int aspectHeight, int previewWidth, int previewHeight) {
+        this.aspectWidth = aspectWidth;
+        this.aspectHeight = aspectHeight;
+        this.previewWidth = previewWidth;
+        this.previewHeight = previewHeight;
     }
 
     @Override
@@ -136,8 +147,8 @@ public class ImageSelector implements View.OnClickListener {
 
     private void cropImage() {
         CropImageIntentBuilder cropBuilder = new CropImageIntentBuilder(
-                ASPECT_WIDTH, ASPECT_HEIGHT,
-                PREVIEW_WIDTH, PREVIEW_HEIGHT,
+                aspectWidth, aspectHeight,
+                previewWidth, previewHeight,
                 imageHolder.getPreview());
         cropBuilder.setSourceImage(imageHolder.getSource());
 
@@ -237,5 +248,4 @@ public class ImageSelector implements View.OnClickListener {
     public ImageHolder getImageHolder() {
         return imageHolder;
     }
-
 }
