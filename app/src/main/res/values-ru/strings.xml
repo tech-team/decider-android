@@ -43,7 +43,7 @@
     <string name="create_post">Отправить </string>
     <string name="add_post_toolbar_title">Новый вопрос</string>
     <string name="fill_all_fields">Пожалуйста, заполните все поля</string>
-    <string name="comments_toolbar_title">Decider: комментарии</string>
+    <string name="comments_toolbar_title">Decider</string>
     <string name="poll_item1">Выбрать первый вариант</string>
     <string name="poll_item2">Выбрать второй вариант</string>
     <string name="add_post_image_choice1">Картинка 1</string>

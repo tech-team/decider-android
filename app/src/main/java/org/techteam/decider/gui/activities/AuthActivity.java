@@ -2,7 +2,11 @@ package org.techteam.decider.gui.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -13,11 +17,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.VKSdkListener;
+import com.vk.sdk.VKUIHelper;
+import com.vk.sdk.api.VKError;
+
 import org.techteam.decider.R;
 import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.gui.activities.lib.AccountAuthenticatorActivity;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.SocialProviders;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Keyboard;
@@ -40,6 +51,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private final static String PACKAGE_NAME = "org.techteam.decider";
 
+    private static final String VK_APP_ID = "4855698";
+    private static final String VK_AUTH_SCOPE = "";
+
     private AccountManager mAccountManager;
 
     // controls
@@ -55,6 +69,10 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
+
+    private static final class ActivityCodes {
+        public static final int SOCIAL_LOGIN = 1001;
     }
 
     @Override
@@ -90,7 +108,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         loginViaVKButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginViaVK();
+                socialLogin(SocialProviders.Provider.VK);
             }
         });
 
@@ -123,12 +141,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         // toolbar stuff
         Toolbar toolbar = (Toolbar) findViewById(R.id.auth_toolbar);
         setSupportActionBar(toolbar);
-
-        //TODO: is this needed?
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(getString(R.string.auth_title));
-        }
 
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
@@ -173,10 +185,45 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         serviceHelper.register(email, password, callbacksKeeper.getCallback(OperationType.REGISTER));
     }
 
-    private void loginViaVK() {
+    private void socialLogin(SocialProviders.Provider provider) {
         Keyboard.hideSoftKeyboard(this, getWindow().getDecorView());
+        String url = SocialProviders.getProviderPath(provider);
 
-        // TODO: vk
+        Intent intent = new Intent(AuthActivity.this, SocialLoginActivity.class);
+        Bundle options = new Bundle();
+        options.putString(SocialLoginActivity.IntentKeys.URL, url);
+        intent.putExtras(options);
+        startActivityForResult(intent, ActivityCodes.SOCIAL_LOGIN);
+
+//        final Activity activity = AuthActivity.this;
+//
+//        VKSdk.initialize(new VKSdkListener() {
+//            @Override
+//            public void onCaptchaError(VKError vkError) {
+//                Toaster.toast(activity, vkError.errorMessage);
+//            }
+//
+//            @Override
+//            public void onTokenExpired(VKAccessToken vkAccessToken) {
+//                Toaster.toast(activity, "Token expired");
+//            }
+//
+//            @Override
+//            public void onAccessDenied(VKError vkError) {
+//                Toaster.toast(activity, vkError.errorMessage);
+//            }
+//
+//            @Override
+//            public void onReceiveNewToken(VKAccessToken newToken) {
+//                super.onReceiveNewToken(newToken);
+//
+//                // auth was successful
+//                Toaster.toast(activity, newToken.userId);
+//                Log.d(TAG, "got access token. user_id = " + newToken.userId + "; access_token = " + newToken.accessToken);
+//            }
+//        }, VK_APP_ID);
+//
+//        VKSdk.authorize("offline");
     }
 
     private void finishLogin(Bundle data) {
@@ -222,11 +269,23 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onResume() {
         super.onResume();
         serviceHelper.init();
+//        VKUIHelper.onResume(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         serviceHelper.release();
+//        VKUIHelper.onDestroy(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
+
+        } else {
+//            VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
+        }
     }
 }

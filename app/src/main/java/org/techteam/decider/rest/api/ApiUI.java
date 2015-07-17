@@ -7,6 +7,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -29,8 +30,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class ApiUI {
 
@@ -42,21 +41,15 @@ public class ApiUI {
 //    private static final String API_URL = "http://private-954f0e-decider.apiary-mock.com/";
 
     public static final String BASE_URL = "http://decidr.ru/";
-    public static final URI BASE_URI;
+    public static final Uri BASE_URI;
     public static final String API_PATH = "api/v1/";
-    private static final URI API_URL;
+    private static final Uri API_URI;
 
     private static final String REFRESH_TOKEN_PATH = "refresh_token";
 
     static {
-        URI uri;
-        try {
-            BASE_URI = new URI(BASE_URL);
-            uri = new URI(BASE_URL);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        API_URL = uri.resolve(API_PATH);
+        BASE_URI = Uri.parse(BASE_URL);
+        API_URI = BASE_URI.buildUpon().appendPath(API_PATH).build();
     }
 
     private class PrefsKeys {
@@ -77,6 +70,9 @@ public class ApiUI {
     public String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
         AccountManager am = AccountManager.get(this.context);
         Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
+        if (accounts.length == 0) {
+            return null;
+        }
         AccountManagerFuture<Bundle> f = am.getAuthToken(accounts[0], AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, null, null, null);
         Bundle res = f.getResult();
         return res.getString(AccountManager.KEY_AUTHTOKEN);
@@ -406,12 +402,28 @@ public class ApiUI {
         }
     }
 
-    private String resolveApiUrl(String path) {
-        return API_URL.resolve(path).toString();
+    public static String resolveApiUrl(String path) {
+        return API_URI.buildUpon().appendPath(path).toString();
+    }
+
+    public static String resolveApiUrl(String... paths) {
+        Uri.Builder uri = API_URI.buildUpon();
+        for (String path : paths) {
+            uri = uri.appendPath(path);
+        }
+        return uri.build().toString();
     }
 
     public static String resolveUrl(String path) {
-        return BASE_URI.resolve(path).toString();
+        return BASE_URI.buildUpon().appendPath(path).toString();
+    }
+
+    public static String resolveUrl(String... paths) {
+        Uri.Builder uri = BASE_URI.buildUpon();
+        for (String path : paths) {
+            uri = uri.appendPath(path);
+        }
+        return uri.build().toString();
     }
 
 
