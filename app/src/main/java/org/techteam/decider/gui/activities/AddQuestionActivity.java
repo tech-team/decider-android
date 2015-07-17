@@ -28,6 +28,7 @@ import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.Keyboard;
 import org.techteam.decider.util.Toaster;
 import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageHolder;
@@ -143,8 +144,8 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
                 Toaster.toast(AddQuestionActivity.this, "Create question ok");
 
                 Intent result = new Intent();
-                //TODO: qid
-                result.putExtra(QUESTION_ID, 0);
+                int qid = data.getInt(CreateQuestionExtras.QID, -1);
+                result.putExtra(QUESTION_ID, qid);
 
                 setResult(Activity.RESULT_OK, result);
                 finish();
@@ -239,6 +240,8 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
     }
 
     private boolean createPost() {
+        Keyboard.hideSoftKeyboard(this, getWindow().getDecorView());
+
         currentQuestionData = gatherQuestionData();
 
         // validate data
