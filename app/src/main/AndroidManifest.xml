@@ -7,10 +7,13 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:name="org.techteam.decider.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <permission
+        android:name="org.techteam.decider.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="org.techteam.decider.permission.C2D_MESSAGE" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
 
     <application
         android:name="com.activeandroid.app.Application"
@@ -18,9 +21,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
-        <meta-data android:name="AA_DB_NAME" android:value="Decider.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="5" />
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="Decider.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="5" />
         <meta-data
             android:name="AA_MODELS"
             android:value="org.techteam.decider.content.entities.UserEntry,
@@ -32,22 +38,22 @@
                            org.techteam.decider.content.entities.TransactionEntry,
                            org.techteam.decider.content.entities.CategoryEntry,
                            org.techteam.decider.content.entities.CommentEntry,
-                           org.techteam.decider.content.entities.UploadedImageEntry
-                           " />
+                           org.techteam.decider.content.entities.UploadedImageEntry" />
 
         <activity
             android:name=".gui.activities.MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:windowSoftInputMode="adjustResize|stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".gui.activities.AuthActivity"
             android:label="@string/auth_title"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:windowSoftInputMode="adjustResize|stateHidden" >
         </activity>
         <activity
             android:name=".gui.activities.AddQuestionActivity"
@@ -57,7 +63,15 @@
 
         <activity android:name="com.vk.sdk.VKOpenAuthActivity" />
         <!-- Declare the bundled CropImage Activity -->
-        <activity android:name="com.android.camera.CropImage"/>
+        <activity android:name="com.android.camera.CropImage" />
+
+        <activity
+            android:name=".gui.activities.SocialLoginActivity"
+            android:label="@string/auth_title" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.techteam.decider.gui.activities.AuthActivity" />
+        </activity>
 
         <service
             android:name=".rest.service.DeciderService"
@@ -65,21 +79,19 @@
         </service>
 
         <provider
+            android:name="com.activeandroid.content.ContentProvider"
             android:authorities="org.techteam.decider"
-            android:exported="false"
-            android:name="com.activeandroid.content.ContentProvider" />
-
+            android:exported="false" />
         <provider
-            android:name="org.techteam.decider.gui.WorkingFileProvider"
+            android:name=".gui.WorkingFileProvider"
             android:authorities="org.techteam.decider.lol"
             android:enabled="true"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true" >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -88,31 +100,34 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="org.techteam.decider" />
             </intent-filter>
         </receiver>
+
         <service
-            android:name="org.techteam.decider.gcm.DeciderGcmListenerService"
+            android:name=".gcm.DeciderGcmListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="org.techteam.decider.gcm.DeciderInstanceIDListenerService"
-            android:exported="false">
+            android:name=".gcm.DeciderInstanceIDListenerService"
+            android:exported="false" >
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
-        <service android:name="org.techteam.decider.auth.AuthenticatorService">
+        <service android:name=".auth.AuthenticatorService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
-            <meta-data android:name="android.accounts.AccountAuthenticator"
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
     </application>
 
 </manifest>

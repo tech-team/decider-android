@@ -48,7 +48,7 @@
     <string name="create_post">Create </string>
     <string name="add_post_toolbar_title">New question</string>
     <string name="fill_all_fields">Please, fill all the fields</string>
-    <string name="comments_toolbar_title">Decider: comments</string>
+    <string name="comments_toolbar_title">Decider</string>
     <string name="poll_item1">Vote 1</string>
     <string name="poll_item2">Vote 2</string>
     <string name="poll_item_image">poll_item_image</string>
