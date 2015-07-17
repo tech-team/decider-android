@@ -1,5 +1,6 @@
 # IDEA
 /local.properties
+/captures/
 
 # User-specific stuff:
 .idea/workspace.xml

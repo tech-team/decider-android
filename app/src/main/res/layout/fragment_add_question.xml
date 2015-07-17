@@ -98,7 +98,7 @@
                     android:padding="4dp"
                     android:drawingCacheQuality="low"
                     android:scaleType="centerInside"
-                    android:src="@drawable/photo_placeholder"
+                    android:src="@drawable/photo_placeholder_wide"
                     android:adjustViewBounds="true"
                     android:contentDescription="@string/add_post_image_choice1" />
 
@@ -110,7 +110,7 @@
                     android:padding="4dp"
                     android:drawingCacheQuality="low"
                     android:scaleType="centerInside"
-                    android:src="@drawable/photo_placeholder"
+                    android:src="@drawable/photo_placeholder_wide"
                     android:adjustViewBounds="true"
                     android:contentDescription="@string/add_post_image_choice2" />
 
