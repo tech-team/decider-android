@@ -1,5 +1,6 @@
 package org.techteam.decider.gui.activities;
 
+import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,6 +17,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import org.techteam.decider.R;
+import org.techteam.decider.rest.api.ApiUI;
+import org.techteam.decider.rest.api.SocialProviders;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 public class SocialLoginActivity extends AppCompatActivity {
     private static final String TAG = SocialLoginActivity.class.getName();
@@ -47,17 +51,27 @@ public class SocialLoginActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 Log.d(TAG, "Got url: " + url);
+                if (url.startsWith(SocialProviders.getSocialCompletePath())) {
+                    Uri finalUri = Uri.parse(url);
+                    String accessToken = finalUri.getQueryParameter("access_token");
+                    long expires = System.currentTimeMillis() + Long.parseLong(finalUri.getQueryParameter("expires")) * 1000;
+                    String refreshToken = finalUri.getQueryParameter("refresh_token");
+                    String username = finalUri.getQueryParameter("username");
+
+                    Intent data = new Intent();
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.TOKEN, accessToken);
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.EXPIRES, expires);
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.LOGIN, username);
+                    setResult(0, data);
+                    finish();
+                }
                 super.onPageFinished(view, url);
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 Log.d(TAG, "Getting url: " + url);
-                if (url.startsWith("http://oauth.vk.com")) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(url));
-                    startActivity(i);
-                }
                 super.onPageStarted(view, url, favicon);
             }
         });

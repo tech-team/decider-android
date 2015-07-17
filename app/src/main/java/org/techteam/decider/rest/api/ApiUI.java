@@ -49,7 +49,7 @@ public class ApiUI {
 
     static {
         BASE_URI = Uri.parse(BASE_URL);
-        API_URI = BASE_URI.buildUpon().appendPath(API_PATH).build();
+        API_URI = BASE_URI.buildUpon().appendEncodedPath(API_PATH).build();
     }
 
     private class PrefsKeys {
@@ -403,25 +403,25 @@ public class ApiUI {
     }
 
     public static String resolveApiUrl(String path) {
-        return API_URI.buildUpon().appendPath(path).toString();
+        return API_URI.buildUpon().appendEncodedPath(path).toString();
     }
 
     public static String resolveApiUrl(String... paths) {
         Uri.Builder uri = API_URI.buildUpon();
         for (String path : paths) {
-            uri = uri.appendPath(path);
+            uri = uri.appendEncodedPath(path);
         }
         return uri.build().toString();
     }
 
     public static String resolveUrl(String path) {
-        return BASE_URI.buildUpon().appendPath(path).toString();
+        return BASE_URI.buildUpon().appendEncodedPath(path).toString();
     }
 
     public static String resolveUrl(String... paths) {
         Uri.Builder uri = BASE_URI.buildUpon();
         for (String path : paths) {
-            uri = uri.appendPath(path);
+            uri = uri.appendEncodedPath(path);
         }
         return uri.build().toString();
     }

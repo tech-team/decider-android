@@ -226,11 +226,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 //        VKSdk.authorize("offline");
     }
 
-    private void finishLogin(Bundle data) {
-        Log.d(TAG, "> finishLogin");
-
-        String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN);
-        String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
+    private void saveToken(Bundle data, String login, String password) {
         String token = data.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
         long expires = data.getLong(ServiceCallback.LoginRegisterExtras.EXPIRES);
         String refreshToken = data.getString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
@@ -264,6 +260,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         finish();
     }
 
+    private void finishLogin(Bundle data) {
+        Log.d(TAG, "> finishLogin");
+
+        String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN);
+        String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
+        saveToken(data, login, password);
+    }
+
 
     @Override
     public void onResume() {
@@ -283,6 +287,11 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
+            if (resultCode == 0) {
+                String username = data.getStringExtra(ServiceCallback.LoginRegisterExtras.LOGIN);
+
+                saveToken(data.getExtras(), username, "dummy");
+            }
 
         } else {
 //            VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
