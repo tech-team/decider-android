@@ -77,6 +77,7 @@ public class CreateCommentProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
+        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getCommentData().getQuestionId());
         return data;
     }
 }

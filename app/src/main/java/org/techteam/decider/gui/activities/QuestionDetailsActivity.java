@@ -150,6 +150,12 @@ public class QuestionDetailsActivity extends AppCompatActivity
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: ok");
+
+                int questionId = data.getInt(GetCommentsExtras.QUESTION_ID, -1);
+
+                Bundle args = new Bundle();
+                args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
+                getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
             }
 
             @Override
