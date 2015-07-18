@@ -48,8 +48,6 @@ public class CreateQuestionProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                UploadedImageEntry.deleteAll();
-
                 JSONObject data = response.getJSONObject("data");
                 QuestionEntry entry = QuestionEntry.fromJson(data);
                 entry.saveTotal();

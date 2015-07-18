@@ -23,7 +23,7 @@ public class CommentEntry extends Model {
     @Column(name="author", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     public UserEntry author;
 
-    @Column(name="q_text")
+    @Column(name="text")
     public String text;
 
     @Column(name="creation_date")

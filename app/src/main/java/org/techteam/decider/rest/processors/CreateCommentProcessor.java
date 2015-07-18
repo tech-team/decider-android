@@ -48,8 +48,6 @@ public class CreateCommentProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                UploadedImageEntry.deleteAll();
-
                 JSONObject data = response.getJSONObject("data");
                 CommentEntry entry = CommentEntry.fromJson(data);
                 entry.saveTotal();
