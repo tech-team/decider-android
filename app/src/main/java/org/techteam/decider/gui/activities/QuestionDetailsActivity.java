@@ -178,6 +178,14 @@ public class QuestionDetailsActivity extends AppCompatActivity
         // set data
         retrieveEntryTask = new RetrieveEntryTask();
         retrieveEntryTask.execute();
+
+        LoaderManager lm = getLoaderManager();
+
+        Bundle args = new Bundle();
+        args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, getIntent().getIntExtra(BundleKeys.Q_ID, -1));
+        args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, 0);
+        args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+        lm.initLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
     }
 
     @Override
