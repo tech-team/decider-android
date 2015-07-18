@@ -4,7 +4,6 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -71,11 +70,6 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     private void finishAuthorization() {
         getFragmentManager().beginTransaction()
                 .add(R.id.content_frame, new MainFragment()).commit();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override

@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import junit.framework.Assert;
+
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
@@ -35,9 +37,6 @@ import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends AppCompatActivity
             implements OnListScrolledDownCallback, IAuthTokenGetter {
-    private QuestionEntry entry;
-    private int qid;
-
     private RetrieveEntryTask retrieveEntryTask;
 
     // children
@@ -72,8 +71,6 @@ public class QuestionDetailsActivity extends AppCompatActivity
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.fragment_question_details);
-
-        qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
         
         // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.post_details_toolbar);
@@ -161,8 +158,6 @@ public class QuestionDetailsActivity extends AppCompatActivity
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
-
-            qid = savedInstanceState.getInt(BundleKeys.Q_ID);
         }
 
         // set data
@@ -174,7 +169,6 @@ public class QuestionDetailsActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
-        outState.putInt(BundleKeys.Q_ID, qid);
     }
 
     @Override
@@ -193,7 +187,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
         String text = commentEdit.getText().toString();
         commentEdit.setText("");
 
-        serviceHelper.createComment(new CommentData(text, entry.getQId(), false),
+        serviceHelper.createComment(new CommentData(text, getIntent().getIntExtra(BundleKeys.Q_ID, -1), false),
                 callbacksKeeper.getCallback(OperationType.CREATE_COMMENT));
     }
 
@@ -210,19 +204,23 @@ public class QuestionDetailsActivity extends AppCompatActivity
     }
 
 
-    class RetrieveEntryTask extends AsyncTask<Void, Void, Void> {
+    class RetrieveEntryTask extends AsyncTask<Void, Void, QuestionEntry> {
 
         @Override
-        protected Void doInBackground(Void... params) {
-            qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
-            entry = QuestionEntry.byQId(qid);
+        protected QuestionEntry doInBackground(Void... params) {
+            int qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+            Assert.assertNotSame("Q_ID is null", qid, -1);
 
-            return null;
+            QuestionEntry entry = QuestionEntry.byQId(qid);
+            Assert.assertNotSame("entry is null", entry, null);
+
+            return entry;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            questionView.reuse(entry, null);
+        protected void onPostExecute(QuestionEntry entry) {
+            // QuestionView will be migrated into list element
+            //questionView.reuse(entry, null);
             serviceHelper.getComments(entry.getQId(),
                     COMMENTS_LIMIT,
                     commentsOffset,
