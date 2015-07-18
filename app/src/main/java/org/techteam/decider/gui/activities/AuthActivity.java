@@ -294,7 +294,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
             if (resultCode == 0) {
-                String username = data.getStringExtra(ServiceCallback.LoginRegisterExtras.LOGIN);
+                String username = data.getStringExtra(ServiceCallback.LoginRegisterExtras.USER_ID);
 
                 saveToken(data.getExtras(), username, "dummy");
             }
