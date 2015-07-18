@@ -13,6 +13,7 @@ import org.techteam.decider.content.entities.CommentEntry;
 
 public class CommentsLoader extends CursorLoader {
 
+    private Integer questionId;
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
@@ -22,13 +23,15 @@ public class CommentsLoader extends CursorLoader {
     }
 
     public abstract class BundleKeys {
+        public static final String QUESTION_ID = "QUESTION_ID";
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
         public static final String INSERTED_COUNT = "INSERTED_COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
     }
 
-    public CommentsLoader(Context context, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public CommentsLoader(Context context, Integer questionId, Integer entryPosition, Integer insertedCount, int loadIntention) {
         super(context);
+        this.questionId = questionId;
         this.entryPosition = entryPosition;
         this.insertedCount = insertedCount;
         this.loadIntention = loadIntention;
@@ -37,7 +40,11 @@ public class CommentsLoader extends CursorLoader {
     @Override
     public Cursor loadInBackground() {
         Uri uri = ContentProvider.createUri(CommentEntry.class, null);
-        return getContext().getContentResolver().query(uri, null, null, null, null);
+        return getContext().getContentResolver().query(uri, null, "question_id = ?", new String[] { Integer.toString(questionId) }, null);
+    }
+
+    public Integer getQuestionId() {
+        return questionId;
     }
 
     public Integer getEntryPosition() {

@@ -116,6 +116,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                 Toaster.toast(QuestionDetailsActivity.this, "GetComments: ok");
 
                 boolean isFeedFinished = data.getBoolean(GetCommentsExtras.FEED_FINISHED, false);
+                int questionId = data.getInt(GetCommentsExtras.QUESTION_ID, -1);
                 int insertedCount = data.getInt(GetCommentsExtras.COUNT, -1);
                 int loadIntention = data.getInt(GetCommentsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
 
@@ -127,6 +128,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                 } else {
                     msg = "Successfully fetched posts";
                     Bundle args = new Bundle();
+                    args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
                     args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                     args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                     getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
@@ -241,20 +243,24 @@ public class QuestionDetailsActivity extends AppCompatActivity
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             if  (id == LoaderIds.COMMENTS_LOADER) {
+                Integer questionId = null;
                 Integer entryPos = null;
                 Integer insertedCount = null;
                 int loadIntention = LoadIntention.REFRESH;
                 if (args != null) {
+                    questionId = args.getInt(CommentsLoader.BundleKeys.QUESTION_ID, -1);
+                    if (questionId == -1) questionId = null;
+
                     entryPos = args.getInt(CommentsLoader.BundleKeys.ENTRY_POSITION, -1);
-                    entryPos = entryPos == -1 ? null : entryPos;
+                    if (entryPos == -1) entryPos = null;
 
                     insertedCount = args.getInt(CommentsLoader.BundleKeys.INSERTED_COUNT, -1);
-                    insertedCount = insertedCount == -1 ? null : insertedCount;
+                    if (insertedCount == -1) insertedCount = null;
 
                     loadIntention = args.getInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
                 }
 
-                return new CommentsLoader(QuestionDetailsActivity.this, entryPos, insertedCount, loadIntention);
+                return new CommentsLoader(QuestionDetailsActivity.this, questionId, entryPos, insertedCount, loadIntention);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }

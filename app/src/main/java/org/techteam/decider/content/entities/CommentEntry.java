@@ -14,11 +14,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.Entry;
 
+import java.util.List;
+
 @Table(name = "Comment", id = BaseColumns._ID)
 public class CommentEntry extends Model {
 
     @Column(name="cid", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
     public int cid;
+
+    @Column(name="question_id", index = true)
+    public int questionId;
 
     @Column(name="author", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     public UserEntry author;
@@ -65,6 +70,10 @@ public class CommentEntry extends Model {
         return new Select().from(CommentEntry.class).where("cid = ?", cid).executeSingle();
     }
 
+    public static List<CommentEntry> byQuestionId(int questionId) {
+        return new Select().from(CommentEntry.class).where("question_id = ?", questionId).execute();
+    }
+
     public static CommentEntry fromJson(JSONObject obj) throws JSONException {
         int cid = obj.getInt("id");
         CommentEntry entry = byCId(cid);
@@ -72,6 +81,7 @@ public class CommentEntry extends Model {
             entry = new CommentEntry();
         }
         entry.cid = cid;
+        entry.questionId = obj.getInt("question_id");
         entry.text = obj.getString("text");
         entry.creationDate = obj.getString("creation_date");
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));

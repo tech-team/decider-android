@@ -95,6 +95,7 @@ public class GetCommentsProcessor extends Processor {
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
         data.putInt(ServiceCallback.GetCommentsExtras.LOAD_INTENTION, request.getLoadIntention());
+        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getQuestionId());
         return data;
     }
 }
