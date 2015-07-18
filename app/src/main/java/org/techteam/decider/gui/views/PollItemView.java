@@ -85,7 +85,7 @@ public class PollItemView extends FrameLayout {
         if (marked)
             color = getResources().getColor(android.R.color.holo_green_light);
 
-        cardView.setBackgroundColor(color);
+        cardView.setCardBackgroundColor(color);
     }
 
     public void setEntry(PollItemEntry entry) {
