@@ -18,14 +18,8 @@
         app:popupTheme="@style/ActionBarPopupThemeOverlay"
         />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/comments_recycler"
-        android:layout_below="@id/post_details_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/cards_background_color"/>
-
     <LinearLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -54,4 +48,13 @@
             android:contentDescription="@string/send_comment" />
 
     </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/comments_recycler"
+        android:layout_below="@id/post_details_toolbar"
+        android:layout_above="@id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/cards_background_color"/>
+
 </RelativeLayout>

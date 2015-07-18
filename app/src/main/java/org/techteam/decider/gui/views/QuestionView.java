@@ -228,10 +228,6 @@ public class QuestionView extends PostView {
         });
     }
 
-    //TODO: govnokod
-    private Uri leftImage;
-    private Uri rightImage;
-
     protected void attachCallbacks() {
         shareButton.setOnClickListener(new OnClickListener() {
             @Override

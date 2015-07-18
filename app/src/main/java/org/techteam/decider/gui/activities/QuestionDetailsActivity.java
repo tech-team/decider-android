@@ -91,8 +91,15 @@ public class QuestionDetailsActivity extends AppCompatActivity
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         commentsView.setLayoutManager(layoutManager);
 
+        // comments stuff
+        int qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+        Assert.assertNotSame("Q_ID is null", qid, -1);
 
-        adapter = new CommentsListAdapter(null, this, null, QuestionDetailsActivity.this, null);
+        QuestionEntry entry = QuestionEntry.byQId(qid);
+        Assert.assertNotSame("entry is null", entry, null);
+
+        //TODO: pass questionInteractor
+        adapter = new CommentsListAdapter(null, this, entry, null, null, QuestionDetailsActivity.this, null);
         commentsView.setAdapter(adapter);
 
         sendCommentButton.setOnClickListener(new View.OnClickListener() {

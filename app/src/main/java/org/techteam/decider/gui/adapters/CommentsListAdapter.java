@@ -10,19 +10,23 @@ import android.view.ViewGroup;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
-import org.techteam.decider.content.entities.CommentEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
-import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.views.CommentInteractor;
 import org.techteam.decider.gui.views.CommentView;
-import org.techteam.decider.gui.views.CommentInteractor;
+import org.techteam.decider.gui.views.QuestionInteractor;
+import org.techteam.decider.gui.views.QuestionView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommentsListAdapter
         extends CursorRecyclerViewAdapter<CommentsListAdapter.ViewHolder> {
+
+    private final QuestionEntry questionEntry;
+    private final QuestionInteractor questionInteractor;
+
     private final OnCommentEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
     private final CommentInteractor commentInteractor;
@@ -32,6 +36,7 @@ public class CommentsListAdapter
 
     private static final int VIEW_TYPE_ENTRY = 0;
     private static final int VIEW_TYPE_FOOTER = 1;
+    private static final int VIEW_TYPE_QUESTION = 2;
 
 
     public void setAll(ArrayList<CommentEntry> entries) {
@@ -44,7 +49,7 @@ public class CommentsListAdapter
     }
 
     public boolean isEmpty() {
-        return getItemCount() - 1 == 0; //-footer
+        return getItemCount() - 2 == 0; //-footer
     }
 
     // Provide a reference to the views for each data item
@@ -64,11 +69,15 @@ public class CommentsListAdapter
 
     public CommentsListAdapter(Cursor contentCursor,
                                Context context,
+                               QuestionEntry questionEntry,
+                               QuestionInteractor questionInteractor,
                                OnCommentEventCallback eventCallback,
                                OnListScrolledDownCallback scrolledDownCallback,
                                CommentInteractor commentInteractor) {
         super(contentCursor);
         this.context = context;
+        this.questionEntry = questionEntry;
+        this.questionInteractor = questionInteractor;
         this.eventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
         this.commentInteractor = commentInteractor;
@@ -82,6 +91,12 @@ public class CommentsListAdapter
         if (viewType == VIEW_TYPE_ENTRY) {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_comment_card, parent, false);
+        } else if (viewType == VIEW_TYPE_QUESTION) {
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_question_card, parent, false);
+
+            QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
+            questionView.reuse(questionEntry, questionInteractor);
         } else {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_loading_entry, parent, false);
@@ -91,8 +106,11 @@ public class CommentsListAdapter
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor, final int position) {
+        if (position == 0)
+            return;
+
         //footer visible
-        if (position == cursor.getCount()) {
+        if (position > cursor.getCount() - 2) {
             scrolledDownCallback.onScrolledDown();
             return;
         }
@@ -138,13 +156,15 @@ public class CommentsListAdapter
     public int getItemCount() {
         Cursor cursor = getCursor();
         if (cursor == null)
-            return 1;
-        return cursor.getCount() + 1;
+            return 2;
+        return cursor.getCount() + 2;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position < CommentsListAdapter.this.getItemCount() - 1)
+        if (position == 0)
+            return VIEW_TYPE_QUESTION;
+        else if (position < CommentsListAdapter.this.getItemCount() - 1)
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
