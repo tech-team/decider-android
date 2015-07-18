@@ -3,10 +3,10 @@ package org.techteam.decider.gui.activities;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -27,7 +27,7 @@ import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
-import org.techteam.decider.gui.fragments.ProfileFragment;
+import org.techteam.decider.rest.api.ApiUI;
 
 import java.util.List;
 
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Drawer.Result drawerResult;
 
     private CategoriesListAdapter categoriesListAdapter;
+    private ApiUI apiUI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, null);
         }
+
+        apiUI = new ApiUI(this);
     }
 
     private void finishAuthorization() {
@@ -124,8 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        //TODO: pass uid
-                        ProfileFragment.create(MainActivity.this, null);
+                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                        String uid = apiUI.getCurrentUserId();
+                        intent.putExtra(ProfileActivity.USER_ID, uid);
+                        startActivity(intent);
 
                         return false;
                     }
@@ -157,24 +162,6 @@ public class MainActivity extends AppCompatActivity {
 
     public Drawer.Result getDrawerResult() {
         return drawerResult;
-    }
-
-    public void lockDrawer() {
-        if (drawerResult == null)
-            return;
-
-        drawerResult
-                .getDrawerLayout()
-                .setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-    }
-
-    public void unlockDrawer() {
-        if (drawerResult == null)
-            return;
-
-        drawerResult
-                .getDrawerLayout()
-                .setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
     public List<CategoryEntry> getSelectedCategories() {

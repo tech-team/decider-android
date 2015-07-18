@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,9 +29,8 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.WorkingFileProvider;
-import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.activities.ProfileActivity;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
-import org.techteam.decider.gui.fragments.ProfileFragment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -336,9 +334,10 @@ public class QuestionView extends PostView {
         avatarImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: evil things
-                MainActivity activity = (MainActivity) getContext();
-                ProfileFragment.create(activity, null);
+                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                String uid = entry.getAuthor().getUid();
+                intent.putExtra(ProfileActivity.USER_ID, uid);
+                getContext().startActivity(intent);
             }
         });
     }

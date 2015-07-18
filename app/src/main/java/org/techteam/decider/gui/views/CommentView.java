@@ -1,7 +1,7 @@
 package org.techteam.decider.gui.views;
 
-import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -11,8 +11,7 @@ import android.widget.TextView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
-import org.techteam.decider.gui.activities.MainActivity;
-import org.techteam.decider.gui.fragments.ProfileFragment;
+import org.techteam.decider.gui.activities.ProfileActivity;
 
 
 public class CommentView extends PostView {
@@ -127,11 +126,10 @@ public class CommentView extends PostView {
         avatarImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: evil things
-                MainActivity activity = (MainActivity) getContext();
-
-                //TODO: pass uid
-                ProfileFragment.create(activity, null);
+                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                String uid = entry.getAuthor().getUid();
+                intent.putExtra(ProfileActivity.USER_ID, uid);
+                getContext().startActivity(intent);
             }
         });
     }
