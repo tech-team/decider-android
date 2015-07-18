@@ -154,7 +154,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
             public void onError(String operationId, Bundle data, String message) {
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
-
+                    getAuthToken(null);
                     return;
                 }
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: failed. " + message);

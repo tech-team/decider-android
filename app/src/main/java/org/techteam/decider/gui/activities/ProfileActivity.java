@@ -1,5 +1,7 @@
 package org.techteam.decider.gui.activities;
 
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -19,8 +21,14 @@ import junit.framework.Assert;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.UserEntry;
+import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.Toaster;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements IAuthTokenGetter {
     public final static String USER_ID = "USER_ID";
 
     public final static int EDIT_PROFILE = 0;
@@ -40,6 +48,15 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView birthdayText;
 
     private Button editButton;
+
+
+    private ServiceHelper serviceHelper;
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+
+    @Override
+    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,8 +94,28 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        retrieveEntryTask = new RetrieveEntryTask();
-        retrieveEntryTask.execute();
+
+        serviceHelper = new ServiceHelper(this);
+        callbacksKeeper.addCallback(OperationType.GET_USER, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(getApplicationContext(), "GetUser: ok");
+                retrieveEntryTask = new RetrieveEntryTask();
+                retrieveEntryTask.execute();
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+                    getAuthToken(null);
+                    return;
+                }
+                Toaster.toast(getApplicationContext(), "GetUser: failed. " + message);
+            }
+        });
+
+        serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.GET_USER));
     }
 
     @Override
@@ -88,6 +125,18 @@ public class ProfileActivity extends AppCompatActivity {
             retrieveEntryTask = new RetrieveEntryTask();
             retrieveEntryTask.execute();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        serviceHelper.init();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onResume();
+        serviceHelper.release();
     }
 
     class RetrieveEntryTask extends AsyncTask<Void, Void, UserEntry> {

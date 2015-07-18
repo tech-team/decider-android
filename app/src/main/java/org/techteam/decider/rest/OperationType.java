@@ -9,7 +9,8 @@ public enum OperationType {
     UPLOAD_IMAGE,
     POLL_VOTE,
     GET_COMMENTS(true),
-    CREATE_COMMENT;
+    CREATE_COMMENT,
+    GET_USER;
 
     private boolean canRefresh = false;
 

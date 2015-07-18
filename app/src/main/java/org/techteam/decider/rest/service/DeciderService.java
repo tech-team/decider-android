@@ -11,6 +11,7 @@ import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.GetUserRequest;
 import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
@@ -19,6 +20,7 @@ import org.techteam.decider.rest.processors.CreateQuestionProcessor;
 import org.techteam.decider.rest.processors.GetCategoriesProcessor;
 import org.techteam.decider.rest.processors.GetCommentsProcessor;
 import org.techteam.decider.rest.processors.GetQuestionsProcessor;
+import org.techteam.decider.rest.processors.GetUserProcessor;
 import org.techteam.decider.rest.processors.LoginRegisterProcessor;
 import org.techteam.decider.rest.processors.PollVoteProcessor;
 import org.techteam.decider.rest.processors.Processor;
@@ -114,6 +116,11 @@ public class DeciderService extends IntentService {
             case CREATE_COMMENT: {
                 CreateCommentRequest request = CreateCommentRequest.fromBundle(extras);
                 processor = new CreateCommentProcessor(getBaseContext(), request);
+                break;
+            }
+            case GET_USER: {
+                GetUserRequest request = GetUserRequest.fromBundle(extras);
+                processor = new GetUserProcessor(getBaseContext(), request);
                 break;
             }
 

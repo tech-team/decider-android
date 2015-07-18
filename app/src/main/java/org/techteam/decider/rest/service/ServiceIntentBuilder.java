@@ -14,6 +14,7 @@ import org.techteam.decider.rest.api.CreateQuestionRequest;
 import org.techteam.decider.rest.api.GetCategoriesRequest;
 import org.techteam.decider.rest.api.GetCommentsRequest;
 import org.techteam.decider.rest.api.GetQuestionsRequest;
+import org.techteam.decider.rest.api.GetUserRequest;
 import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.UploadImageRequest;
@@ -94,6 +95,12 @@ public final class ServiceIntentBuilder {
     public static Intent createCommentIntent(Context context, OperationType op, String requestId, CommentData commentData) {
         Intent intent = getBasicIntent(context, requestId, op);
         intent.putExtra(CreateCommentRequest.IntentExtras.COMMENT_DATA, commentData);
+        return intent;
+    }
+
+    public static Intent getUserIntent(Context context, OperationType op, String requestId, String userId) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(GetUserRequest.IntentExtras.USER_ID, userId);
         return intent;
     }
 }

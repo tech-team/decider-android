@@ -253,6 +253,17 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
+    public JSONObject getUser(GetUserRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
+        UrlParams params = new UrlParams();
+        params.add("user_id", request.getUserId());
+
+        HttpResponse response = makeProtectedGetCall(GetUserRequest.URL, params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, IOException {
         String accessToken = getAccessToken();
         if (accessToken == null) {

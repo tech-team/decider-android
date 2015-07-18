@@ -176,6 +176,25 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
+    public void getUser(String userId, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.GET_USER;
+
+        String requestId = createRequestId(op, userId);
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.getUserIntent(context, op, requestId, userId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
+
+
+
     public void saveOperationsState(Bundle outState, String key) {
         outState.putParcelableArrayList(key, new ArrayList<>(pendingOperations.values()));
     }
