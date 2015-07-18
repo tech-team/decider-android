@@ -172,6 +172,11 @@ public class QuestionsListFragment
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 mSwipeRefreshLayout.setRefreshing(false);
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+                    QuestionsListFragment.this.activity.getAuthToken(null);
+                    return;
+                }
                 String msg = "Error. " + message;
                 Toaster.toastLong(getActivity().getApplicationContext(), msg);
                 System.out.println(msg);
@@ -186,6 +191,11 @@ public class QuestionsListFragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+                    QuestionsListFragment.this.activity.getAuthToken(null);
+                    return;
+                }
                 String msg = "Error. " + message;
                 Toaster.toastLong(getActivity().getApplicationContext(), msg);
                 System.out.println(msg);

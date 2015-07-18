@@ -84,6 +84,11 @@ public class MainFragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+                    MainFragment.this.activity.getAuthToken(null);
+                    return;
+                }
                 String msg = "Categories error. " + message;
                 Toaster.toast(getActivity().getApplicationContext(), msg);
                 System.out.println(msg);

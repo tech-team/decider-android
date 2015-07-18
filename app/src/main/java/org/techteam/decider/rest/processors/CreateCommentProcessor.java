@@ -16,6 +16,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CreateCommentRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
@@ -60,13 +61,16 @@ public class CreateCommentProcessor extends Processor {
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException | InvalidAccessTokenException e) {
+        } catch (IOException | JSONException | TokenRefreshFailException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
-            cb.onError(null, result);
-        } catch (AuthenticatorException e) {
+            cb.onError(e.getMessage(), result);
+        } catch (InvalidAccessTokenException e) {
             e.printStackTrace();
-        } catch (OperationCanceledException e) {
+            transactionError(operationType, requestId);
+            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
+            cb.onError(e.getMessage(), result);
+        } catch (AuthenticatorException | OperationCanceledException e) {
             e.printStackTrace();
         }
 

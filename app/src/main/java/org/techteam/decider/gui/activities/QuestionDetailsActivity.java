@@ -1,5 +1,7 @@
 package org.techteam.decider.gui.activities;
 
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
@@ -18,6 +20,7 @@ import android.widget.ImageButton;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
+import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
@@ -31,7 +34,7 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends AppCompatActivity
-            implements OnListScrolledDownCallback {
+            implements OnListScrolledDownCallback, IAuthTokenGetter {
     private QuestionEntry entry;
     private int qid;
 
@@ -56,6 +59,11 @@ public class QuestionDetailsActivity extends AppCompatActivity
     public static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String Q_ID = "qid";
+    }
+
+    @Override
+    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -123,6 +131,11 @@ public class QuestionDetailsActivity extends AppCompatActivity
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+                    getAuthToken(null);
+                    return;
+                }
                 Toaster.toast(QuestionDetailsActivity.this, "GetComments: failed. " + message);
             }
         });
@@ -135,6 +148,11 @@ public class QuestionDetailsActivity extends AppCompatActivity
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+
+                    return;
+                }
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: failed. " + message);
             }
         });

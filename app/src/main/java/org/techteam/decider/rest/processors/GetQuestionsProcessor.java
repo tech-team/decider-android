@@ -75,9 +75,14 @@ public class GetQuestionsProcessor extends Processor {
             }
 
             cb.onSuccess(result);
-        } catch (IOException | JSONException | InvalidAccessTokenException | TokenRefreshFailException e) {
+        } catch (IOException | JSONException | TokenRefreshFailException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
+            cb.onError(e.getMessage(), result);
+        } catch (InvalidAccessTokenException e) {
+            e.printStackTrace();
+            transactionError(operationType, requestId);
+            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
             cb.onError(e.getMessage(), result);
         } catch (AuthenticatorException e) {
             e.printStackTrace();

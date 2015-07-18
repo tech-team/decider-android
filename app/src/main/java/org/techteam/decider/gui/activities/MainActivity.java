@@ -1,6 +1,5 @@
 package org.techteam.decider.gui.activities;
 
-import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.content.Intent;
@@ -23,8 +22,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
-import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.rest.api.ApiUI;
@@ -32,7 +31,7 @@ import org.techteam.decider.rest.api.ApiUI;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IAuthTokenGetter {
     public static final int AUTH_REQUEST_CODE = 101;
     public static String PACKAGE_NAME;
 
@@ -45,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private ApiUI apiUI;
 
     @Override
+    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PACKAGE_NAME = getApplicationContext().getPackageName();
@@ -53,13 +57,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            AccountManager am = AccountManager.get(this);
-            am.getAuthTokenByFeatures(PACKAGE_NAME, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, this, null, null, new AccountManagerCallback<Bundle>() {
+            getAuthToken(new AccountManagerCallback<Bundle>() {
                 @Override
                 public void run(AccountManagerFuture<Bundle> future) {
                     finishAuthorization();
                 }
-            }, null);
+            });
         }
 
         apiUI = new ApiUI(this);

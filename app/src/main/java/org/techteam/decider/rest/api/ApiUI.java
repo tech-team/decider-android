@@ -73,6 +73,7 @@ public class ApiUI {
         if (accounts.length == 0) {
             return null;
         }
+
         AccountManagerFuture<Bundle> f = am.getAuthToken(accounts[0], AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, null, null, null);
         Bundle res = f.getResult();
         return res.getString(AccountManager.KEY_AUTHTOKEN);

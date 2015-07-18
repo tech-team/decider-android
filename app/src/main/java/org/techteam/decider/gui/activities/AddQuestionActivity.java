@@ -1,5 +1,7 @@
 package org.techteam.decider.gui.activities;
 
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.ProgressDialog;
@@ -22,6 +24,7 @@ import android.widget.Spinner;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.question.ImageQuestionData;
+import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.rest.CallbacksKeeper;
@@ -34,7 +37,7 @@ import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageHolder;
 import org.techteam.decider.util.image_selector.ImageSelector;
 
-public class AddQuestionActivity extends AppCompatActivity implements ActivityStarter {
+public class AddQuestionActivity extends AppCompatActivity implements ActivityStarter, IAuthTokenGetter {
     private static final String TAG = AddQuestionActivity.class.getName();
 
     public static final String QUESTION_ID = "QUESTION_ID";
@@ -66,6 +69,11 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String QUESTION_DATA = "QUESTION_DATA";
+    }
+
+    @Override
+    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -136,6 +144,11 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 waitDialog.dismiss();
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
+                    getAuthToken(null);
+                    return;
+                }
                 Toaster.toast(AddQuestionActivity.this,
                 "Create question failed: " + message);
             }

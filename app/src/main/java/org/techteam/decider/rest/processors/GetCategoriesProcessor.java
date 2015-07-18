@@ -72,10 +72,15 @@ public class GetCategoriesProcessor extends Processor {
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException | InvalidAccessTokenException e) {
+        } catch (IOException | JSONException | TokenRefreshFailException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
             cb.onError(null, result);
+        } catch (InvalidAccessTokenException e) {
+            e.printStackTrace();
+            transactionError(operationType, requestId);
+            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
+            cb.onError(e.getMessage(), result);
         } catch (AuthenticatorException e) {
             e.printStackTrace();
         } catch (OperationCanceledException e) {

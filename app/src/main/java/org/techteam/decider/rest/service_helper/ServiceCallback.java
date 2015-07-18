@@ -6,6 +6,14 @@ public interface ServiceCallback {
     void onSuccess(String operationId, Bundle data);
     void onError(String operationId, Bundle data, String message);
 
+    class ErrorsExtras {
+        public static final String ERROR_CODE = "ERROR_CODE";
+
+        public class Codes {
+            public static final int INVALID_TOKEN = 1;
+        }
+    }
+
     class GetQuestionsExtras {
         public static final String FEED_FINISHED = "FEED_FINISHED";
         public static final String COUNT = "COUNT";
