@@ -1,7 +1,6 @@
 package org.techteam.decider.gui.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -121,34 +120,8 @@ public class CommentsListAdapter
         holder.commentView.reuse(entry, commentInteractor);
     }
 
-    private void share(Context context, CommentEntry entry) {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, formatEntryForSharing(context, entry));
-        sendIntent.setType("text/plain");
-        context.startActivity(sendIntent);
-    }
-
     public CommentEntry get(int position) {
         return dataset.get(position);
-    }
-
-    private String formatEntryForSharing(Context context, CommentEntry entry) {
-        StringBuilder sb = new StringBuilder();
-
-        String delimiter = "\n";
-        String emptyLine = " \n";
-        String hashTag = "#" + context.getString(R.string.app_name);
-
-        sb.append(context.getString(R.string.app_name));
-        sb.append(delimiter);
-
-        //TODO: entry sharing
-
-        sb.append(delimiter);
-        sb.append(hashTag);
-
-        return sb.toString();
     }
 
     // Return the size of your dataset (invoked by the layout manager)

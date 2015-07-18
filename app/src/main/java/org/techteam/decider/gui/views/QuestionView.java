@@ -31,6 +31,7 @@ import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.WorkingFileProvider;
 import org.techteam.decider.gui.activities.ProfileActivity;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
+import org.techteam.decider.util.ImageLoaderInitializer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -125,6 +126,12 @@ public class QuestionView extends PostView {
 
     protected void fillFields() {
         final Context context = getContext();
+
+        String avatar = entry.getAuthor().getAvatar();
+        if (avatar != null) {
+            ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(context);
+            imageLoader.displayImage(avatar, avatarImage);
+        }
 
         authorText.setText(entry.getAuthor().getUsername());
         dateText.setText(getDateString(entry.getCreationDate()));

@@ -9,9 +9,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.gui.activities.ProfileActivity;
+import org.techteam.decider.util.ImageLoaderInitializer;
 
 
 public class CommentView extends PostView {
@@ -82,9 +85,15 @@ public class CommentView extends PostView {
     protected void fillFields() {
         Context context = getContext();
 
-//        authorText.setText(entry.getAuthor().getUsername());
-//        dateText.setText(getDateString(entry.getCreationDate()));
-//        postText.setText(entry.getText());
+        String avatar = entry.getAuthor().getAvatar();
+        if (avatar != null) {
+            ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(context);
+            imageLoader.displayImage(avatar, avatarImage);
+        }
+
+        authorText.setText(entry.getAuthor().getUsername());
+        dateText.setText(getDateString(entry.getCreationDate()));
+        postText.setText(entry.getText());
 
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

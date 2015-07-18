@@ -7,8 +7,6 @@ import android.net.Uri;
 
 import com.activeandroid.content.ContentProvider;
 
-import org.techteam.decider.content.ContentSection;
-import org.techteam.decider.content.QuestionHelper;
 import org.techteam.decider.content.entities.CommentEntry;
 
 public class CommentsLoader extends CursorLoader {

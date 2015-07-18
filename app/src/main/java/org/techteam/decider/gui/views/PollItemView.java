@@ -13,16 +13,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.rest.api.ApiUI;
+import org.techteam.decider.util.ImageLoaderInitializer;
 
 public class PollItemView extends FrameLayout {
     // children
@@ -91,23 +89,7 @@ public class PollItemView extends FrameLayout {
     public void setEntry(PollItemEntry entry) {
         this.entry = entry;
 
-        ImageLoader imageLoader = ImageLoader.getInstance();
-        if (!imageLoader.isInited()) {
-            DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .build();
-
-            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getContext())
-                    .defaultDisplayImageOptions(defaultOptions)
-                    .memoryCache(new LruMemoryCache(50 * 1024 * 1024))
-                    .diskCacheSize(100 * 1024 * 1024)
-                    .diskCacheFileCount(300)
-                    .build();
-
-            imageLoader.init(config);
-        }
-
+        ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(getContext());
         if (entry.getPreviewUrl() != null) {
             imageLoader.displayImage(ApiUI.resolveUrl(entry.getPreviewUrl()), imageView, new SimpleImageLoadingListener() {
                 @Override

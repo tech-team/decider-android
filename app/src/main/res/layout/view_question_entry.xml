@@ -14,11 +14,11 @@
         android:id="@+id/avatar_image"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginRight="6dp"
         android:layout_marginEnd="6dp"
-        android:src="@android:drawable/sym_def_app_icon"
+        android:src="@drawable/photo_placeholder"
         android:contentDescription="@string/avatar" />
 
     <TextView
@@ -27,6 +27,7 @@
         android:layout_toEndOf="@id/avatar_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         tools:text="Vasja Pupkin" />
 
     <TextView
@@ -58,7 +59,7 @@
     <View
         android:id="@+id/header_hr"
         android:layout_width="fill_parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
         android:layout_height="1dp"
         android:background="#DDDDDD"
