@@ -57,12 +57,14 @@ public class SocialLoginActivity extends AppCompatActivity {
                     long expires = System.currentTimeMillis() + Long.parseLong(finalUri.getQueryParameter("expires")) * 1000;
                     String refreshToken = finalUri.getQueryParameter("refresh_token");
                     String username = finalUri.getQueryParameter("username");
+                    String userId = finalUri.getQueryParameter("user_id"); // TODO: not sure about parameter name
 
                     Intent data = new Intent();
                     data.putExtra(ServiceCallback.LoginRegisterExtras.TOKEN, accessToken);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.EXPIRES, expires);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.LOGIN, username);
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.USER_ID, userId);
                     setResult(0, data);
                     finish();
                 }

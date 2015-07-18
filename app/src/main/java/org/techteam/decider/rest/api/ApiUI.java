@@ -37,9 +37,6 @@ public class ApiUI {
     private Context context;
     private SharedPreferences prefs;
 
-//    private static final String API_URL = "http://localhost:8888/api/v1/";
-//    private static final String API_URL = "http://private-954f0e-decider.apiary-mock.com/";
-
     public static final String BASE_URL = "http://decidr.ru/";
     public static final Uri BASE_URI;
     public static final String API_PATH = "api/v1/";
@@ -64,7 +61,6 @@ public class ApiUI {
         this.context = context;
 
         prefs = this.context.getSharedPreferences(PrefsKeys.PREFS_NAME, Context.MODE_PRIVATE);
-//        saveToken("0atkeWZqnRq9GVxHNCCtJpOevUtrrN", 36000, "Z77gke1xm6xJ5xaAs7mTUB9fSm1RpO");
     }
 
     public String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
@@ -77,11 +73,6 @@ public class ApiUI {
         AccountManagerFuture<Bundle> f = am.getAuthToken(accounts[0], AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, null, null, null, null);
         Bundle res = f.getResult();
         return res.getString(AccountManager.KEY_AUTHTOKEN);
-//        return prefs.getString(PrefsKeys.ACCESS_TOKEN, "ACCESS_TOKEN");
-    }
-
-    public String getRefreshToken() {
-        return prefs.getString(PrefsKeys.REFRESH_TOKEN, "REFRESH_TOKEN");
     }
 
     public void setCurrentUserId(String userId) {
@@ -92,10 +83,6 @@ public class ApiUI {
 
     public String getCurrentUserId() {
         return prefs.getString(PrefsKeys.CURRENT_USER, null);
-    }
-
-    public int getExpires() {
-        return prefs.getInt(PrefsKeys.EXPIRES, 0);
     }
 
     public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
@@ -342,18 +329,6 @@ public class ApiUI {
         return httpResponse;
     }
 
-//    private void saveToken(String accessToken, int expires, String refreshToken) {
-//        SharedPreferences.Editor editor = prefs.edit();
-//        editor.putString(PrefsKeys.ACCESS_TOKEN, accessToken);
-//        editor.putInt(PrefsKeys.EXPIRES, expires);
-//        editor.putString(PrefsKeys.REFRESH_TOKEN, refreshToken);
-//        editor.apply();
-//    }
-
-//    private void saveToken(JSONObject objData) throws JSONException {
-//        saveToken(extractToken(objData), extractTokenExpires(objData), extractRefreshToken(objData));
-//    }
-
     public String extractToken(JSONObject objData) throws JSONException {
         return objData.getString("access_token");
     }
@@ -381,25 +356,6 @@ public class ApiUI {
 //            saveToken(data);
         } else {
             throw new TokenRefreshFailException("Response code = " + response.getResponseCode() + "; response = " + body + "; refreshToken = " + refreshToken);
-        }
-    }
-
-    @Deprecated
-    public void refreshToken() throws IOException, JSONException, TokenRefreshFailException {
-        Log.e(TAG, "refreshToken() is deprecated");
-
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(REFRESH_TOKEN_PATH));
-        UrlParams params = new UrlParams();
-        params.add("refresh_token", getRefreshToken());
-        httpRequest.setParams(params);
-        HttpResponse response = HttpDownloader.httpPost(httpRequest);
-        if (response.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
-            String body = response.getBody();
-            JSONObject resp = new JSONObject(body);
-            JSONObject data = resp.getJSONObject("data");
-//            saveToken(data);
-        } else {
-            throw new TokenRefreshFailException("Response code = " + response.getResponseCode());
         }
     }
 
