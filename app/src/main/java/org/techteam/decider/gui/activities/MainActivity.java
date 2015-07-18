@@ -12,7 +12,9 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
 
 
     // drawer related stuff
-    private AccountHeader.Result headerResult;
-    private Drawer.Result drawerResult;
+    private AccountHeader drawerHeader;
+    private Drawer drawer;
 
     private CategoriesListAdapter categoriesListAdapter;
     private ApiUI apiUI;
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
         this.categoriesListAdapter = categoriesListAdapter;
 
         // Create the AccountHeader
-        headerResult = new AccountHeader()
+        drawerHeader = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
@@ -135,10 +137,10 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 .build();
 
         //Now create your drawer and pass the AccountHeader.Result
-        drawerResult = new Drawer()
+        drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withAccountHeader(headerResult)
+                .withAccountHeader(drawerHeader)
                 .addDrawerItems(
                         new CategoriesDrawerItem(categoriesListAdapter),
                         new DividerDrawerItem(),
@@ -146,19 +148,19 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                        // do something with the clicked item :D
+                    public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
+                        return false;
                     }
                 })
                 .build();
     }
 
-    public AccountHeader.Result getHeaderResult() {
-        return headerResult;
+    public AccountHeader getDrawerHeader() {
+        return drawerHeader;
     }
 
-    public Drawer.Result getDrawerResult() {
-        return drawerResult;
+    public Drawer getDrawer() {
+        return drawer;
     }
 
     public List<CategoryEntry> getSelectedCategories() {
