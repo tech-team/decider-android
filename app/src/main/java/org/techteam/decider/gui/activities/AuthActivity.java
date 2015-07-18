@@ -28,6 +28,7 @@ import org.techteam.decider.auth.AccountGeneral;
 import org.techteam.decider.gui.activities.lib.AccountAuthenticatorActivity;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.api.SocialProviders;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
@@ -54,6 +55,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private static final String VK_APP_ID = "4855698";
     private static final String VK_AUTH_SCOPE = "";
 
+    private ApiUI apiUI;
     private AccountManager mAccountManager;
 
     // controls
@@ -82,6 +84,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.fragment_auth);
 
+        apiUI = new ApiUI(this);
         mAccountManager = AccountManager.get(getBaseContext());
 
         // find controls
@@ -230,6 +233,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         String token = data.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
         long expires = data.getLong(ServiceCallback.LoginRegisterExtras.EXPIRES);
         String refreshToken = data.getString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
+        String userId = data.getString(ServiceCallback.LoginRegisterExtras.USER_ID);
         String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
         final Account account = new Account(login, PACKAGE_NAME);
@@ -247,6 +251,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         }
         mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(expires));
         mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
+        mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.USER_ID, userId);
+        apiUI.setCurrentUserId(userId);
 
 
         data.putString(AccountManager.KEY_ACCOUNT_NAME, login);

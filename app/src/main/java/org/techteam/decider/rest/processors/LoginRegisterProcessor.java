@@ -44,13 +44,16 @@ public class LoginRegisterProcessor extends Processor {
             JSONObject data = response.getJSONObject("data");
             JSONObject userJson = data.getJSONObject("user");
 
+            String uid = null;
+
             ActiveAndroid.beginTransaction();
             try {
                 UserEntry entry = UserEntry.fromJson(userJson, true);
                 entry.save();
                 ActiveAndroid.setTransactionSuccessful();
 
-                apiUI.setCurrentUserId(entry.getUid());
+                uid = entry.getUid();
+//                apiUI.setCurrentUserId(uid);
             } finally {
                 ActiveAndroid.endTransaction();
             }
@@ -59,6 +62,7 @@ public class LoginRegisterProcessor extends Processor {
             result.putString(ServiceCallback.LoginRegisterExtras.TOKEN, apiUI.extractToken(data));
             result.putLong(ServiceCallback.LoginRegisterExtras.EXPIRES, System.currentTimeMillis() + apiUI.extractTokenExpires(data) * 1000);
             result.putString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, apiUI.extractRefreshToken(data));
+            result.putString(ServiceCallback.LoginRegisterExtras.USER_ID, uid);
 
             cb.onSuccess(result);
         } catch (IOException | JSONException e) {

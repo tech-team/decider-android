@@ -72,6 +72,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         String expiresStr = am.getUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES);
         Long expires = expiresStr != null ? Long.parseLong(expiresStr) : null;
         String refreshToken = am.getUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN);
+        String userId = am.getUserData(account, ServiceCallback.LoginRegisterExtras.USER_ID);
 
         Log.d(TAG, "> peekAuthToken returned - " + authToken);
         if (TextUtils.isEmpty(authToken) || (expires != null && System.currentTimeMillis() > expires)) { // Token is expired
@@ -87,6 +88,8 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                     am.setAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(System.currentTimeMillis() + expires * 1000));
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
+                    am.setUserData(account, ServiceCallback.LoginRegisterExtras.USER_ID, userId);
+                    apiUI.setCurrentUserId(userId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
