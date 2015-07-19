@@ -52,16 +52,18 @@ public class CommentsGetProcessor extends Processor {
                 return;
             }
 
-            JSONArray data = response.getJSONArray("data");
+            JSONObject data = response.getJSONObject("data");
+            int remainig = data.getInt("remaining"); // TODO
+            JSONArray comments = data.getJSONArray("comments");
 
-            if (data.length() == 0) {
+            if (comments.length() == 0) {
                 result.putBoolean(ServiceCallback.GetCommentsExtras.FEED_FINISHED, true);
             } else {
 
                 ActiveAndroid.beginTransaction();
                 try {
-                    for (int i = 0; i < data.length(); ++i) {
-                        JSONObject q = data.getJSONObject(i);
+                    for (int i = 0; i < comments.length(); ++i) {
+                        JSONObject q = comments.getJSONObject(i);
                         CommentEntry entry = CommentEntry.fromJson(q);
                         entry.saveTotal();
                     }
