@@ -40,14 +40,15 @@ public class ApiUI {
 
     public static final String BASE_URL = "http://decidr.ru/";
     public static final Uri BASE_URI;
-    public static final String API_PATH = "api/v1/";
     private static final Uri API_URI;
+    private static final Uri PUSH_URI;
 
     private static final String REFRESH_TOKEN_PATH = "refresh_token";
 
     static {
         BASE_URI = Uri.parse(BASE_URL);
-        API_URI = BASE_URI.buildUpon().appendEncodedPath(API_PATH).build();
+        API_URI = BASE_URI.buildUpon().appendEncodedPath("api/v1/").build();
+        PUSH_URI = BASE_URI.buildUpon().appendEncodedPath("push/").build();
     }
 
     private class PrefsKeys {
@@ -104,7 +105,7 @@ public class ApiUI {
             params.add("categories[]", category);
         }
 
-        HttpResponse response = makeProtectedGetCall(QuestionsGetRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(QuestionsGetRequest.URL), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -115,30 +116,11 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("locale", request.getLocale());
 
-        HttpResponse response = makeProtectedGetCall(CategoriesGetRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(CategoriesGetRequest.URL), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
-    }
-
-    public JSONObject login(LoginRegisterRequest request) throws IOException, JSONException {
-        UrlParams params = new UrlParams();
-        params.add("email", request.getEmail());
-        params.add("password", request.getPassword());
-
-        HttpResponse response = makeAuthPostCall(LoginRegisterRequest.LOGIN_URL, params);
-        if (response == null || response.getBody() == null) {
-            return null;
-        }
-        int code = response.getResponseCode();
-
-        JSONObject obj = new JSONObject(response.getBody());
-//        if (code < 400) {
-//            JSONObject objData = obj.getJSONObject("data");
-//            saveToken(objData);
-//        }
-        return obj;
     }
 
     public JSONObject loginRegister(OperationType op, LoginRegisterRequest request) throws IOException, JSONException, ServerErrorException {
@@ -157,7 +139,7 @@ public class ApiUI {
             default:
                 throw new RuntimeException(new IllegalArgumentException("unexpected operationType on loginRegister"));
         }
-        HttpResponse response = makeAuthPostCall(path, params);
+        HttpResponse response = makeAuthPostCall(resolveApiUrl(path), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -200,7 +182,7 @@ public class ApiUI {
                 imageParamFacades[i].write(params, originalPicKey, previewPicKey);
             }
 
-            HttpResponse response = makeProtectedMultipartPostCall(QuestionCreateRequest.URL, params);
+            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(QuestionCreateRequest.URL), params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -217,7 +199,7 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("data", data.toJson().toString());
 
-        HttpResponse response = makeProtectedPostCall(CommentCreateRequest.URL, params);
+        HttpResponse response = makeProtectedPostCall(resolveApiUrl(CommentCreateRequest.URL), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -232,7 +214,7 @@ public class ApiUI {
         try {
             imageParamFacade.write(params, "image", "preview");
 
-            HttpResponse response = makeProtectedMultipartPostCall(ImageUploadRequest.URL, params);
+            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(ImageUploadRequest.URL), params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -247,7 +229,7 @@ public class ApiUI {
         params.add("question_id", request.getQuestionId());
         params.add("poll_item_id", request.getPollItemId());
 
-        HttpResponse response = makeProtectedPostCall(PollVoteRequest.URL, params);
+        HttpResponse response = makeProtectedPostCall(resolveApiUrl(PollVoteRequest.URL), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -260,7 +242,7 @@ public class ApiUI {
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
 
-        HttpResponse response = makeProtectedGetCall(CommentsGetRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(CommentsGetRequest.URL), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -271,7 +253,7 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("user_id", request.getUserId());
 
-        HttpResponse response = makeProtectedGetCall(UserGetRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(UserGetRequest.URL), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -297,7 +279,7 @@ public class ApiUI {
                 imageParamFacade.write(params, null, "avatar");
             }
 
-            HttpResponse response = makeProtectedMultipartPostCall(UserEditRequest.URL, params);
+            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(UserEditRequest.URL), params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -307,6 +289,18 @@ public class ApiUI {
                 imageParamFacade.close();
             }
         }
+    }
+
+    public JSONObject authPush(PushAuthRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+        UrlParams params = new UrlParams();
+        params.add("instanceId", request.getInstanceId());
+        params.add("reg_token", request.getRegToken());
+
+        HttpResponse response = makeProtectedPostCall(resolvePushUrl(PushAuthRequest.URL), params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
     }
 
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, IOException {
@@ -348,7 +342,7 @@ public class ApiUI {
     }
 
     private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        HttpRequest httpRequest = new HttpRequest(url);
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.GET);
 
@@ -358,7 +352,7 @@ public class ApiUI {
     }
 
     private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        HttpRequest httpRequest = new HttpRequest(url);
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.POST);
 
@@ -368,7 +362,7 @@ public class ApiUI {
     }
 
     private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        HttpRequest httpRequest = new HttpRequest(url);
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.MULTIPART_POST);
 
@@ -379,7 +373,7 @@ public class ApiUI {
 
 
     private HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
-        HttpRequest httpRequest = new HttpRequest(resolveApiUrl(url));
+        HttpRequest httpRequest = new HttpRequest(url);
         httpRequest.setParams(params);
         httpRequest.setRequestType(HttpRequest.Type.POST);
 
@@ -419,9 +413,6 @@ public class ApiUI {
         }
     }
 
-    public static String resolveApiUrl(String path) {
-        return API_URI.buildUpon().appendEncodedPath(path).toString();
-    }
 
     public static String resolveApiUrl(String... paths) {
         Uri.Builder uri = API_URI.buildUpon();
@@ -431,8 +422,12 @@ public class ApiUI {
         return uri.build().toString();
     }
 
-    public static String resolveUrl(String path) {
-        return BASE_URI.buildUpon().appendEncodedPath(path).toString();
+    public static String resolvePushUrl(String... paths) {
+        Uri.Builder uri = PUSH_URI.buildUpon();
+        for (String path : paths) {
+            uri = uri.appendEncodedPath(path);
+        }
+        return uri.build().toString();
     }
 
     public static String resolveUrl(String... paths) {

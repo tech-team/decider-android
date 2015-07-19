@@ -1,5 +1,7 @@
 package org.techteam.decider.gcm;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,17 +13,26 @@ import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.techteam.decider.R;
+import org.techteam.decider.rest.api.ApiUI;
+import org.techteam.decider.rest.api.InvalidAccessTokenException;
+import org.techteam.decider.rest.api.PushAuthRequest;
+import org.techteam.decider.rest.api.ServerErrorException;
+import org.techteam.decider.rest.api.TokenRefreshFailException;
 
 import java.io.IOException;
 
 public class GcmRegistrationIntentService extends IntentService {
     private static final String TAG = GcmRegistrationIntentService.class.getName();
-
     private static final String[] TOPICS = { "global" };
+
+    private ApiUI apiUI;
 
     public GcmRegistrationIntentService() {
         super(TAG);
+        apiUI = new ApiUI(this);
     }
 
     @Override
@@ -39,7 +50,7 @@ public class GcmRegistrationIntentService extends IntentService {
                 Log.i(TAG, "GCM Registration Token: " + token);
 
                 // TODO: Implement this method to send any registration to your app's servers.
-                sendRegistrationToServer(token);
+                sendRegistrationToServer(instanceID.getId(), token);
 
                 // Subscribe to topic channels
                 subscribeTopics(token);
@@ -68,8 +79,9 @@ public class GcmRegistrationIntentService extends IntentService {
      *
      * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) {
-        // Add custom implementation, as needed.
+    private void sendRegistrationToServer(String instanceId, String token) throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        PushAuthRequest pushAuthRequest = new PushAuthRequest(instanceId, token);
+        JSONObject response = apiUI.authPush(pushAuthRequest);
     }
 
     /**
