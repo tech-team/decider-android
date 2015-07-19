@@ -32,16 +32,10 @@ public abstract class PostView extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    protected String getDateString(String raw) {
-        String result;
-
-        try {
-            Date date = sourceDateFormat.parse(raw);
-            result = uiDateFormat.format(date);
-        } catch (ParseException e) {
-            result = "";
+    protected String getDateString(Date date) {
+        if (date == null) {
+            return null;
         }
-
-        return result;
+        return uiDateFormat.format(date);
     }
 }

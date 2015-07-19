@@ -204,7 +204,7 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
             surnameText.setText(entry.getLastName());
             countryText.setText(entry.getCountry());
             cityText.setText(entry.getCity());
-            birthdayText.setText(entry.getBirthday());
+            birthdayText.setText(entry.getBirthday().toString());
 
             waitDialog.dismiss();
         }

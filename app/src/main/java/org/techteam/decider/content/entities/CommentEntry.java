@@ -14,6 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.Entry;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Table(name = "Comment", id = BaseColumns._ID)
@@ -32,10 +35,12 @@ public class CommentEntry extends Model {
     public String text;
 
     @Column(name="creation_date")
-    public String creationDate; // TODO: change to DateTime
+    public Date creationDate;
 
     @Column(name="anonymous")
     public boolean anonymous;
+
+    private static final SimpleDateFormat creationDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     public CommentEntry() {
         super();
@@ -53,7 +58,7 @@ public class CommentEntry extends Model {
         return text;
     }
 
-    public String getCreationDate() {
+    public Date getCreationDate() {
         return creationDate;
     }
 
@@ -83,7 +88,14 @@ public class CommentEntry extends Model {
         entry.cid = cid;
         entry.questionId = obj.getInt("question_id");
         entry.text = obj.getString("text");
-        entry.creationDate = obj.getString("creation_date");
+        String creationDate = obj.getString("creation_date");
+        if (creationDate != null) {
+            try {
+                entry.creationDate = creationDateFormat.parse(creationDate);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));
         if (obj.has("is_anonymous")) {
             entry.anonymous = obj.getBoolean("is_anonymous");

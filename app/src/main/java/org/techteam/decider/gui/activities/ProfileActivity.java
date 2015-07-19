@@ -167,7 +167,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
             fullNameText.setText(entry.getFirstName() + " " + entry.getLastName());
             countryText.setText(entry.getCountry());
             cityText.setText(entry.getCity());
-            birthdayText.setText(entry.getBirthday());
+            birthdayText.setText(entry.getBirthday().toString());
 
             waitDialog.dismiss();
         }

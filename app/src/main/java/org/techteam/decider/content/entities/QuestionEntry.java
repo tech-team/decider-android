@@ -15,6 +15,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.Entry;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Table(name = "Questions", id = BaseColumns._ID)
 public class QuestionEntry extends Model {
     @Column(name="qid", unique=true, onUniqueConflict = Column.ConflictAction.REPLACE)
@@ -24,7 +28,7 @@ public class QuestionEntry extends Model {
     public String text;
 
     @Column(name="creation_date")
-    public String creationDate; // TODO: change to DateTime
+    public Date creationDate = null;
 
     @Column(name="category_id")
     public int categoryId;
@@ -50,6 +54,8 @@ public class QuestionEntry extends Model {
     @Column(name="voted")
     public boolean voted;
 
+    private static final SimpleDateFormat creationDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
     public QuestionEntry() {
         super();
     }
@@ -62,7 +68,7 @@ public class QuestionEntry extends Model {
         return text;
     }
 
-    public String getCreationDate() {
+    public Date getCreationDate() {
         return creationDate;
     }
 
@@ -119,7 +125,14 @@ public class QuestionEntry extends Model {
         }
         entry.qid = qid;
         entry.text = obj.getString("text");
-        entry.creationDate = obj.getString("creation_date");
+        String creationDate = obj.getString("creation_date");
+        if (creationDate != null) {
+            try {
+                entry.creationDate = creationDateFormat.parse(creationDate);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
         entry.categoryId = obj.getInt("category_id");
         entry.author = UserEntry.fromJson(obj.getJSONObject("author"));
         entry.likesCount = obj.has("likes_count") ? obj.getInt("likes_count") : 0;

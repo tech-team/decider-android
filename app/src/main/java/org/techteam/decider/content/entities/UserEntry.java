@@ -11,6 +11,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.Entry;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Table(name="Users", id = BaseColumns._ID)
 public class UserEntry extends Model {
 
@@ -42,8 +46,9 @@ public class UserEntry extends Model {
     private String city = "";
 
     @Column(name="birthday")
-    private String birthday = "";
+    private Date birthday = null;
 
+    private static final SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public enum Gender {
         None("N"),
@@ -118,7 +123,14 @@ public class UserEntry extends Model {
             entry.city = obj.isNull("city") ? null : obj.getString("city");
         }
         if (obj.has("birthday")) {
-            entry.birthday = obj.isNull("birthday") ? null : obj.getString("birthday");
+            String birthday = obj.isNull("birthday") ? null : obj.getString("birthday");
+            if (birthday != null) {
+                try {
+                    entry.birthday = birthdayFormat.parse(birthday);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         return entry;
@@ -152,7 +164,7 @@ public class UserEntry extends Model {
         return city;
     }
 
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 }
