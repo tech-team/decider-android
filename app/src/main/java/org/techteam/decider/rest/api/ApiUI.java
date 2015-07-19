@@ -23,6 +23,7 @@ import org.techteam.decider.net2.HttpRequest;
 import org.techteam.decider.net2.HttpResponse;
 import org.techteam.decider.net2.UrlParams;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -82,7 +83,16 @@ public class ApiUI {
     }
 
     public String getCurrentUserId() {
-        return prefs.getString(PrefsKeys.CURRENT_USER, null);
+        String userId = prefs.getString(PrefsKeys.CURRENT_USER, null);
+        if (userId == null) {
+            AccountManager am = AccountManager.get(this.context);
+            Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
+            if (accounts.length == 0) {
+                return null;
+            }
+            userId = am.getUserData(accounts[0], ServiceCallback.LoginRegisterExtras.USER_ID);
+        }
+        return userId;
     }
 
     public JSONObject getQuestions(QuestionsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
