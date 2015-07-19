@@ -273,6 +273,7 @@ public class ApiUI {
             if (userData.hasUsername()) params.add("username", userData.getUsername());
             if (userData.hasFirstName()) params.add("first_name", userData.getFirstName());
             if (userData.hasLastName()) params.add("last_name", userData.getLastName());
+            if (userData.hasGender()) params.add("gender", userData.getGender().getLetter());
             if (userData.hasBirthday()) params.add("birthday", userData.getBirthday());
             if (userData.hasCountry()) params.add("country", userData.getCountry());
             if (userData.hasCity()) params.add("city", userData.getCity());
