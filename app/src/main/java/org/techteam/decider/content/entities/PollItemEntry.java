@@ -66,7 +66,7 @@ public class PollItemEntry extends Model {
             entry = new PollItemEntry();
         }
         entry.pid = pid;
-        entry.text = obj.getString("text");
+        entry.text = obj.isNull("text") ? null : obj.getString("text");
         entry.imageUrl = obj.getString("image_url");
         entry.previewUrl = obj.getString("preview_url");
         entry.votesCount = obj.has("votes_count") ? obj.getInt("votes_count") : 0;

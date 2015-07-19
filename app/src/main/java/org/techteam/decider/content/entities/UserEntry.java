@@ -74,19 +74,19 @@ public class UserEntry extends Model {
 
         entry.uid = uid;
         entry.username = obj.getString("username");
-        entry.avatar = obj.getString("avatar");
+        entry.avatar = obj.isNull("avatar") ? null : obj.getString("avatar");
         //TODO: new fields
         entry.firstName = obj.getString("first_name");
         entry.middleName = obj.getString("middle_name");
         entry.lastName = obj.getString("last_name");
         if (obj.has("country")) {
-            entry.country = obj.getString("country");
+            entry.country = obj.isNull("country") ? null : obj.getString("country");
         }
         if (obj.has("city")) {
-            entry.city = obj.getString("city");
+            entry.city = obj.isNull("city") ? null : obj.getString("city");
         }
         if (obj.has("birthday")) {
-            entry.birthday = obj.getString("birthday");
+            entry.birthday = obj.isNull("birthday") ? null : obj.getString("birthday");
         }
 
         return entry;
