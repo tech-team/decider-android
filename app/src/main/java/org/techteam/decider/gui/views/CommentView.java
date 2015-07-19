@@ -14,6 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.gui.activities.ProfileActivity;
+import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
 
 
@@ -88,7 +89,7 @@ public class CommentView extends PostView {
         String avatar = entry.getAuthor().getAvatar();
         if (avatar != null) {
             ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(context);
-            imageLoader.displayImage(avatar, avatarImage);
+            imageLoader.displayImage(ApiUI.resolveUrl(avatar), avatarImage);
         }
 
         authorText.setText(entry.getAuthor().getUsername());

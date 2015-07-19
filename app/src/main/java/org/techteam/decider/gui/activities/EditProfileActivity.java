@@ -31,6 +31,7 @@ import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Keyboard;
@@ -244,9 +245,9 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
         @Override
         protected void onPostExecute(UserEntry entry) {
             String avatarUrl = entry.getAvatar();
-            //TODO: such "null", very string!
-            if (avatarUrl != null && !avatarUrl.equals("null"))
-                ImageLoader.getInstance().displayImage(entry.getAvatar(), profileImage);
+            if (avatarUrl != null) {
+                ImageLoader.getInstance().displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
+            }
 
             nameText.setText(entry.getFirstName());
             surnameText.setText(entry.getLastName());
