@@ -32,6 +32,9 @@ public class UserEntry extends Model {
     @Column(name="lastName")
     private String lastName;
 
+    @Column(name="gender")
+    private String gender;
+
     @Column(name="country")
     private String country = "";
 
@@ -40,6 +43,34 @@ public class UserEntry extends Model {
 
     @Column(name="birthday")
     private String birthday = "";
+
+
+    public enum Gender {
+        None("N"),
+        Male("M"),
+        Female("F");
+
+        String letter;
+        private static Gender[] cachedValues = values();
+
+        Gender(String letter) {
+            this.letter = letter;
+        }
+
+        public String getLetter() {
+            return letter;
+        }
+
+        public static Gender fromLetter(String letter) {
+            for (Gender g : cachedValues) {
+                if(g.getLetter().equals(letter)) {
+                    return g;
+                }
+            }
+            throw new RuntimeException("Unknown gender id");
+        }
+    }
+
 
     public UserEntry() {
         super();
@@ -79,6 +110,7 @@ public class UserEntry extends Model {
         entry.firstName = obj.getString("first_name");
         entry.middleName = obj.getString("middle_name");
         entry.lastName = obj.getString("last_name");
+        entry.gender = obj.has("gender") ? obj.getString("gender") : Gender.None.getLetter();
         if (obj.has("country")) {
             entry.country = obj.isNull("country") ? null : obj.getString("country");
         }
@@ -102,6 +134,14 @@ public class UserEntry extends Model {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getGenderRaw() {
+        return gender;
+    }
+
+    public Gender getGender() {
+        return Gender.fromLetter(gender);
     }
 
     public String getCountry() {

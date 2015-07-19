@@ -3,11 +3,14 @@ package org.techteam.decider.content;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.techteam.decider.content.entities.UserEntry;
+
 public class UserData implements Parcelable {
     private ImageData avatar;
     private String username;
     private String firstName;
     private String lastName;
+    private UserEntry.Gender gender;
     private String birthday;
     private String country;
     private String city;
@@ -21,6 +24,7 @@ public class UserData implements Parcelable {
         username = in.readString();
         firstName = in.readString();
         lastName = in.readString();
+        gender = UserEntry.Gender.fromLetter(in.readString());
         birthday = in.readString();
         country = in.readString();
         city = in.readString();
@@ -76,6 +80,19 @@ public class UserData implements Parcelable {
 
     public UserData setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
+    }
+
+    public UserEntry.Gender getGender() {
+        return gender;
+    }
+
+    public boolean hasGender() {
+        return gender != null;
+    }
+
+    public UserData setGender(UserEntry.Gender gender) {
+        this.gender = gender;
         return this;
     }
 
@@ -142,6 +159,7 @@ public class UserData implements Parcelable {
         dest.writeString(username);
         dest.writeString(firstName);
         dest.writeString(lastName);
+        dest.writeString(gender.getLetter());
         dest.writeString(birthday);
         dest.writeString(country);
         dest.writeString(city);
