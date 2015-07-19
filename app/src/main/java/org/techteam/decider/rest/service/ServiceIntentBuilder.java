@@ -3,21 +3,23 @@ package org.techteam.decider.rest.service;
 import android.content.Context;
 import android.content.Intent;
 
+import org.techteam.decider.content.UserData;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.content.question.ImageData;
+import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.CreateCommentRequest;
-import org.techteam.decider.rest.api.CreateQuestionRequest;
-import org.techteam.decider.rest.api.GetCategoriesRequest;
-import org.techteam.decider.rest.api.GetCommentsRequest;
-import org.techteam.decider.rest.api.GetQuestionsRequest;
-import org.techteam.decider.rest.api.GetUserRequest;
+import org.techteam.decider.rest.api.CommentCreateRequest;
+import org.techteam.decider.rest.api.QuestionCreateRequest;
+import org.techteam.decider.rest.api.CategoriesGetRequest;
+import org.techteam.decider.rest.api.CommentsGetRequest;
+import org.techteam.decider.rest.api.QuestionsGetRequest;
+import org.techteam.decider.rest.api.UserEditRequest;
+import org.techteam.decider.rest.api.UserGetRequest;
 import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
-import org.techteam.decider.rest.api.UploadImageRequest;
+import org.techteam.decider.rest.api.ImageUploadRequest;
 
 import java.util.Collection;
 
@@ -33,23 +35,23 @@ public final class ServiceIntentBuilder {
     public static Intent getQuestionsIntent(Context context, OperationType op, String requestId, ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention) {
         Intent intent = getBasicIntent(context, requestId, op);
 
-        intent.putExtra(GetQuestionsRequest.IntentExtras.CONTENT_SECTION, contentSection.toInt());
-        intent.putExtra(GetQuestionsRequest.IntentExtras.LIMIT, limit);
-        intent.putExtra(GetQuestionsRequest.IntentExtras.OFFSET, offset);
+        intent.putExtra(QuestionsGetRequest.IntentExtras.CONTENT_SECTION, contentSection.toInt());
+        intent.putExtra(QuestionsGetRequest.IntentExtras.LIMIT, limit);
+        intent.putExtra(QuestionsGetRequest.IntentExtras.OFFSET, offset);
 
         int[] categories_ids = new int[categories.size()];
         int i = 0;
         for (CategoryEntry c : categories) {
             categories_ids[i++] = c.getUid();
         }
-        intent.putExtra(GetQuestionsRequest.IntentExtras.CATEGORIES, categories_ids);
-        intent.putExtra(GetQuestionsRequest.IntentExtras.LOAD_INTENTION, loadIntention);
+        intent.putExtra(QuestionsGetRequest.IntentExtras.CATEGORIES, categories_ids);
+        intent.putExtra(QuestionsGetRequest.IntentExtras.LOAD_INTENTION, loadIntention);
         return intent;
     }
 
     public static Intent getCategoriesIntent(Context context, OperationType op, String requestId, String locale) {
         Intent intent = getBasicIntent(context, requestId, op);
-        intent.putExtra(GetCategoriesRequest.IntentExtras.LOCALE, locale);
+        intent.putExtra(CategoriesGetRequest.IntentExtras.LOCALE, locale);
         return intent;
     }
 
@@ -62,16 +64,16 @@ public final class ServiceIntentBuilder {
 
     public static Intent createQuestionIntent(Context context, OperationType op, String requestId, QuestionData questionData) {
         Intent intent = getBasicIntent(context, requestId, op);
-        intent.putExtra(CreateQuestionRequest.IntentExtras.QUESTION_DATA, questionData);
+        intent.putExtra(QuestionCreateRequest.IntentExtras.QUESTION_DATA, questionData);
         return intent;
     }
 
 
     public static Intent uploadImageIntent(Context context, OperationType op, String requestId, ImageData image, int imageOrdinalId) {
         Intent intent = getBasicIntent(context, requestId, op);
-        intent.putExtra(UploadImageRequest.IntentExtras.ORIGINAL_IMAGE, image.getOriginalFilename());
-        intent.putExtra(UploadImageRequest.IntentExtras.PREVIEW_IMAGE, image.getPreviewFilename());
-        intent.putExtra(UploadImageRequest.IntentExtras.IMAGE_ORDINAL_ID, imageOrdinalId);
+        intent.putExtra(ImageUploadRequest.IntentExtras.ORIGINAL_IMAGE, image.getOriginalFilename());
+        intent.putExtra(ImageUploadRequest.IntentExtras.PREVIEW_IMAGE, image.getPreviewFilename());
+        intent.putExtra(ImageUploadRequest.IntentExtras.IMAGE_ORDINAL_ID, imageOrdinalId);
         return intent;
     }
 
@@ -85,22 +87,28 @@ public final class ServiceIntentBuilder {
     public static Intent getCommentsIntent(Context context, OperationType op, String requestId, int questionId, int limit, int offset, int loadIntention) {
         Intent intent = getBasicIntent(context, requestId, op);
 
-        intent.putExtra(GetCommentsRequest.IntentExtras.QUESTION_ID, questionId);
-        intent.putExtra(GetCommentsRequest.IntentExtras.LIMIT, limit);
-        intent.putExtra(GetCommentsRequest.IntentExtras.OFFSET, offset);
-        intent.putExtra(GetCommentsRequest.IntentExtras.LOAD_INTENTION, loadIntention);
+        intent.putExtra(CommentsGetRequest.IntentExtras.QUESTION_ID, questionId);
+        intent.putExtra(CommentsGetRequest.IntentExtras.LIMIT, limit);
+        intent.putExtra(CommentsGetRequest.IntentExtras.OFFSET, offset);
+        intent.putExtra(CommentsGetRequest.IntentExtras.LOAD_INTENTION, loadIntention);
         return intent;
     }
 
     public static Intent createCommentIntent(Context context, OperationType op, String requestId, CommentData commentData) {
         Intent intent = getBasicIntent(context, requestId, op);
-        intent.putExtra(CreateCommentRequest.IntentExtras.COMMENT_DATA, commentData);
+        intent.putExtra(CommentCreateRequest.IntentExtras.COMMENT_DATA, commentData);
         return intent;
     }
 
     public static Intent getUserIntent(Context context, OperationType op, String requestId, String userId) {
         Intent intent = getBasicIntent(context, requestId, op);
-        intent.putExtra(GetUserRequest.IntentExtras.USER_ID, userId);
+        intent.putExtra(UserGetRequest.IntentExtras.USER_ID, userId);
+        return intent;
+    }
+
+    public static Intent editUserIntent(Context context, OperationType op, String requestId, UserData userData) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(UserEditRequest.IntentExtras.USER_DATA, userData);
         return intent;
     }
 }

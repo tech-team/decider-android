@@ -1,14 +1,10 @@
 package org.techteam.decider.rest.api;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 
-import org.techteam.decider.content.question.ImageData;
+import org.techteam.decider.content.ImageData;
 
-public class UploadImageRequest {
+public class ImageUploadRequest {
         public static final String URL = "images";
     private final ImageData image;
     private final int imageOrdinalId;
@@ -19,16 +15,16 @@ public class UploadImageRequest {
         public static final String IMAGE_ORDINAL_ID = "IMAGE_ORDINAL_ID";
     }
 
-    public UploadImageRequest(ImageData image, int imageOrdinalId) {
+    public ImageUploadRequest(ImageData image, int imageOrdinalId) {
         this.image = image;
         this.imageOrdinalId = imageOrdinalId;
     }
 
-    public static UploadImageRequest fromBundle(Bundle bundle) {
+    public static ImageUploadRequest fromBundle(Bundle bundle) {
         String originalImage = bundle.getString(IntentExtras.ORIGINAL_IMAGE);
         String previewImage = bundle.getString(IntentExtras.PREVIEW_IMAGE);
         int imageOrdinalId = bundle.getInt(IntentExtras.IMAGE_ORDINAL_ID);
-        return new UploadImageRequest(new ImageData(originalImage, previewImage), imageOrdinalId);
+        return new ImageUploadRequest(new ImageData(originalImage, previewImage), imageOrdinalId);
     }
 
     public ImageData getImage() {

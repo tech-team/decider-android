@@ -127,7 +127,7 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
 
         categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
 
-        callbacksKeeper.addCallback(OperationType.CREATE_QUESTION, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.QUESTION_CREATE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
@@ -250,7 +250,7 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
         }
 
         waitDialog = ProgressDialog.show(this, getString(R.string.creating_post), getString(R.string.please_wait), true);
-        serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.CREATE_QUESTION));
+        serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.QUESTION_CREATE));
 
         return true;
     }

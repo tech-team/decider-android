@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class GetCategoriesRequest {
+public class CategoriesGetRequest {
     private final String locale;
 
     public static final String URL = "categories";
@@ -11,13 +11,13 @@ public class GetCategoriesRequest {
         public static final String LOCALE = "LOCALE";
     }
 
-    public GetCategoriesRequest(String locale) {
+    public CategoriesGetRequest(String locale) {
         this.locale = locale;
     }
 
-    public static GetCategoriesRequest fromBundle(Bundle bundle) {
+    public static CategoriesGetRequest fromBundle(Bundle bundle) {
         String locale = bundle.getString(IntentExtras.LOCALE, "en_US");
-        return new GetCategoriesRequest(locale);
+        return new CategoriesGetRequest(locale);
     }
 
     public String getLocale() {

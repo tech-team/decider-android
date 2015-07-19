@@ -8,23 +8,23 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.content.entities.UploadedImageEntry;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.CreateQuestionRequest;
+import org.techteam.decider.rest.api.CategoriesGetRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class CreateQuestionProcessor extends Processor {
-    private static final String TAG = CreateQuestionProcessor.class.getName();
-    private final CreateQuestionRequest request;
+public class CategoriesGetProcessor extends Processor {
+    private static final String TAG = CategoriesGetProcessor.class.getName();
+    private final CategoriesGetRequest request;
 
-    public CreateQuestionProcessor(Context context, CreateQuestionRequest request) {
+    public CategoriesGetProcessor(Context context, CategoriesGetRequest request) {
         super(context);
         this.request = request;
     }
@@ -36,8 +36,14 @@ public class CreateQuestionProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.createQuestion(request);
+            JSONObject response = apiUI.getCategories(request);
             Log.i(TAG, response.toString());
+
+            if (response == null) {
+                transactionError(operationType, requestId);
+                cb.onError("No categories found", result);
+                return;
+            }
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
@@ -48,12 +54,18 @@ public class CreateQuestionProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                JSONObject data = response.getJSONObject("data");
-                QuestionEntry entry = QuestionEntry.fromJson(data);
-                entry.saveTotal();
-                result.putInt(ServiceCallback.CreateQuestionExtras.QID, entry.getQId());
+                JSONArray data = response.getJSONArray("data");
+                for (int i = 0; i < data.length(); ++i) {
+                    JSONObject q = data.getJSONObject(i);
+                    CategoryEntry entry = CategoryEntry.fromJson(q);
+                    CategoryEntry dbEntry = CategoryEntry.byUid(entry.getUid());
+                    if (dbEntry == null || !dbEntry.contentEquals(entry)) {
+                        entry.save();
+                    }
+                }
                 ActiveAndroid.setTransactionSuccessful();
 
+                result.putInt(ServiceCallback.GetCategoriesExtras.COUNT, data.length());
             } finally {
                 ActiveAndroid.endTransaction();
             }
@@ -75,11 +87,5 @@ public class CreateQuestionProcessor extends Processor {
             e.printStackTrace();
         }
 
-    }
-
-    @Override
-    protected Bundle getInitialBundle() {
-        Bundle data = new Bundle();
-        return data;
     }
 }

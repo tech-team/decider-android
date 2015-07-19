@@ -8,23 +8,22 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.GetCategoriesRequest;
+import org.techteam.decider.rest.api.CommentCreateRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class GetCategoriesProcessor extends Processor {
-    private static final String TAG = GetCategoriesProcessor.class.getName();
-    private final GetCategoriesRequest request;
+public class CommentCreateProcessor extends Processor {
+    private static final String TAG = CommentCreateProcessor.class.getName();
+    private final CommentCreateRequest request;
 
-    public GetCategoriesProcessor(Context context, GetCategoriesRequest request) {
+    public CommentCreateProcessor(Context context, CommentCreateRequest request) {
         super(context);
         this.request = request;
     }
@@ -36,14 +35,8 @@ public class GetCategoriesProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getCategories(request);
+            JSONObject response = apiUI.createComment(request);
             Log.i(TAG, response.toString());
-
-            if (response == null) {
-                transactionError(operationType, requestId);
-                cb.onError("No categories found", result);
-                return;
-            }
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
@@ -54,18 +47,11 @@ public class GetCategoriesProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                JSONArray data = response.getJSONArray("data");
-                for (int i = 0; i < data.length(); ++i) {
-                    JSONObject q = data.getJSONObject(i);
-                    CategoryEntry entry = CategoryEntry.fromJson(q);
-                    CategoryEntry dbEntry = CategoryEntry.byUid(entry.getUid());
-                    if (dbEntry == null || !dbEntry.contentEquals(entry)) {
-                        entry.save();
-                    }
-                }
+                JSONObject data = response.getJSONObject("data");
+                CommentEntry entry = CommentEntry.fromJson(data);
+                entry.saveTotal();
                 ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetCategoriesExtras.COUNT, data.length());
             } finally {
                 ActiveAndroid.endTransaction();
             }
@@ -75,17 +61,22 @@ public class GetCategoriesProcessor extends Processor {
         } catch (IOException | JSONException | TokenRefreshFailException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
-            cb.onError(null, result);
+            cb.onError(e.getMessage(), result);
         } catch (InvalidAccessTokenException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
             result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
             cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
+        } catch (AuthenticatorException | OperationCanceledException e) {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    protected Bundle getInitialBundle() {
+        Bundle data = new Bundle();
+        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getCommentData().getQuestionId());
+        return data;
     }
 }

@@ -10,21 +10,20 @@ import com.activeandroid.ActiveAndroid;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.UploadedImageEntry;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.CreateCommentRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
+import org.techteam.decider.rest.api.ImageUploadRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class CreateCommentProcessor extends Processor {
-    private static final String TAG = CreateCommentProcessor.class.getName();
-    private final CreateCommentRequest request;
+public class ImageUploadProcessor extends Processor {
+    private static final String TAG = ImageUploadProcessor.class.getName();
+    private final ImageUploadRequest request;
 
-    public CreateCommentProcessor(Context context, CreateCommentRequest request) {
+    public ImageUploadProcessor(Context context, ImageUploadRequest request) {
         super(context);
         this.request = request;
     }
@@ -36,7 +35,7 @@ public class CreateCommentProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.createComment(request);
+            JSONObject response = apiUI.uploadImage(request);
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");
@@ -45,17 +44,27 @@ public class CreateCommentProcessor extends Processor {
                 cb.onError("status is not ok. resp = " + response.toString(), result);
                 return;
             }
+            JSONObject data = response.getJSONObject("data");
+            String uid = data.getString("uid");
 
             ActiveAndroid.beginTransaction();
             try {
-                JSONObject data = response.getJSONObject("data");
-                CommentEntry entry = CommentEntry.fromJson(data);
-                entry.saveTotal();
+                UploadedImageEntry entry = new UploadedImageEntry(uid, request.getImageOrdinalId());
+                entry.save();
                 ActiveAndroid.setTransactionSuccessful();
 
             } finally {
                 ActiveAndroid.endTransaction();
             }
+
+
+            if (uid == null) {
+                transactionError(operationType, requestId);
+                cb.onError("Received a null image uid", result);
+                return;
+            }
+
+            result.putString(ServiceCallback.ImageUploadExtras.UID, uid);
 
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
@@ -68,7 +77,9 @@ public class CreateCommentProcessor extends Processor {
             transactionError(operationType, requestId);
             result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
             cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException | OperationCanceledException e) {
+        } catch (AuthenticatorException e) {
+            e.printStackTrace();
+        } catch (OperationCanceledException e) {
             e.printStackTrace();
         }
 
@@ -77,7 +88,7 @@ public class CreateCommentProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getCommentData().getQuestionId());
+        data.putInt(ServiceCallback.ImageUploadExtras.IMAGE_ORDINAL_ID, request.getImageOrdinalId());
         return data;
     }
 }

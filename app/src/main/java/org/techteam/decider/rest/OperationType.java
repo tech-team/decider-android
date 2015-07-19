@@ -1,16 +1,17 @@
 package org.techteam.decider.rest;
 
 public enum OperationType {
-    GET_QUESTIONS(true),
-    GET_CATEGORIES,
+    CATEGORIES_GET,
+    COMMENT_CREATE,
+    COMMENTS_GET(true),
+    IMAGE_UPLOAD,
     LOGIN,
     REGISTER,
-    CREATE_QUESTION,
-    UPLOAD_IMAGE,
     POLL_VOTE,
-    GET_COMMENTS(true),
-    CREATE_COMMENT,
-    GET_USER;
+    QUESTION_CREATE,
+    QUESTIONS_GET(true),
+    USER_GET,
+    USER_EDIT;
 
     private boolean canRefresh = false;
 

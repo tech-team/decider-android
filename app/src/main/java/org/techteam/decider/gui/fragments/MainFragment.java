@@ -76,7 +76,7 @@ public class MainFragment
         this.activity = (MainActivity) activity;
         serviceHelper = new ServiceHelper(activity);
 
-        callbacksKeeper.addCallback(OperationType.GET_CATEGORIES, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.CATEGORIES_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
@@ -95,7 +95,7 @@ public class MainFragment
             }
         });
 
-        serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.GET_CATEGORIES));
+        serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.CATEGORIES_GET));
     }
 
     @Override

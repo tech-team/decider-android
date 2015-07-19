@@ -8,15 +8,15 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import org.techteam.decider.content.UserData;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.content.question.ImageData;
+import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.PendingOperation;
-import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service.DeciderService;
 import org.techteam.decider.rest.service.ServiceIntentBuilder;
 import org.techteam.decider.util.CallbackHelper;
@@ -42,7 +42,7 @@ public class ServiceHelper {
     public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.GET_QUESTIONS;
+        OperationType op = OperationType.QUESTIONS_GET;
 
         String requestId = createRequestId(op, contentSection, limit, offset);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -58,7 +58,7 @@ public class ServiceHelper {
     public void getCategories(String locale, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.GET_CATEGORIES;
+        OperationType op = OperationType.CATEGORIES_GET;
 
         String requestId = createRequestId(op, locale);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -99,7 +99,7 @@ public class ServiceHelper {
     public void uploadImage(ImageData image, int imageOrdinalId, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.UPLOAD_IMAGE;
+        OperationType op = OperationType.IMAGE_UPLOAD;
 
         String requestId = createRequestId(op, imageOrdinalId, image.getOriginalFilename());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -115,7 +115,7 @@ public class ServiceHelper {
     public void createQuestion(QuestionData questionData, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.CREATE_QUESTION;
+        OperationType op = OperationType.QUESTION_CREATE;
 
         String requestId = createRequestId(op, questionData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -147,7 +147,7 @@ public class ServiceHelper {
     public void getComments(int questionId, int limit, int offset, int loadIntention, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.GET_COMMENTS;
+        OperationType op = OperationType.COMMENTS_GET;
 
         String requestId = createRequestId(op, questionId, limit, offset);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -163,7 +163,7 @@ public class ServiceHelper {
     public void createComment(CommentData commentData, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.CREATE_COMMENT;
+        OperationType op = OperationType.COMMENT_CREATE;
 
         String requestId = createRequestId(op, commentData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
@@ -179,13 +179,29 @@ public class ServiceHelper {
     public void getUser(String userId, ServiceCallback cb) {
         init();
 
-        OperationType op = OperationType.GET_USER;
+        OperationType op = OperationType.USER_GET;
 
         String requestId = createRequestId(op, userId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
             Intent intent = ServiceIntentBuilder.getUserIntent(context, op, requestId, userId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
+    public void editUser(UserData userData, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.USER_EDIT;
+
+        String requestId = createRequestId(op, userData.createFingerprint());
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.editUserIntent(context, op, requestId, userData);
             context.startService(intent);
         }
 

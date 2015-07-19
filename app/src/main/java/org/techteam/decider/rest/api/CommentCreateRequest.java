@@ -3,9 +3,8 @@ package org.techteam.decider.rest.api;
 import android.os.Bundle;
 
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.content.question.QuestionData;
 
-public class CreateCommentRequest {
+public class CommentCreateRequest {
     private final CommentData commentData;
 
     public static final String URL = "comments";
@@ -14,13 +13,13 @@ public class CreateCommentRequest {
         public static final String COMMENT_DATA = "COMMENT_DATA";
     }
 
-    public CreateCommentRequest(CommentData commentData) {
+    public CommentCreateRequest(CommentData commentData) {
         this.commentData = commentData;
     }
 
-    public static CreateCommentRequest fromBundle(Bundle bundle) {
+    public static CommentCreateRequest fromBundle(Bundle bundle) {
         CommentData commentData = bundle.getParcelable(IntentExtras.COMMENT_DATA);
-        return new CreateCommentRequest(commentData);
+        return new CommentCreateRequest(commentData);
     }
 
     public CommentData getCommentData() {

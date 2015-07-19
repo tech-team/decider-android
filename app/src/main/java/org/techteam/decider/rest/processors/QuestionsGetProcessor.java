@@ -8,22 +8,25 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.UploadedImageEntry;
+import org.techteam.decider.content.QuestionHelper;
+import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.QuestionsGetRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
-import org.techteam.decider.rest.api.UploadImageRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class UploadImageProcessor extends Processor {
-    private static final String TAG = UploadImageProcessor.class.getName();
-    private final UploadImageRequest request;
+public class QuestionsGetProcessor extends Processor {
+    private static final String TAG = QuestionsGetProcessor.class.getName();
+    private final QuestionsGetRequest request;
 
-    public UploadImageProcessor(Context context, UploadImageRequest request) {
+    public QuestionsGetProcessor(Context context, QuestionsGetRequest request) {
         super(context);
         this.request = request;
     }
@@ -35,8 +38,12 @@ public class UploadImageProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.uploadImage(request);
+            JSONObject response = apiUI.getQuestions(request);
             Log.i(TAG, response.toString());
+
+            if (request.getLoadIntention() == LoadIntention.REFRESH) {
+                QuestionHelper.deleteAll(request.getContentSection());
+            }
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
@@ -44,29 +51,29 @@ public class UploadImageProcessor extends Processor {
                 cb.onError("status is not ok. resp = " + response.toString(), result);
                 return;
             }
-            JSONObject data = response.getJSONObject("data");
-            String uid = data.getString("uid");
 
-            ActiveAndroid.beginTransaction();
-            try {
-                UploadedImageEntry entry = new UploadedImageEntry(uid, request.getImageOrdinalId());
-                entry.save();
-                ActiveAndroid.setTransactionSuccessful();
+            JSONArray data = response.getJSONArray("data");
+            if (data.length() == 0) {
+                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, 0);
+                result.putBoolean(ServiceCallback.GetQuestionsExtras.FEED_FINISHED, true);
+            } else {
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (int i = 0; i < data.length(); ++i) {
+                        JSONObject q = data.getJSONObject(i);
+                        QuestionEntry question = QuestionEntry.fromJson(q);
 
-            } finally {
-                ActiveAndroid.endTransaction();
+                        QuestionHelper.saveQuestion(request.getContentSection(), question);
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+
+                    result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
+                } finally {
+                    ActiveAndroid.endTransaction();
+                }
+                transactionFinished(operationType, requestId);
             }
 
-
-            if (uid == null) {
-                transactionError(operationType, requestId);
-                cb.onError("Received a null image uid", result);
-                return;
-            }
-
-            result.putString(ServiceCallback.ImageUploadExtras.UID, uid);
-
-            transactionFinished(operationType, requestId);
             cb.onSuccess(result);
         } catch (IOException | JSONException | TokenRefreshFailException e) {
             e.printStackTrace();
@@ -88,7 +95,8 @@ public class UploadImageProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.ImageUploadExtras.IMAGE_ORDINAL_ID, request.getImageOrdinalId());
+        data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, request.getLoadIntention());
+        data.putInt(ServiceCallback.GetQuestionsExtras.SECTION, request.getContentSection().toInt());
         return data;
     }
 }

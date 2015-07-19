@@ -110,7 +110,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
         });
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.GET_COMMENTS, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.COMMENTS_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(QuestionDetailsActivity.this, "GetComments: ok");
@@ -146,7 +146,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.CREATE_COMMENT, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.COMMENT_CREATE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: ok");
@@ -211,7 +211,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
         commentEdit.setText("");
 
         serviceHelper.createComment(new CommentData(text, getIntent().getIntExtra(BundleKeys.Q_ID, -1), false),
-                callbacksKeeper.getCallback(OperationType.CREATE_COMMENT));
+                callbacksKeeper.getCallback(OperationType.COMMENT_CREATE));
     }
 
     @Override
@@ -248,7 +248,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                     COMMENTS_LIMIT,
                     commentsOffset,
                     LoadIntention.REFRESH,
-                    callbacksKeeper.getCallback(OperationType.GET_COMMENTS));
+                    callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
         }
     }
 

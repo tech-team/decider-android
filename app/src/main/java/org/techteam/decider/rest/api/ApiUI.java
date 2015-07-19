@@ -9,13 +9,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.auth.AccountGeneral;
+import org.techteam.decider.content.UserData;
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.content.question.ImageData;
+import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.question.ImageQuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
@@ -85,7 +85,7 @@ public class ApiUI {
         return prefs.getString(PrefsKeys.CURRENT_USER, null);
     }
 
-    public JSONObject getQuestions(GetQuestionsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
+    public JSONObject getQuestions(QuestionsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
@@ -94,18 +94,18 @@ public class ApiUI {
             params.add("categories[]", category);
         }
 
-        HttpResponse response = makeProtectedGetCall(GetQuestionsRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(QuestionsGetRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getCategories(GetCategoriesRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
+    public JSONObject getCategories(CategoriesGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("locale", request.getLocale());
 
-        HttpResponse response = makeProtectedGetCall(GetCategoriesRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(CategoriesGetRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -161,7 +161,7 @@ public class ApiUI {
         return obj;
     }
 
-    public JSONObject createQuestion(CreateQuestionRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
+    public JSONObject createQuestion(QuestionCreateRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         ImageQuestionData q = (ImageQuestionData) request.getQuestionData();
         ImageData[] images = { q.getPicture1(), q.getPicture2() };
         ImageParamFacade[] imageParamFacades = new ImageParamFacade[images.length];
@@ -186,7 +186,7 @@ public class ApiUI {
                 imageParamFacades[i].write(params, originalPicKey, previewPicKey);
             }
 
-            HttpResponse response = makeProtectedMultipartPostCall(CreateQuestionRequest.URL, params);
+            HttpResponse response = makeProtectedMultipartPostCall(QuestionCreateRequest.URL, params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -198,19 +198,19 @@ public class ApiUI {
         }
     }
 
-    public JSONObject createComment(CreateCommentRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
+    public JSONObject createComment(CommentCreateRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         CommentData data = request.getCommentData();
         UrlParams params = new UrlParams();
         params.add("data", data.toJson().toString());
 
-        HttpResponse response = makeProtectedPostCall(CreateCommentRequest.URL, params);
+        HttpResponse response = makeProtectedPostCall(CommentCreateRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject uploadImage(UploadImageRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
+    public JSONObject uploadImage(ImageUploadRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         ImageData image = request.getImage();
         ImageParamFacade imageParamFacade = new ImageParamFacade(image);
@@ -218,7 +218,7 @@ public class ApiUI {
         try {
             imageParamFacade.write(params, "image", "preview");
 
-            HttpResponse response = makeProtectedMultipartPostCall(UploadImageRequest.URL, params);
+            HttpResponse response = makeProtectedMultipartPostCall(ImageUploadRequest.URL, params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -240,28 +240,58 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getComments(GetCommentsRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
+    public JSONObject getComments(CommentsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("question_id", request.getQuestionId());
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
 
-        HttpResponse response = makeProtectedGetCall(GetCommentsRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(CommentsGetRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getUser(GetUserRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
+    public JSONObject getUser(UserGetRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
         UrlParams params = new UrlParams();
         params.add("user_id", request.getUserId());
 
-        HttpResponse response = makeProtectedGetCall(GetUserRequest.URL, params);
+        HttpResponse response = makeProtectedGetCall(UserGetRequest.URL, params);
         if (response == null || response.getBody() == null) {
             return null;
         }
         return new JSONObject(response.getBody());
+    }
+
+    public JSONObject editUser(UserEditRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException {
+        UserData userData = request.getUserData();
+
+        ImageParamFacade imageParamFacade = null;
+        try {
+            UrlParams params = new UrlParams();
+            if (userData.hasUsername()) params.add("username", userData.getUsername());
+            if (userData.hasFirstName()) params.add("first_name", userData.getFirstName());
+            if (userData.hasLastName()) params.add("last_name", userData.getLastName());
+            if (userData.hasBirthday()) params.add("birthday", userData.getBirthday());
+            if (userData.hasCountry()) params.add("country", userData.getCountry());
+            if (userData.hasCity()) params.add("city", userData.getCity());
+            if (userData.hasAbout()) params.add("about", userData.getAbout());
+            if (userData.hasAvatar()) {
+                imageParamFacade = new ImageParamFacade(userData.getAvatar());
+                imageParamFacade.write(params, null, "avatar");
+            }
+
+            HttpResponse response = makeProtectedMultipartPostCall(UserEditRequest.URL, params);
+            if (response == null || response.getBody() == null) {
+                return null;
+            }
+            return new JSONObject(response.getBody());
+        } finally {
+            if (imageParamFacade != null) {
+                imageParamFacade.close();
+            }
+        }
     }
 
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, IOException {
@@ -399,13 +429,13 @@ public class ApiUI {
 
 
     private static class ImageParamFacade {
-        private ImageData imageData;
+        private final ImageData imageData;
 
-        FileInputStream originalFin = null;
-        BufferedInputStream originalBufin = null;
+        FileInputStream originalFIS = null;
+        BufferedInputStream originalBIS = null;
 
-        FileInputStream previewFin = null;
-        BufferedInputStream previewBufin = null;
+        FileInputStream previewFIS = null;
+        BufferedInputStream previewBIS = null;
 
         File originalFile = null;
         File previewFile = null;
@@ -415,31 +445,34 @@ public class ApiUI {
         }
 
         public void write(UrlParams params, String originalKey, String previewKey) throws FileNotFoundException {
-            originalFile = new File(imageData.getOriginalFilename());
-            originalFin = new FileInputStream(originalFile);
-            originalBufin = new BufferedInputStream(originalFin);
+            if (originalKey != null) {
+                originalFile = new File(imageData.getOriginalFilename());
+                originalFIS = new FileInputStream(originalFile);
+                originalBIS = new BufferedInputStream(originalFIS);
+                params.add(originalKey, new HttpFile(originalBIS, originalFile.getName()));
+            }
 
-            previewFile = new File(imageData.getPreviewFilename());
-            previewFin = new FileInputStream(previewFile);
-            previewBufin = new BufferedInputStream(previewFin);
-
-            params.add(originalKey, new HttpFile(originalBufin, originalFile.getName()));
-            params.add(previewKey, new HttpFile(previewBufin, previewFile.getName()));
+            if (previewKey != null) {
+                previewFile = new File(imageData.getPreviewFilename());
+                previewFIS = new FileInputStream(previewFile);
+                previewBIS = new BufferedInputStream(previewFIS);
+                params.add(previewKey, new HttpFile(previewBIS, previewFile.getName()));
+            }
         }
 
         public void close() throws IOException {
-            if (originalBufin != null) {
-                originalBufin.close();
+            if (originalBIS != null) {
+                originalBIS.close();
             }
-            if (originalFin != null) {
-                originalFin.close();
+            if (originalFIS != null) {
+                originalFIS.close();
             }
 
-            if (previewBufin != null) {
-                previewBufin.close();
+            if (previewBIS != null) {
+                previewBIS.close();
             }
-            if (previewFin != null) {
-                previewFin.close();
+            if (previewFIS != null) {
+                previewFIS.close();
             }
         }
     }

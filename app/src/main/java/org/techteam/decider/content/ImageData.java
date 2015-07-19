@@ -1,4 +1,4 @@
-package org.techteam.decider.content.question;
+package org.techteam.decider.content;
 
 import android.net.Uri;
 import android.os.Parcel;

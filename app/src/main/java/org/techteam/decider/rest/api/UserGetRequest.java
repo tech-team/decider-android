@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class GetUserRequest {
+public class UserGetRequest {
     private final String userId;
 
     public static final String URL = "user";
@@ -11,13 +11,13 @@ public class GetUserRequest {
         public static final String USER_ID = "USER_ID";
     }
 
-    public GetUserRequest(String userId) {
+    public UserGetRequest(String userId) {
         this.userId = userId;
     }
 
-    public static GetUserRequest fromBundle(Bundle bundle) {
+    public static UserGetRequest fromBundle(Bundle bundle) {
         String userId = bundle.getString(IntentExtras.USER_ID);
-        return new GetUserRequest(userId);
+        return new UserGetRequest(userId);
     }
 
     public String getUserId() {

@@ -6,26 +6,28 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.CreateCommentRequest;
-import org.techteam.decider.rest.api.CreateQuestionRequest;
-import org.techteam.decider.rest.api.GetCategoriesRequest;
-import org.techteam.decider.rest.api.GetCommentsRequest;
-import org.techteam.decider.rest.api.GetQuestionsRequest;
-import org.techteam.decider.rest.api.GetUserRequest;
+import org.techteam.decider.rest.api.CommentCreateRequest;
+import org.techteam.decider.rest.api.QuestionCreateRequest;
+import org.techteam.decider.rest.api.CategoriesGetRequest;
+import org.techteam.decider.rest.api.CommentsGetRequest;
+import org.techteam.decider.rest.api.QuestionsGetRequest;
+import org.techteam.decider.rest.api.UserEditRequest;
+import org.techteam.decider.rest.api.UserGetRequest;
 import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
-import org.techteam.decider.rest.api.UploadImageRequest;
-import org.techteam.decider.rest.processors.CreateCommentProcessor;
-import org.techteam.decider.rest.processors.CreateQuestionProcessor;
-import org.techteam.decider.rest.processors.GetCategoriesProcessor;
-import org.techteam.decider.rest.processors.GetCommentsProcessor;
-import org.techteam.decider.rest.processors.GetQuestionsProcessor;
-import org.techteam.decider.rest.processors.GetUserProcessor;
+import org.techteam.decider.rest.api.ImageUploadRequest;
+import org.techteam.decider.rest.processors.CommentCreateProcessor;
+import org.techteam.decider.rest.processors.QuestionCreateProcessor;
+import org.techteam.decider.rest.processors.CategoriesGetProcessor;
+import org.techteam.decider.rest.processors.CommentsGetProcessor;
+import org.techteam.decider.rest.processors.QuestionsGetProcessor;
+import org.techteam.decider.rest.processors.UserEditProcessor;
+import org.techteam.decider.rest.processors.UserGetProcessor;
 import org.techteam.decider.rest.processors.LoginRegisterProcessor;
 import org.techteam.decider.rest.processors.PollVoteProcessor;
 import org.techteam.decider.rest.processors.Processor;
 import org.techteam.decider.rest.processors.ProcessorCallback;
-import org.techteam.decider.rest.processors.UploadImageProcessor;
+import org.techteam.decider.rest.processors.ImageUploadProcessor;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 
 
@@ -77,14 +79,14 @@ public class DeciderService extends IntentService {
 
         switch (operation) {
 
-            case GET_QUESTIONS: {
-                GetQuestionsRequest request = GetQuestionsRequest.fromBundle(extras);
-                processor = new GetQuestionsProcessor(getBaseContext(), request);
+            case QUESTIONS_GET: {
+                QuestionsGetRequest request = QuestionsGetRequest.fromBundle(extras);
+                processor = new QuestionsGetProcessor(getBaseContext(), request);
                 break;
             }
-            case GET_CATEGORIES: {
-                GetCategoriesRequest request = GetCategoriesRequest.fromBundle(extras);
-                processor = new GetCategoriesProcessor(getBaseContext(), request);
+            case CATEGORIES_GET: {
+                CategoriesGetRequest request = CategoriesGetRequest.fromBundle(extras);
+                processor = new CategoriesGetProcessor(getBaseContext(), request);
                 break;
             }
             case LOGIN:
@@ -93,14 +95,14 @@ public class DeciderService extends IntentService {
                 processor = new LoginRegisterProcessor(getBaseContext(), request);
                 break;
             }
-            case CREATE_QUESTION: {
-                CreateQuestionRequest request = CreateQuestionRequest.fromBundle(extras);
-                processor = new CreateQuestionProcessor(getBaseContext(), request);
+            case QUESTION_CREATE: {
+                QuestionCreateRequest request = QuestionCreateRequest.fromBundle(extras);
+                processor = new QuestionCreateProcessor(getBaseContext(), request);
                 break;
             }
-            case UPLOAD_IMAGE: {
-                UploadImageRequest request = UploadImageRequest.fromBundle(extras);
-                processor = new UploadImageProcessor(getBaseContext(), request);
+            case IMAGE_UPLOAD: {
+                ImageUploadRequest request = ImageUploadRequest.fromBundle(extras);
+                processor = new ImageUploadProcessor(getBaseContext(), request);
                 break;
             }
             case POLL_VOTE: {
@@ -108,19 +110,24 @@ public class DeciderService extends IntentService {
                 processor = new PollVoteProcessor(getBaseContext(), request);
                 break;
             }
-            case GET_COMMENTS: {
-                GetCommentsRequest request = GetCommentsRequest.fromBundle(extras);
-                processor = new GetCommentsProcessor(getBaseContext(), request);
+            case COMMENTS_GET: {
+                CommentsGetRequest request = CommentsGetRequest.fromBundle(extras);
+                processor = new CommentsGetProcessor(getBaseContext(), request);
                 break;
             }
-            case CREATE_COMMENT: {
-                CreateCommentRequest request = CreateCommentRequest.fromBundle(extras);
-                processor = new CreateCommentProcessor(getBaseContext(), request);
+            case COMMENT_CREATE: {
+                CommentCreateRequest request = CommentCreateRequest.fromBundle(extras);
+                processor = new CommentCreateProcessor(getBaseContext(), request);
                 break;
             }
-            case GET_USER: {
-                GetUserRequest request = GetUserRequest.fromBundle(extras);
-                processor = new GetUserProcessor(getBaseContext(), request);
+            case USER_GET: {
+                UserGetRequest request = UserGetRequest.fromBundle(extras);
+                processor = new UserGetProcessor(getBaseContext(), request);
+                break;
+            }
+            case USER_EDIT: {
+                UserEditRequest request = UserEditRequest.fromBundle(extras);
+                processor = new UserEditProcessor(getBaseContext(), request);
                 break;
             }
 

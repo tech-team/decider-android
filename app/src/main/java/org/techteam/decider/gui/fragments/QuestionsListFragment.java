@@ -2,7 +2,6 @@ package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
@@ -23,7 +22,6 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
@@ -142,7 +140,7 @@ public class QuestionsListFragment
 
         this.activity = (MainActivity) activity;
         serviceHelper = new ServiceHelper(activity);
-        callbacksKeeper.addCallback(OperationType.GET_QUESTIONS, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.QUESTIONS_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -249,7 +247,7 @@ public class QuestionsListFragment
                 questionsOffset = 0,
                 activity.getSelectedCategories(),
                 LoadIntention.REFRESH,
-                callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
+                callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
     }
 
     @Override
@@ -269,9 +267,9 @@ public class QuestionsListFragment
                 questionsOffset,
                 activity.getSelectedCategories(),
                 intention,
-                callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
+                callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
 
-//        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, intention, callbacksKeeper.getCallback(OperationType.GET_QUESTIONS));
+//        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, intention, callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
     }
 
     @Override

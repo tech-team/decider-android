@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import com.android.camera.CropImageIntentBuilder;
 
 import org.techteam.decider.R;
-import org.techteam.decider.content.question.ImageData;
+import org.techteam.decider.content.ImageData;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
 
 import java.io.File;

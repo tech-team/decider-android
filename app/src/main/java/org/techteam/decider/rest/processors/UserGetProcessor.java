@@ -8,27 +8,22 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.QuestionHelper;
-import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.entities.UserEntry;
-import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.GetQuestionsRequest;
-import org.techteam.decider.rest.api.GetUserRequest;
+import org.techteam.decider.rest.api.UserGetRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class GetUserProcessor extends Processor {
-    private static final String TAG = GetUserProcessor.class.getName();
-    private final GetUserRequest request;
+public class UserGetProcessor extends Processor {
+    private static final String TAG = UserGetProcessor.class.getName();
+    private final UserGetRequest request;
 
-    public GetUserProcessor(Context context, GetUserRequest request) {
+    public UserGetProcessor(Context context, UserGetRequest request) {
         super(context);
         this.request = request;
     }

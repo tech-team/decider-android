@@ -8,24 +8,22 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.CommentEntry;
-import org.techteam.decider.gui.loaders.LoadIntention;
+import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.GetCommentsRequest;
+import org.techteam.decider.rest.api.UserEditRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class GetCommentsProcessor extends Processor {
-    private static final String TAG = GetCommentsProcessor.class.getName();
-    private final GetCommentsRequest request;
+public class UserEditProcessor extends Processor {
+    private static final String TAG = UserEditProcessor.class.getName();
+    private final UserEditRequest request;
 
-    public GetCommentsProcessor(Context context, GetCommentsRequest request) {
+    public UserEditProcessor(Context context, UserEditRequest request) {
         super(context);
         this.request = request;
     }
@@ -37,12 +35,8 @@ public class GetCommentsProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getComments(request);
+            JSONObject response = apiUI.editUser(request);
             Log.i(TAG, response.toString());
-
-            if (request.getLoadIntention() == LoadIntention.REFRESH) {
-                CommentEntry.deleteAll();
-            }
 
             String status = response.getString("status");
             if (!status.equalsIgnoreCase("ok")) {
@@ -51,28 +45,17 @@ public class GetCommentsProcessor extends Processor {
                 return;
             }
 
-            JSONArray data = response.getJSONArray("data");
-
-            if (data.length() == 0) {
-                result.putBoolean(ServiceCallback.GetCommentsExtras.FEED_FINISHED, true);
-            } else {
-
-                ActiveAndroid.beginTransaction();
-                try {
-                    for (int i = 0; i < data.length(); ++i) {
-                        JSONObject q = data.getJSONObject(i);
-                        CommentEntry entry = CommentEntry.fromJson(q);
-                        entry.saveTotal();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-
-                    result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
-                } finally {
-                    ActiveAndroid.endTransaction();
-                }
-
-                transactionFinished(operationType, requestId);
+            JSONObject data = response.getJSONObject("data");
+            ActiveAndroid.beginTransaction();
+            try {
+                UserEntry entry = UserEntry.fromJson(data, true);
+                entry.save();
+                ActiveAndroid.setTransactionSuccessful();
+            } finally {
+                ActiveAndroid.endTransaction();
             }
+            transactionFinished(operationType, requestId);
+
             cb.onSuccess(result);
         } catch (IOException | JSONException | TokenRefreshFailException e) {
             e.printStackTrace();
@@ -94,8 +77,6 @@ public class GetCommentsProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetCommentsExtras.LOAD_INTENTION, request.getLoadIntention());
-        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getQuestionId());
         return data;
     }
 }

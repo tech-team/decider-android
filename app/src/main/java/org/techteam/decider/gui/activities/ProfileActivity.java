@@ -96,7 +96,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
 
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.GET_USER, new ServiceCallback() {
+        callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(getApplicationContext(), "GetUser: ok");
@@ -115,7 +115,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
             }
         });
 
-        serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.GET_USER));
+        serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
     }
 
     @Override
