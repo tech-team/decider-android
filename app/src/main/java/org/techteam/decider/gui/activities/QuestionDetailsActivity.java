@@ -138,9 +138,13 @@ public class QuestionDetailsActivity extends AppCompatActivity
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
-                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
-                    getAuthToken(null);
-                    return;
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
                 }
                 Toaster.toast(QuestionDetailsActivity.this, "GetComments: failed. " + message);
             }
@@ -161,9 +165,13 @@ public class QuestionDetailsActivity extends AppCompatActivity
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
-                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
-                    getAuthToken(null);
-                    return;
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
                 }
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: failed. " + message);
             }

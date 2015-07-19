@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.techteam.decider.content.entities.UploadedImageEntry;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
+import org.techteam.decider.rest.api.ServerErrorException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.api.ImageUploadRequest;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -81,6 +82,12 @@ public class ImageUploadProcessor extends Processor {
             e.printStackTrace();
         } catch (OperationCanceledException e) {
             e.printStackTrace();
+        } catch (ServerErrorException e) {
+            e.printStackTrace();
+            transactionError(operationType, requestId);
+            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
+            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
+            cb.onError(e.getMessage(), result);
         }
 
     }

@@ -66,4 +66,5 @@
     <string name="about_placeholder">My name is Vasja and i\'m am Pupkin from Russia</string>
     <string name="profile_toolbar_title">Profile</string>
     <string name="pictures_fil">Both pictures must be filled</string>
+    <string name="server_problem">На сервере возникли некоторые проблемы. Попробуйте еще раз позже.</string>
 </resources>

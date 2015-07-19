@@ -8,9 +8,11 @@ public interface ServiceCallback {
 
     class ErrorsExtras {
         public static final String ERROR_CODE = "ERROR_CODE";
+        public static final String SERVER_ERROR_CODE = "SERVER_ERROR_CODE";
 
         public class Codes {
             public static final int INVALID_TOKEN = 1;
+            public static final int SERVER_ERROR = 2;
         }
     }
 

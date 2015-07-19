@@ -108,13 +108,17 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                waitDialog.dismiss();
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
-                if (code == ErrorsExtras.Codes.INVALID_TOKEN) {
-                    getAuthToken(null);
-                    return;
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
                 }
                 Toaster.toastLong(getApplicationContext(), "GetUser: failed. " + message);
-                waitDialog.dismiss();
             }
         });
 

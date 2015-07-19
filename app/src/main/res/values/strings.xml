@@ -93,5 +93,6 @@
     <string name="divider">Divider</string>
     <string name="saving_profile">Saving profile</string>
     <string name="loading_profile">Loading profile</string>
+    <string name="server_problem">Server is experiencing some problems right now. Try again later.</string>
 
 </resources>
