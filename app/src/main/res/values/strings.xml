@@ -94,5 +94,12 @@
     <string name="saving_profile">Saving profile</string>
     <string name="loading_profile">Loading profile</string>
     <string name="server_problem">Server is experiencing some problems right now. Try again later.</string>
+    <string name="gender_label">Gender:</string>
+    <string name="gender_placeholder">male</string>
+    <string name="gender_icon">Gender</string>
+    <string name="gender_hint">Male/female</string>
+    <string name="gender_none">Бесполое существо</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
 
 </resources>

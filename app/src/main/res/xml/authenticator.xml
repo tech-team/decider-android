@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- TODO: Replace with actual app icon -->
 <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
     android:accountType="org.techteam.decider"
-    android:icon="@drawable/vk"
-    android:smallIcon="@drawable/vk"
+    android:icon="@drawable/logo"
+    android:smallIcon="@drawable/logo"
     android:label="@string/app_name"
     android:accountPreferences="@xml/preferences"/>

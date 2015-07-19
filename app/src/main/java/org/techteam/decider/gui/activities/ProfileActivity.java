@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -28,6 +29,8 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
+
+import java.util.Date;
 
 public class ProfileActivity extends AppCompatActivity implements IAuthTokenGetter {
     public final static String USER_ID = "USER_ID";
@@ -167,7 +170,12 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
             fullNameText.setText(entry.getFirstName() + " " + entry.getLastName());
             countryText.setText(entry.getCountry());
             cityText.setText(entry.getCity());
-            birthdayText.setText(entry.getBirthday().toString());
+
+            Date birthday = entry.getBirthday();
+            if (birthday != null) {
+                String date = DateFormat.getDateFormat(ProfileActivity.this).format(birthday);
+                birthdayText.setText(date);
+            }
 
             waitDialog.dismiss();
         }

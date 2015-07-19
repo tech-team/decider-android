@@ -2,6 +2,7 @@ package org.techteam.decider.gui.activities;
 
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -10,10 +11,14 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -33,6 +38,13 @@ import org.techteam.decider.util.Toaster;
 import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageSelector;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import static org.techteam.decider.content.entities.UserEntry.byUId;
+
 public class EditProfileActivity extends AppCompatActivity implements ActivityStarter, IAuthTokenGetter {
     public final static String USER_ID = "USER_ID";
 
@@ -48,6 +60,8 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
     private EditText nickNameText;
     private EditText nameText;
     private EditText surnameText;
+    private Spinner genderSpinner;
+    private ArrayAdapter<Gender> genderAdapter;
     private EditText countryText;
     private EditText cityText;
     private EditText birthdayText;
@@ -57,6 +71,8 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
     private ProgressDialog waitDialog;
+
+    private Date birthday;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,9 +105,17 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
         nickNameText = (EditText) findViewById(R.id.nick);
         nameText = (EditText) findViewById(R.id.name);
         surnameText = (EditText) findViewById(R.id.surname);
+        genderSpinner = (Spinner) findViewById(R.id.gender);
         countryText = (EditText) findViewById(R.id.country);
         cityText = (EditText) findViewById(R.id.city);
         birthdayText = (EditText) findViewById(R.id.birthday);
+
+        List<Gender> genders = new ArrayList<>();
+        genders.add(new Gender(UserEntry.Gender.None));
+        genders.add(new Gender(UserEntry.Gender.Female));
+        genders.add(new Gender(UserEntry.Gender.Male));
+        genderAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, genders);
+        genderSpinner.setAdapter(genderAdapter);
 
         saveButton = (Button) findViewById(R.id.save);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +127,27 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
             }
         });
 
+        birthdayText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date date = entry.getBirthday();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+
+                DatePickerDialog dialog = new DatePickerDialog(EditProfileActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(year, monthOfYear, dayOfMonth);
+                        birthday = calendar.getTime();
+
+                        String date = DateFormat.getDateFormat(EditProfileActivity.this).format(birthday);
+                        birthdayText.setText(date);
+                    }
+                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                dialog.show();
+            }
+        });
 
         serviceHelper = new ServiceHelper(this);
         callbacksKeeper.addCallback(OperationType.USER_EDIT, new ServiceCallback() {
@@ -164,10 +209,13 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
         if (imageData != null)
             userData.setUsername(nickNameText.getText().toString());
 
-        //TODO: userData.setMuzhik();
+        userData.setGender(genderAdapter.getItem(genderSpinner.getSelectedItemPosition()).getValue());
         userData.setFirstName(nickNameText.getText().toString());
         userData.setLastName(nameText.getText().toString());
-        userData.setBirthday(surnameText.getText().toString());
+
+        if (birthday != null)
+            userData.setBirthday(birthday);
+
         userData.setCountry(countryText.getText().toString());
         userData.setCity(cityText.getText().toString());
 
@@ -188,7 +236,7 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
 
         @Override
         protected UserEntry doInBackground(Void... params) {
-            entry = UserEntry.byUId(uid);
+            entry = byUId(uid);
 
             return entry;
         }
@@ -204,9 +252,54 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
             surnameText.setText(entry.getLastName());
             countryText.setText(entry.getCountry());
             cityText.setText(entry.getCity());
-            birthdayText.setText(entry.getBirthday().toString());
+
+            Date birthday = entry.getBirthday();
+            if (birthday != null) {
+                String date = DateFormat.getDateFormat(EditProfileActivity.this).format(entry.getBirthday());
+                birthdayText.setText(date);
+            }
+
+            UserEntry.Gender genderValue = entry.getGender();
+            int position = getGenderPositionByValue(genderValue);
+            genderSpinner.setSelection(position);
 
             waitDialog.dismiss();
+        }
+    }
+
+
+    public int getGenderPositionByValue(UserEntry.Gender genderValue) {
+        for (int i = 0; i < genderAdapter.getCount(); ++i) {
+            Gender gender = genderAdapter.getItem(i);
+            if (gender.getValue() == genderValue)
+                return i;
+        }
+
+        return 0;
+    }
+
+    private class Gender {
+        private UserEntry.Gender value;
+
+        public Gender(UserEntry.Gender genderValue) {
+            value = genderValue;
+        }
+
+        public UserEntry.Gender getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            switch (value) {
+                case Male:
+                    return getString(R.string.gender_male);
+                case Female:
+                    return getString(R.string.gender_female);
+                case None:
+                default:
+                    return getString(R.string.gender_none);
+            }
         }
     }
 }
