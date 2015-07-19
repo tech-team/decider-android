@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import org.techteam.decider.content.entities.UserEntry;
 
+import java.text.ParseException;
+import java.util.Date;
+
 public class UserData implements Parcelable {
     private ImageData avatar;
     private String username;
@@ -100,12 +103,16 @@ public class UserData implements Parcelable {
         return birthday;
     }
 
+    public Date getBirthdayDate() throws ParseException {
+        return UserEntry.BIRTHDAY_FORMAT.parse(birthday);
+    }
+
     public boolean hasBirthday() {
         return birthday != null;
     }
 
-    public UserData setBirthday(String birthday) {
-        this.birthday = birthday;
+    public UserData setBirthday(Date birthday) {
+        this.birthday = UserEntry.BIRTHDAY_FORMAT.format(birthday);
         return this;
     }
 

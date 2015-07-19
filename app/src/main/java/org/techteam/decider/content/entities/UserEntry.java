@@ -9,7 +9,6 @@ import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.Entry;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,7 +47,7 @@ public class UserEntry extends Model {
     @Column(name="birthday")
     private Date birthday = null;
 
-    private static final SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static final SimpleDateFormat BIRTHDAY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public enum Gender {
         None("N"),
@@ -126,7 +125,7 @@ public class UserEntry extends Model {
             String birthday = obj.isNull("birthday") ? null : obj.getString("birthday");
             if (birthday != null) {
                 try {
-                    entry.birthday = birthdayFormat.parse(birthday);
+                    entry.birthday = BIRTHDAY_FORMAT.parse(birthday);
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
