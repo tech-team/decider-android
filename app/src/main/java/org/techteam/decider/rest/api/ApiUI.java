@@ -329,6 +329,14 @@ public class ApiUI {
             AccountManager am = AccountManager.get(context);
             am.invalidateAuthToken(context.getApplicationContext().getPackageName(), oldAccessToken);
             String newAccessToken = getAccessToken();
+            if (newAccessToken == null) {
+                Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
+                if (accounts.length != 0) {
+                    AccountManagerFuture<Boolean> f = am.removeAccount(accounts[0], null, null);
+                    f.getResult();
+                }
+                throw new InvalidAccessTokenException();
+            }
 
             httpRequest.getParams().replace("access_token", newAccessToken);
             httpResponse = HttpDownloader.exec(httpRequest);

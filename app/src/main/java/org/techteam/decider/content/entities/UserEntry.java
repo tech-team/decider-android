@@ -71,7 +71,7 @@ public class UserEntry extends Model {
                     return g;
                 }
             }
-            throw new RuntimeException("Unknown gender id");
+            throw new RuntimeException("Unknown gender id: " + letter);
         }
     }
 
@@ -110,11 +110,10 @@ public class UserEntry extends Model {
         entry.uid = uid;
         entry.username = obj.getString("username");
         entry.avatar = obj.isNull("avatar") ? null : obj.getString("avatar");
-        //TODO: new fields
         entry.firstName = obj.getString("first_name");
         entry.middleName = obj.getString("middle_name");
         entry.lastName = obj.getString("last_name");
-        entry.gender = obj.has("gender") ? obj.getString("gender") : Gender.None.getLetter();
+        entry.gender = obj.has("gender") && !obj.isNull("gender") ? obj.getString("gender") : Gender.None.getLetter();
         if (obj.has("country")) {
             entry.country = obj.isNull("country") ? null : obj.getString("country");
         }
