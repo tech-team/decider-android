@@ -3,6 +3,7 @@ package org.techteam.decider.gui.activities;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,8 +39,8 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
 
     private RetrieveEntryTask retrieveEntryTask;
 
-    private View rootView;
     // children
+    private Toolbar toolbar;
     private ImageView profileImage;
 
     private TextView fullNameText;
@@ -52,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
 
     private ServiceHelper serviceHelper;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private ProgressDialog waitDialog;
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
@@ -69,7 +71,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
         Assert.assertNotSame("UID is null", uid, null);
 
         // setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -79,7 +81,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
         // find children
         profileImage = (ImageView) findViewById(R.id.profile_image);
 
-        fullNameText = (TextView) findViewById(R.id.full_name_text);
+        fullNameText = (TextView) findViewById(R.id.nick_name_text);
         countryText = (TextView) findViewById(R.id.country_text);
         cityText = (TextView) findViewById(R.id.city_text);
         birthdayText = (TextView) findViewById(R.id.birthday_text);
@@ -111,10 +113,12 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
                     getAuthToken(null);
                     return;
                 }
-                Toaster.toast(getApplicationContext(), "GetUser: failed. " + message);
+                Toaster.toastLong(getApplicationContext(), "GetUser: failed. " + message);
+                waitDialog.dismiss();
             }
         });
 
+        waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait), true);
         serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
     }
 
@@ -150,17 +154,18 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
 
         @Override
         protected void onPostExecute(UserEntry entry) {
-            // populate gui with data
-            ImageLoader.getInstance().displayImage(entry.getAvatar(), profileImage);
+            String avatarUrl = entry.getAvatar();
+            //TODO: such "null", very string!
+            if (avatarUrl != null && !avatarUrl.equals("null"))
+                ImageLoader.getInstance().displayImage(entry.getAvatar(), profileImage);
 
-            fullNameText.setText(
-                    entry.getFirstName() + " "
-                            + entry.getMiddleName() + " "
-                            + entry.getLastName());
-
+            toolbar.setTitle(getString(R.string.profile_toolbar_title) + ": " + entry.getUsername());
+            fullNameText.setText(entry.getFirstName() + " " + entry.getLastName());
             countryText.setText(entry.getCountry());
             cityText.setText(entry.getCity());
             birthdayText.setText(entry.getBirthday());
+
+            waitDialog.dismiss();
         }
     }
 }

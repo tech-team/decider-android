@@ -87,11 +87,11 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="1.2"
                 android:orientation="vertical" >
 
                 <TextView
-                    android:id="@+id/full_name_text"
+                    android:id="@+id/nick_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"

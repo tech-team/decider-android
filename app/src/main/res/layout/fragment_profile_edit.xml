@@ -80,6 +80,13 @@
                 android:orientation="vertical">
 
                 <EditText
+                    android:id="@+id/nick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/nick_hint"
+                    />
+
+                <EditText
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -92,14 +99,6 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/surname_hint"
                     />
-
-                <EditText
-                    android:id="@+id/birthday"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="date"
-                    android:ems="10"
-                    android:hint="@string/date_hint"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -115,6 +114,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:columnCount="2" >
+
+            <ImageView
+                android:id="@+id/date_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_today"
+                android:contentDescription="@string/birthday_icon" />
+
+            <EditText
+                android:id="@+id/birthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                android:ems="10"
+                android:hint="@string/date_hint"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_columnSpan="2"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                android:contentDescription="@string/divider"
+                android:background="@android:drawable/divider_horizontal_textfield" />
 
             <ImageView
                 android:id="@+id/country_image"
@@ -144,6 +167,7 @@
                 android:layout_columnSpan="2"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="20dp"
+                android:contentDescription="@string/divider"
                 android:background="@android:drawable/divider_horizontal_textfield" />
 
 

@@ -66,7 +66,7 @@
     <string name="country_placeholder">Russia</string>
     <string name="city_label">City:</string>
     <string name="city_placeholder">Moscow</string>
-    <string name="birthday_placeholder">12.12.1912</string>
+    <string name="birthday_placeholder">12.12.92</string>
     <string name="birthday_label">Birthday:</string>
     <string name="profile_image__desc">Profile image</string>
     <string name="about_label">About:</string>
@@ -74,8 +74,9 @@
     <string name="profile_toolbar_title">Profile</string>
     <string name="name">Name</string>
     <string name="surname_hint">Surname...</string>
-    <string name="name_hint">Name...</string>
-    <string name="location_icon">Your location icon</string>
+    <string name="nick_hint">Nickname...</string>
+    <string name="birthday_icon">Birthday icon</string>
+    <string name="location_icon">Location icon</string>
     <string name="city_hint">City...</string>
     <string name="country_hint">Country...</string>
     <string name="about_hint">I am...</string>
@@ -88,5 +89,9 @@
     <string name="pictures_fil">Both pictures must be filled</string>
     <string name="creating_post">Creating a post</string>
     <string name="please_wait">Please wait...</string>
+    <string name="name_hint">Name...</string>
+    <string name="divider">Divider</string>
+    <string name="saving_profile">Saving profile</string>
+    <string name="loading_profile">Loading profile</string>
 
 </resources>

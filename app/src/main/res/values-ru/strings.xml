@@ -59,7 +59,7 @@
     <string name="country_placeholder">Russia</string>
     <string name="city_label">City:</string>
     <string name="city_placeholder">Moscow</string>
-    <string name="birthday_placeholder">12.12.1912</string>
+    <string name="birthday_placeholder">12.12.92</string>
     <string name="birthday_label">Birthday:</string>
     <string name="profile_image__desc">Profile image</string>
     <string name="about_label">About:</string>
