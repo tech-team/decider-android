@@ -38,7 +38,7 @@ public class CommentsLoader extends CursorLoader {
     @Override
     public Cursor loadInBackground() {
         Uri uri = ContentProvider.createUri(CommentEntry.class, null);
-        return getContext().getContentResolver().query(uri, null, "question_id = ?", new String[] { Integer.toString(questionId) }, null);
+        return getContext().getContentResolver().query(uri, null, "question_id = ?", new String[] { Integer.toString(questionId) }, "cid ASC");
     }
 
     public Integer getQuestionId() {

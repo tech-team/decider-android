@@ -44,8 +44,9 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
     private boolean mDataValid;
     private int mRowIdColumn;
     private DataSetObserver mDataSetObserver;
+    private boolean mManualCursorMoving;
 
-    public CursorRecyclerViewAdapter(Context context, Cursor cursor) {
+    public CursorRecyclerViewAdapter(Context context, Cursor cursor, boolean manualCursorMoving) {
         mContext = context;
         mCursor = cursor;
         mDataValid = cursor != null;
@@ -54,14 +55,27 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
+        mManualCursorMoving = manualCursorMoving;
+    }
+
+    public CursorRecyclerViewAdapter(Context context, Cursor cursor) {
+        this(context, cursor, false);
     }
 
     public CursorRecyclerViewAdapter(Cursor cursor) {
-        this(null, cursor);
+        this(null, cursor, false);
+    }
+
+    public CursorRecyclerViewAdapter(Cursor cursor, boolean manualCursorMoving) {
+        this(null, cursor, manualCursorMoving);
     }
 
     public Cursor getCursor() {
         return mCursor;
+    }
+
+    public boolean isManualCursorMoving() {
+        return mManualCursorMoving;
     }
 
     @Override
@@ -93,8 +107,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
 //            throw new IllegalStateException("this should only be called when the cursor is valid");
 //        }
         if (mDataValid) {
-            if (!mCursor.moveToPosition(position)) {
-//                throw new IllegalStateException("couldn't move cursor to position " + position);
+            if (!mManualCursorMoving && !mCursor.moveToPosition(position)) {
             }
             onBindViewHolder(viewHolder, mCursor, position);
         }

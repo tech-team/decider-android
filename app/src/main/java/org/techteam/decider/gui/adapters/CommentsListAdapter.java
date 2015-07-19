@@ -73,7 +73,7 @@ public class CommentsListAdapter
                                OnCommentEventCallback eventCallback,
                                OnListScrolledDownCallback scrolledDownCallback,
                                CommentInteractor commentInteractor) {
-        super(contentCursor);
+        super(contentCursor, true);
         this.context = context;
         this.questionEntry = questionEntry;
         this.questionInteractor = questionInteractor;
@@ -87,37 +87,44 @@ public class CommentsListAdapter
     public CommentsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                             int viewType) {
         View v;
-        if (viewType == VIEW_TYPE_ENTRY) {
-            v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_comment_card, parent, false);
-        } else if (viewType == VIEW_TYPE_QUESTION) {
-            v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_question_card, parent, false);
+        switch (viewType) {
+            case VIEW_TYPE_QUESTION:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fragment_question_card, parent, false);
 
-            QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
-            questionView.reuse(questionEntry, questionInteractor);
-        } else {
-            v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_loading_entry, parent, false);
+                QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
+                questionView.reuse(questionEntry, questionInteractor);
+                break;
+            case VIEW_TYPE_ENTRY:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fragment_comment_card, parent, false);
+                break;
+            default:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_loading_entry, parent, false);
+                break;
         }
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor, final int position) {
-        if (position == 0)
-            return;
-
-        //footer visible
-        if (position > cursor.getCount() - 2) {
-            scrolledDownCallback.onScrolledDown();
+        if (position == 0) {
             return;
         }
 
-        CommentEntry entry = CommentEntry.fromCursor(cursor);
+        cursor.moveToPosition(position - 1);
 
+        //footer visible
+        if (position > cursor.getCount() - 2) {
+            scrolledDownCallback.onScrolledDown(); // TODO: not sure if we really need this and how it should be correctly used
+//            return;
+        }
 
-        holder.commentView.reuse(entry, commentInteractor);
+        if (!cursor.isAfterLast()) {
+            CommentEntry entry = CommentEntry.fromCursor(cursor);
+            holder.commentView.reuse(entry, commentInteractor);
+        }
     }
 
     public CommentEntry get(int position) {
