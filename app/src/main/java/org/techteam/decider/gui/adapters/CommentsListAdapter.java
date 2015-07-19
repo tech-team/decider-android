@@ -109,21 +109,15 @@ public class CommentsListAdapter
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor, final int position) {
-        if (position == 0) {
-            return;
+        if (getItemViewType(position) == VIEW_TYPE_ENTRY) {
+            cursor.moveToPosition(position - 1);
+            CommentEntry entry = CommentEntry.fromCursor(cursor);
+            holder.commentView.reuse(entry, commentInteractor);
         }
-
-        cursor.moveToPosition(position - 1);
 
         //footer visible
         if (position > cursor.getCount() - 2) {
-            scrolledDownCallback.onScrolledDown(); // TODO: not sure if we really need this and how it should be correctly used
-//            return;
-        }
-
-        if (!cursor.isAfterLast()) {
-            CommentEntry entry = CommentEntry.fromCursor(cursor);
-            holder.commentView.reuse(entry, commentInteractor);
+            scrolledDownCallback.onScrolledDown();
         }
     }
 
