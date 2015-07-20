@@ -14,7 +14,6 @@ import org.techteam.decider.content.QuestionHelper;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
-import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.gui.views.QuestionView;
 
 import java.util.ArrayList;
@@ -23,14 +22,11 @@ import java.util.List;
 public class QuestionsListAdapter
         extends CursorRecyclerViewAdapter<QuestionsListAdapter.ViewHolder> {
     private final ContentSection currentSection;
-    private final OnQuestionEventCallback eventCallback;
+    private final OnQuestionEventCallback onQuestionEventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private final QuestionInteractor questionInteractor;
     private List<QuestionEntry> dataset = new ArrayList<>();
 
     private Context context;
-
-    private OnQuestionEventCallback onQuestionEventCallback;
 
     private static final int VIEW_TYPE_ENTRY = 0;
     private static final int VIEW_TYPE_FOOTER = 1;
@@ -68,14 +64,12 @@ public class QuestionsListAdapter
                                 Context context,
                                 ContentSection currentSection,
                                 OnQuestionEventCallback eventCallback,
-                                OnListScrolledDownCallback scrolledDownCallback,
-                                QuestionInteractor questionInteractor) {
+                                OnListScrolledDownCallback scrolledDownCallback) {
         super(contentCursor);
         this.context = context;
         this.currentSection = currentSection;
-        this.eventCallback = eventCallback;
+        this.onQuestionEventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
-        this.questionInteractor = questionInteractor;
     }
 
     // Create new views (invoked by the layout manager)
@@ -100,12 +94,25 @@ public class QuestionsListAdapter
             scrolledDownCallback.onScrolledDown();
             return;
         }
-        holder.questionView.setOnQuestionEventCallback(onQuestionEventCallback);
+        holder.questionView.setEventListener(new QuestionView.EventListener() {
+            @Override
+            public void onLikeClick(QuestionEntry post) {
+                onQuestionEventCallback.onLikeClick(position, post);
+            }
+
+            @Override
+            public void onVoteClick(QuestionEntry post, int voteId) {
+                onQuestionEventCallback.onVoteClick(position, post, voteId);
+            }
+
+            @Override
+            public void onCommentsClick(QuestionEntry post) {
+                onQuestionEventCallback.onCommentsClick(position, post);
+            }
+        });
 
         QuestionEntry entry = QuestionHelper.fromCursor(currentSection, cursor);
-
-
-        holder.questionView.reuse(entry, questionInteractor);
+        holder.questionView.reuse(entry);
     }
 
     private void share(Context context, QuestionEntry entry) {
@@ -153,9 +160,5 @@ public class QuestionsListAdapter
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
-    }
-
-    public void setOnQuestionEventCallback(OnQuestionEventCallback cb) {
-        onQuestionEventCallback = cb;
     }
 }

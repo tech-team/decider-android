@@ -25,6 +25,7 @@ import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
@@ -36,14 +37,13 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends AppCompatActivity
-            implements OnListScrolledDownCallback, IAuthTokenGetter {
+            implements OnListScrolledDownCallback, IAuthTokenGetter, OnQuestionEventCallback {
     private RetrieveEntryTask retrieveEntryTask;
 
     // children
     private QuestionView questionView;
     private RecyclerView commentsView;
     private EditText commentEdit;
-    private ImageButton sendCommentButton;
 
     private CommentsListAdapter adapter;
 
@@ -77,15 +77,17 @@ public class QuestionDetailsActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         // find children
         questionView = (QuestionView) findViewById(R.id.post_view);
         commentsView = (RecyclerView) findViewById(R.id.comments_recycler);
 
         commentEdit = (EditText) findViewById(R.id.comment_edit);
-        sendCommentButton = (ImageButton) findViewById(R.id.comment_send);
+        ImageButton sendCommentButton = (ImageButton) findViewById(R.id.comment_send);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -98,8 +100,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
         QuestionEntry entry = QuestionEntry.byQId(qid);
         Assert.assertNotSame("entry is null", entry, null);
 
-        //TODO: pass questionInteractor
-        adapter = new CommentsListAdapter(null, this, entry, null, null, QuestionDetailsActivity.this, null);
+        adapter = new CommentsListAdapter(null, this, entry, this, null, QuestionDetailsActivity.this, null);
         commentsView.setAdapter(adapter);
 
         sendCommentButton.setOnClickListener(new View.OnClickListener() {
@@ -122,11 +123,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
 
                 commentsOffset += insertedCount;
 
-                String msg;
-                if (isFeedFinished) {
-                    msg = "No more posts";
-                } else {
-                    msg = "Successfully fetched posts";
+                if (!isFeedFinished) {
                     Bundle args = new Bundle();
                     args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
                     args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
@@ -224,14 +221,29 @@ public class QuestionDetailsActivity extends AppCompatActivity
 
     @Override
     public void onScrolledDown() {
-        int intention;
-        if (adapter.getCursor().getCount() == 0) {
-            intention = LoadIntention.REFRESH;
-        } else {
-            intention = LoadIntention.APPEND;
-        }
+//        int intention;
+//        if (adapter.getCursor().getCount() == 0) {
+//            intention = LoadIntention.REFRESH;
+//        } else {
+//            intention = LoadIntention.APPEND;
+//        }
 
         // TODO
+    }
+
+    @Override
+    public void onLikeClick(int entryPosition, QuestionEntry post) {
+
+    }
+
+    @Override
+    public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
+
+    }
+
+    @Override
+    public void onCommentsClick(int entryPosition, QuestionEntry post) {
+
     }
 
 

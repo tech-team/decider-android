@@ -28,7 +28,6 @@ import org.techteam.decider.gui.adapters.QuestionsListAdapter;
 import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
-import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -44,7 +43,6 @@ public class QuestionsListFragment
         SwipeRefreshLayout.OnRefreshListener,
         OnQuestionEventCallback,
         OnListScrolledDownCallback,
-        QuestionInteractor,
         SharedPreferences.OnSharedPreferenceChangeListener,
         OnCategorySelectedListener {
 
@@ -93,19 +91,7 @@ public class QuestionsListFragment
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this, QuestionsListFragment.this);
-        adapter.setOnQuestionEventCallback(new OnQuestionEventCallback() {
-            @Override
-            public void onLike(QuestionEntry post) {
-
-            }
-
-            @Override
-            public void onVote(QuestionEntry post, int voteId) {
-                Toaster.toast(activity.getBaseContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
-                serviceHelper.pollVote(post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
-            }
-        });
+        adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this);
         recyclerView.setAdapter(adapter);
 
         //this thing waits for user to stop scrolling and adds new data or refreshes existing data
@@ -117,7 +103,7 @@ public class QuestionsListFragment
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    for (Runnable r: delayedAdapterNotifications)
+                    for (Runnable r : delayedAdapterNotifications)
                         r.run();
 
                     delayedAdapterNotifications.clear();
@@ -189,6 +175,11 @@ public class QuestionsListFragment
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toastLong(getActivity().getApplicationContext(), "Successfully voted");
+
+                int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
+                Bundle args = new Bundle();
+                args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
+                getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
             }
 
             @Override
@@ -204,7 +195,6 @@ public class QuestionsListFragment
                 }
                 String msg = "Error. " + message;
                 Toaster.toastLong(getActivity().getApplicationContext(), msg);
-                System.out.println(msg);
             }
         });
         Log.d(TAG, "restarting loader...");
@@ -281,25 +271,21 @@ public class QuestionsListFragment
     }
 
     @Override
-    public void onCommentsClick(QuestionEntry entry) {
+    public void onLikeClick(int entryPosition, QuestionEntry post) {
+        Toaster.toast(getActivity(), "Like clicked");
+    }
+
+    @Override
+    public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
+        Toaster.toast(activity.getBaseContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
+        serviceHelper.pollVote(post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
+    }
+
+    @Override
+    public void onCommentsClick(int entryPosition, QuestionEntry post) {
         Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
-        intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, entry.getQId());
+        intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, post.getQId());
         startActivity(intent);
-    }
-
-    @Override
-    public void onLikeClick(QuestionEntry post) {
-        Toaster.toast(getActivity(), "Like pressed");
-    }
-
-    @Override
-    public void onLike(QuestionEntry post) {
-        Toaster.toast(getActivity(), "Liked successfully");
-    }
-
-    @Override
-    public void onVote(QuestionEntry post, int voteId) {
-        Toaster.toast(getActivity(), "Voted successfully");
     }
 
     @Override

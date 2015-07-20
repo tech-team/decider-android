@@ -3,6 +3,7 @@ package org.techteam.decider.gui.fragments;
 import org.techteam.decider.content.entities.QuestionEntry;
 
 public interface OnQuestionEventCallback {
-    void onLike(QuestionEntry post);
-    void onVote(QuestionEntry post, int voteId);
+    void onLikeClick(int entryPosition, QuestionEntry post);
+    void onVoteClick(int entryPosition, QuestionEntry post, int voteId);
+    void onCommentsClick(int entryPosition, QuestionEntry post);
 }

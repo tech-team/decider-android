@@ -12,9 +12,9 @@ import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.views.CommentInteractor;
 import org.techteam.decider.gui.views.CommentView;
-import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.gui.views.QuestionView;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class CommentsListAdapter
         extends CursorRecyclerViewAdapter<CommentsListAdapter.ViewHolder> {
 
     private final QuestionEntry questionEntry;
-    private final QuestionInteractor questionInteractor;
+    private final OnQuestionEventCallback onQuestionEventCallback;
 
     private final OnCommentEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
@@ -69,14 +69,14 @@ public class CommentsListAdapter
     public CommentsListAdapter(Cursor contentCursor,
                                Context context,
                                QuestionEntry questionEntry,
-                               QuestionInteractor questionInteractor,
+                               OnQuestionEventCallback onQuestionEventCallback,
                                OnCommentEventCallback eventCallback,
                                OnListScrolledDownCallback scrolledDownCallback,
                                CommentInteractor commentInteractor) {
         super(contentCursor, true);
         this.context = context;
         this.questionEntry = questionEntry;
-        this.questionInteractor = questionInteractor;
+        this.onQuestionEventCallback = onQuestionEventCallback;
         this.eventCallback = eventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
         this.commentInteractor = commentInteractor;
@@ -93,7 +93,23 @@ public class CommentsListAdapter
                         .inflate(R.layout.fragment_question_card, parent, false);
 
                 QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
-                questionView.reuse(questionEntry, questionInteractor);
+                questionView.setEventListener(new QuestionView.EventListener() {
+                    @Override
+                    public void onLikeClick(QuestionEntry post) {
+                        onQuestionEventCallback.onLikeClick(-1, post);
+                    }
+
+                    @Override
+                    public void onVoteClick(QuestionEntry post, int voteId) {
+                        onQuestionEventCallback.onVoteClick(-1, post, voteId);
+                    }
+
+                    @Override
+                    public void onCommentsClick(QuestionEntry post) {
+                        onQuestionEventCallback.onCommentsClick(-1, post);
+                    }
+                });
+                questionView.reuse(questionEntry);
                 break;
             case VIEW_TYPE_ENTRY:
                 v = LayoutInflater.from(parent.getContext())
