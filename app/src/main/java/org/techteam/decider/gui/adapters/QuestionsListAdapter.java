@@ -1,7 +1,6 @@
 package org.techteam.decider.gui.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,8 +11,8 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.QuestionHelper;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.gui.views.QuestionView;
 
@@ -35,34 +34,8 @@ public class QuestionsListAdapter
     private static final int VIEW_TYPE_ENTRY = 0;
     private static final int VIEW_TYPE_FOOTER = 1;
 
-
-    public void setAll(ArrayList<QuestionEntry> entries) {
-        dataset.clear();
-        dataset.addAll(entries);
-    }
-
-    public void addAll(ArrayList<QuestionEntry> entries) {
-        dataset.addAll(entries);
-    }
-
-    public boolean isEmpty() {
-        return getItemCount() - 1 == 0; //-footer
-    }
-
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder
-            extends RecyclerView.ViewHolder {
-
-        public QuestionView questionView;
-
-        public ViewHolder(View v) {
-            super(v);
-
-            questionView = (QuestionView) v.findViewById(R.id.post_view);
-        }
-    }
+    private boolean feedFinished;
+    private View loadingView;
 
     public QuestionsListAdapter(Cursor contentCursor,
                                 Context context,
@@ -89,53 +62,22 @@ public class QuestionsListAdapter
         } else {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_loading_entry, parent, false);
+            loadingView = v.findViewById(R.id.collapsible_view);
+            updateLoadingEntry();
         }
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor, final int position) {
-        //footer visible
-        if (position == cursor.getCount()) {
+        if (getItemViewType(position) == VIEW_TYPE_FOOTER) {
             scrolledDownCallback.onScrolledDown();
             return;
         }
+
         holder.questionView.setOnQuestionEventCallback(onQuestionEventCallback);
-
         QuestionEntry entry = QuestionHelper.fromCursor(currentSection, cursor);
-
-
         holder.questionView.reuse(entry, questionInteractor);
-    }
-
-    private void share(Context context, QuestionEntry entry) {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, formatEntryForSharing(context, entry));
-        sendIntent.setType("text/plain");
-        context.startActivity(sendIntent);
-    }
-
-    public QuestionEntry get(int position) {
-        return dataset.get(position);
-    }
-
-    private String formatEntryForSharing(Context context, QuestionEntry entry) {
-        StringBuilder sb = new StringBuilder();
-
-        String delimiter = "\n";
-        String emptyLine = " \n";
-        String hashTag = "#" + context.getString(R.string.app_name);
-
-        sb.append(context.getString(R.string.app_name));
-        sb.append(delimiter);
-
-        //TODO: entry sharing
-
-        sb.append(delimiter);
-        sb.append(hashTag);
-
-        return sb.toString();
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -157,5 +99,29 @@ public class QuestionsListAdapter
 
     public void setOnQuestionEventCallback(OnQuestionEventCallback cb) {
         onQuestionEventCallback = cb;
+    }
+
+    public void setFeedFinished(boolean feedFinished) {
+        this.feedFinished = feedFinished;
+        updateLoadingEntry();
+    }
+
+    private void updateLoadingEntry() {
+        if (feedFinished)
+            loadingView.setVisibility(View.GONE);
+        else
+            loadingView.setVisibility(View.VISIBLE);
+    }
+
+
+    public static class ViewHolder
+            extends RecyclerView.ViewHolder {
+        public QuestionView questionView;
+
+        public ViewHolder(View v) {
+            super(v);
+
+            questionView = (QuestionView) v.findViewById(R.id.post_view);
+        }
     }
 }

@@ -5,13 +5,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/posts_recycler"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:overScrollMode="never"
-        android:background="@color/cards_background_color"/>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/posts_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:overScrollMode="never"
+            android:background="@color/cards_background_color"/>
+
+        <TextView
+            android:id="@+id/empty_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:gravity="center"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:text="@string/no_questions"/>
+
+    </FrameLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

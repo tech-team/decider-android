@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
@@ -25,9 +26,9 @@ import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
-import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
+import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -61,6 +62,7 @@ public class QuestionsListFragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView recyclerView;
+    private TextView emptyListView;
     private QuestionsListAdapter adapter;
 
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
@@ -87,6 +89,7 @@ public class QuestionsListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_questions_list, container, false);
 
+        emptyListView = (TextView) rootView.findViewById(R.id.empty_list);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.posts_recycler);
         recyclerView.setHasFixedSize(true);
 
@@ -162,6 +165,15 @@ public class QuestionsListFragment
                     args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                     args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
                     getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                }
+
+                adapter.setFeedFinished(isFeedFinished);
+                if (insertedCount == 0 && isFeedFinished) {
+                    recyclerView.setVisibility(View.GONE);
+                    emptyListView.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyListView.setVisibility(View.GONE);
                 }
 
                 Log.i(TAG, msg);
