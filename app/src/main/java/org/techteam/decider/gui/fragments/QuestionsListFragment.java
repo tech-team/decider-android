@@ -144,16 +144,6 @@ public class QuestionsListFragment
                 String msg;
                 if (isFeedFinished) {
                     msg = "No more posts";
-
-                    if (insertedCount == 0 && adapter.getItemCount() == 1) {
-                        //recyclerView.setVisibility(View.GONE);
-                        adapter.swapCursor(null);
-                        emptyListView.setVisibility(View.VISIBLE);
-                    } else {
-                        //recyclerView.setVisibility(View.VISIBLE);
-                        emptyListView.setVisibility(View.GONE);
-                    }
-
                 } else {
                     msg = "Successfully fetched posts";
                     Bundle args = new Bundle();
@@ -165,6 +155,14 @@ public class QuestionsListFragment
                 }
 
                 adapter.setFeedFinished(isFeedFinished);
+                if (insertedCount == 0 && adapter.getItemCount() == 1 && isFeedFinished) {
+                    //recyclerView.setVisibility(View.GONE);
+                    adapter.swapCursor(null);
+                    emptyListView.setVisibility(View.VISIBLE);
+                } else {
+                    //recyclerView.setVisibility(View.VISIBLE);
+                    emptyListView.setVisibility(View.GONE);
+                }
                 // 1 is like 0, ... but 1 ("Loading..." entry)
 
 

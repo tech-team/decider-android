@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
 
     private void finishAuthorization() {
         getFragmentManager().beginTransaction()
-                .add(R.id.content_frame, new MainFragment()).commit();
+                .add(R.id.content_frame, new MainFragment(), MainFragment.TAG).commit();
     }
 
     @Override
@@ -256,6 +257,10 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
                     @Override
                     public void run(AccountManagerFuture<Bundle> future) {
+                        MainFragment f = (MainFragment) getFragmentManager().findFragmentByTag(MainFragment.TAG);
+                        if (f != null) {
+                            f.invalidatePages();
+                        }
                         getUserInfo();
                     }
                 };

@@ -186,17 +186,30 @@ public class MainFragment
         }
     }
 
+    public void invalidatePages() {
+        if (mSectionsPagerAdapter != null) {
+            mSectionsPagerAdapter.invalidateFragments();
+        }
+    }
+
     //TODO: refactor this out
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
+
+        private Fragment[] fragments;
+
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            fragments = new Fragment[getCount()];
         }
 
         @Override
         public Fragment getItem(int position) {
-            QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
-            onCategorySelectedListener = f;
-            return f;
+            if (fragments[position] == null) {
+                QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
+                // onCategorySelectedListener = f; // TODO: too bad, it's not going to be called every time it is expected
+                fragments[position] = f;
+            }
+            return fragments[position];
         }
 
         @Override
@@ -213,6 +226,15 @@ public class MainFragment
         @Override
         public int getTextColor() {
             return android.R.color.white;
+        }
+
+        public void invalidateFragments() {
+//            for (int position = 0; position < getCount(); ++position) {
+//                if (fragments[position] != null) {
+//                    destroyItem(null, position, fragments[position]);
+//                }
+//            }
+            fragments = new Fragment[getCount()];
         }
     }
 
