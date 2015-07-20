@@ -79,6 +79,22 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
     }
 
     @Override
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
+        if (cb == null) {
+            cb = new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    if (future.isCancelled()) {
+                        setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+                        finish();
+                    }
+                }
+            };
+        }
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -193,6 +209,11 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == ActivityHelper.GLOBAL_EXIT_RETURN_CODE) {
+            setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+            finish();
+            return;
+        }
         // call both, they will compare ordinals
         leftImageSelector.onActivityResult(requestCode, resultCode, data);
         rightImageSelector.onActivityResult(requestCode, resultCode, data);

@@ -65,6 +65,21 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
     }
 
     @Override
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
+        if (cb == null) {
+            cb = new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    if (future.isCancelled()) {
+                        finish();
+                    }
+                }
+            };
+        }
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

@@ -29,7 +29,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
@@ -42,6 +41,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.CacheHelper;
 import org.techteam.decider.util.ImageLoaderInitializer;
 import org.techteam.decider.util.Toaster;
 
@@ -71,6 +71,22 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     }
 
     @Override
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
+        if (cb == null) {
+            cb = new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    if (future.isCancelled()) {
+                        setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+                        finish();
+                    }
+                }
+            };
+        }
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PACKAGE_NAME = getApplicationContext().getPackageName();
@@ -82,7 +98,11 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
             getAuthToken(new AccountManagerCallback<Bundle>() {
                 @Override
                 public void run(AccountManagerFuture<Bundle> future) {
-                    finishAuthorization();
+                    if (future.isCancelled()) {
+                        finish();
+                    } else {
+                        finishAuthorization();
+                    }
                 }
             });
         }
@@ -102,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -112,7 +132,9 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
             }
         });
 
-        serviceHelper.getUser(apiUI.getCurrentUserId(), callbacksKeeper.getCallback(OperationType.USER_GET));
+        if (apiUI.getCurrentUserId() != null) {
+            serviceHelper.getUser(apiUI.getCurrentUserId(), callbacksKeeper.getCallback(OperationType.USER_GET));
+        }
     }
 
     private void finishAuthorization() {
@@ -123,23 +145,22 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     @Override
     protected void onResume() {
         super.onResume();
-        VKUIHelper.onResume(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        VKUIHelper.onDestroy(this);
     }
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() == 0) {
-            super.onBackPressed();
-            return;
-        }
-
-        getFragmentManager().popBackStack();
+        super.onBackPressed();
+//        if (getFragmentManager().getBackStackEntryCount() == 0) {
+//            super.onBackPressed();
+//            return;
+//        }
+//
+//        getFragmentManager().popBackStack();
     }
 
     @Override
@@ -210,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     }
 
     private void logout() {
+        CacheHelper.deleteCache(this);
         AccountManager am = AccountManager.get(this);
         Account[] accounts = am.getAccountsByType(getApplicationContext().getPackageName());
 
@@ -219,11 +241,12 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 @Override
                 public void run(AccountManagerFuture<Boolean> future) {
                     // restart activity, it will request authorization and receive new user's data
-                    recreate();
+
+                    getAuthToken(null);
                 }
             }, null);
         } else {
-            recreate();
+            getAuthToken(null);
         }
     }
 

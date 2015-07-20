@@ -23,6 +23,8 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.activities.ActivityHelper;
+import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
@@ -144,24 +146,29 @@ public class QuestionsListFragment
                 String msg;
                 if (isFeedFinished) {
                     msg = "No more posts";
+
+                    if (insertedCount == 0 && adapter.getItemCount() == 1) {
+                        //recyclerView.setVisibility(View.GONE);
+                        adapter.swapCursor(null);
+                        emptyListView.setVisibility(View.VISIBLE);
+                    } else {
+                        //recyclerView.setVisibility(View.VISIBLE);
+                        emptyListView.setVisibility(View.GONE);
+                    }
+
                 } else {
                     msg = "Successfully fetched posts";
                     Bundle args = new Bundle();
                     args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                     args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                     args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
+                    args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
                     getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
 
                 adapter.setFeedFinished(isFeedFinished);
                 // 1 is like 0, ... but 1 ("Loading..." entry)
-                if (insertedCount == 0 && adapter.getItemCount() == 1 && isFeedFinished) {
-                    //recyclerView.setVisibility(View.GONE);
-                    emptyListView.setVisibility(View.VISIBLE);
-                } else {
-                    //recyclerView.setVisibility(View.VISIBLE);
-                    emptyListView.setVisibility(View.GONE);
-                }
+
 
                 Log.i(TAG, msg);
             }
@@ -172,7 +179,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthToken(null);
+                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -200,7 +207,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthToken(null);
+                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -227,7 +234,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthToken(null);
+                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -240,7 +247,7 @@ public class QuestionsListFragment
         Log.d(TAG, "restarting loader...");
         Bundle args = new Bundle();
         args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
-        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+        getLoaderManager().initLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -326,7 +333,7 @@ public class QuestionsListFragment
     public void onCommentsClick(int entryPosition, QuestionEntry post) {
         Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
         intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, post.getQId());
-        startActivity(intent);
+        startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
     }
 
     @Override
@@ -345,6 +352,15 @@ public class QuestionsListFragment
     public void onPause() {
         super.onPause();
         serviceHelper.release();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == ActivityHelper.GLOBAL_EXIT_RETURN_CODE) {
+            getActivity().setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+            getActivity().finish();
+            return;
+        }
     }
 
     @Override
@@ -385,6 +401,7 @@ public class QuestionsListFragment
                 Integer entryPos = null;
                 Integer insertedCount = null;
                 int loadIntention = LoadIntention.REFRESH;
+                boolean feedFinished = false;
                 ContentSection loadedSection = currentSection;
                 if (args != null) {
                     entryPos = args.getInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, -1);
@@ -395,9 +412,11 @@ public class QuestionsListFragment
 
                     loadIntention = args.getInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.NONE);
                     loadedSection = ContentSection.fromInt(args.getInt(QuestionsLoader.BundleKeys.SECTION));
+
+                    feedFinished = args.getBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, false);
                 }
 
-                return new QuestionsLoader(getActivity(), loadedSection, entryPos, insertedCount, loadIntention);
+                return new QuestionsLoader(getActivity(), loadedSection, entryPos, insertedCount, loadIntention, feedFinished);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }
@@ -408,6 +427,7 @@ public class QuestionsListFragment
             Integer entryPos = questionsLoader.getEntryPosition();
             Integer count = questionsLoader.getInsertedCount();
             int loadIntention = questionsLoader.getLoadIntention();
+            boolean feedFinished = questionsLoader.isFeedFinished();
 
             if (loadIntention == LoadIntention.REFRESH) {
                 questionsOffset += newCursor.getCount();

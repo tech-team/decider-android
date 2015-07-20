@@ -20,6 +20,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.gui.activities.ActivityHelper;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
@@ -87,7 +88,7 @@ public class MainFragment
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        MainFragment.this.activity.getAuthToken(null);
+                        MainFragment.this.activity.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -163,6 +164,11 @@ public class MainFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == ActivityHelper.GLOBAL_EXIT_RETURN_CODE) {
+            getActivity().setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+            getActivity().finish();
+            return;
+        }
         if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
             int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
             Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
@@ -188,7 +194,6 @@ public class MainFragment
 
         @Override
         public Fragment getItem(int position) {
-            // TODO: static create() method with section arg
             QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
             onCategorySelectedListener = f;
             return f;

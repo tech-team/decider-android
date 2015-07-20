@@ -76,6 +76,27 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
     private Date birthday;
 
     @Override
+    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
+        if (cb == null) {
+            cb = new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    if (future.isCancelled()) {
+                        setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+                        finish();
+                    }
+                }
+            };
+        }
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -227,12 +248,12 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == ActivityHelper.GLOBAL_EXIT_RETURN_CODE) {
+            setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+            finish();
+            return;
+        }
         imageSelector.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
     }
 
     class RetrieveEntryTask extends AsyncTask<Void, Void, UserEntry> {

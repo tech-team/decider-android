@@ -197,36 +197,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         options.putString(SocialLoginActivity.IntentKeys.URL, url);
         intent.putExtras(options);
         startActivityForResult(intent, ActivityCodes.SOCIAL_LOGIN);
-
-//        final Activity activity = AuthActivity.this;
-//
-//        VKSdk.initialize(new VKSdkListener() {
-//            @Override
-//            public void onCaptchaError(VKError vkError) {
-//                Toaster.toast(activity, vkError.errorMessage);
-//            }
-//
-//            @Override
-//            public void onTokenExpired(VKAccessToken vkAccessToken) {
-//                Toaster.toast(activity, "Token expired");
-//            }
-//
-//            @Override
-//            public void onAccessDenied(VKError vkError) {
-//                Toaster.toast(activity, vkError.errorMessage);
-//            }
-//
-//            @Override
-//            public void onReceiveNewToken(VKAccessToken newToken) {
-//                super.onReceiveNewToken(newToken);
-//
-//                // auth was successful
-//                Toaster.toast(activity, newToken.userId);
-//                Log.d(TAG, "got access token. user_id = " + newToken.userId + "; access_token = " + newToken.accessToken);
-//            }
-//        }, VK_APP_ID);
-//
-//        VKSdk.authorize("offline");
     }
 
     private void saveToken(Bundle data, String login, String password) {
@@ -279,28 +249,30 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public void onResume() {
         super.onResume();
         serviceHelper.init();
-//        VKUIHelper.onResume(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         serviceHelper.release();
-//        VKUIHelper.onDestroy(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
-            if (resultCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
                 String username = data.getStringExtra(ServiceCallback.LoginRegisterExtras.USER_ID);
 
                 saveToken(data.getExtras(), username, "dummy");
             }
 
         } else {
-//            VKUIHelper.onActivityResult(this, requestCode, resultCode, data);
         }
     }
 }

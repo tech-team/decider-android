@@ -84,16 +84,12 @@ public class ApiUI {
     }
 
     public String getCurrentUserId() {
-        String userId = prefs.getString(PrefsKeys.CURRENT_USER, null);
-        if (userId == null) {
-            AccountManager am = AccountManager.get(this.context);
-            Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
-            if (accounts.length == 0) {
-                return null;
-            }
-            userId = am.getUserData(accounts[0], ServiceCallback.LoginRegisterExtras.USER_ID);
+        AccountManager am = AccountManager.get(this.context);
+        Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
+        if (accounts.length == 0) {
+            return null;
         }
-        return userId;
+        return am.getUserData(accounts[0], ServiceCallback.LoginRegisterExtras.USER_ID);
     }
 
     public JSONObject getQuestions(QuestionsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {

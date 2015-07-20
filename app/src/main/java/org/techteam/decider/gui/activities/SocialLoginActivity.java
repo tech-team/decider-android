@@ -1,5 +1,6 @@
 package org.techteam.decider.gui.activities;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -63,7 +64,7 @@ public class SocialLoginActivity extends AppCompatActivity {
                     data.putExtra(ServiceCallback.LoginRegisterExtras.EXPIRES, expires);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.USER_ID, userId);
-                    setResult(0, data);
+                    setResult(Activity.RESULT_OK, data);
                     finish();
                 }
                 super.onPageFinished(view, url);
@@ -80,6 +81,12 @@ public class SocialLoginActivity extends AppCompatActivity {
         webView.loadUrl(url);
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_CANCELED);
+        finish();
     }
 
 }

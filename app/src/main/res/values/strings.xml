@@ -105,7 +105,7 @@
     <string name="error_no_accounts">Error: No accounts to show in drawer.</string>
     <string name="no_nick">user</string>
     <string name="preview_toolbar_title">Preview</string>
-    <string name="exit_question_creation">Do you really want to exit?\nThis question won't be saved.</string>
+    <string name="exit_question_creation">Do you really want to exit?\nThis question won\'t be saved.</string>
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
 

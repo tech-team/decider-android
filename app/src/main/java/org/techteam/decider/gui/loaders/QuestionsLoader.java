@@ -16,6 +16,7 @@ public class QuestionsLoader extends CursorLoader {
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
+    private boolean feedFinished;
 
     public Integer getInsertedCount() {
         return insertedCount;
@@ -26,20 +27,22 @@ public class QuestionsLoader extends CursorLoader {
         public static final String INSERTED_COUNT = "INSERTED_COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
         public static final String SECTION = "SECTION";
+        public static final String FEED_FINISHED = "FEED_FINISHED";
     }
 
-    public QuestionsLoader(Context context, ContentSection contentSection, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public QuestionsLoader(Context context, ContentSection contentSection, Integer entryPosition, Integer insertedCount, int loadIntention, boolean feedFinished) {
         super(context);
         this.contentSection = contentSection;
         this.entryPosition = entryPosition;
         this.insertedCount = insertedCount;
         this.loadIntention = loadIntention;
+        this.feedFinished = feedFinished;
     }
 
     @Override
     public Cursor loadInBackground() {
         Uri uri = ContentProvider.createUri(QuestionHelper.getClass(contentSection), null);
-        return getContext().getContentResolver().query(uri, null, null, null, null);
+        return getContext().getContentResolver().query(uri, null, null, null, "_ID ASC");
     }
 
     public Integer getEntryPosition() {
@@ -48,5 +51,9 @@ public class QuestionsLoader extends CursorLoader {
 
     public int getLoadIntention() {
         return loadIntention;
+    }
+
+    public boolean isFeedFinished() {
+        return feedFinished;
     }
 }

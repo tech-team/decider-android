@@ -40,8 +40,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
         Log.d(TAG, "> addAccount");
 
-        final Intent intent = new Intent(mContext, AuthActivity.class);
-
+        final Intent intent = new Intent(mContext.getApplicationContext(), AuthActivity.class);
         intent.putExtra(AuthActivity.ARG_ACCOUNT_TYPE, accountType);
         intent.putExtra(AuthActivity.ARG_AUTH_TYPE, authTokenType);
         intent.putExtra(AuthActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
@@ -110,7 +109,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         // If we get here, then we couldn't access the user's password - so we
         // need to re-prompt them for their credentials. We do that by creating
         // an intent to display our AuthenticatorActivity.
-        final Intent intent = new Intent(mContext, AuthActivity.class);
+        final Intent intent = new Intent(mContext.getApplicationContext(), AuthActivity.class);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         intent.putExtra(AuthActivity.ARG_ACCOUNT_TYPE, account.type);
         intent.putExtra(AuthActivity.ARG_AUTH_TYPE, authTokenType);

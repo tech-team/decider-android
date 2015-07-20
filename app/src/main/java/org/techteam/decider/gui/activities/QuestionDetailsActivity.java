@@ -67,6 +67,22 @@ public class QuestionDetailsActivity extends AppCompatActivity
     }
 
     @Override
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
+        if (cb == null) {
+            cb = new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    if (future.isCancelled()) {
+                        setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+                        finish();
+                    }
+                }
+            };
+        }
+        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -138,7 +154,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -165,7 +181,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -189,7 +205,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -214,7 +230,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
                 int code = data.getInt(ErrorsExtras.ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.Codes.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.Codes.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
