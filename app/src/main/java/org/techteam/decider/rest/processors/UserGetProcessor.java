@@ -43,7 +43,7 @@ public class UserGetProcessor extends RequestProcessor<UserGetRequest> {
         JSONObject data = response.getJSONObject("data");
         ActiveAndroid.beginTransaction();
         try {
-            UserEntry entry = UserEntry.fromJson(data, true);
+            UserEntry entry = UserEntry.fromJson(data);
             entry.save();
             ActiveAndroid.setTransactionSuccessful();
         } finally {

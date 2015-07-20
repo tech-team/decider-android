@@ -46,7 +46,7 @@ public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterReques
 
         ActiveAndroid.beginTransaction();
         try {
-            UserEntry entry = UserEntry.fromJson(userJson, true);
+            UserEntry entry = UserEntry.fromJson(userJson);
             entry.save();
             ActiveAndroid.setTransactionSuccessful();
 

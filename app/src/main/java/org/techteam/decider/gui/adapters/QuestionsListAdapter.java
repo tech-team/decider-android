@@ -111,10 +111,12 @@ public class QuestionsListAdapter
     }
 
     private void updateLoadingEntry() {
-        if (feedFinished)
-            loadingView.setVisibility(View.GONE);
-        else
-            loadingView.setVisibility(View.VISIBLE);
+        if (loadingView != null) {
+            if (feedFinished)
+                loadingView.setVisibility(View.GONE);
+            else
+                loadingView.setVisibility(View.VISIBLE);
+        }
     }
 
 

@@ -54,7 +54,7 @@ public class QuestionsListFragment
 
     private static final int QUESTIONS_LIMIT = 30;
     private int questionsOffset = 0;
-    private ContentSection currentSection = ContentSection.NEW;
+    private ContentSection currentSection = null;
 
     //see comment in onCreateView()
     private Queue<Runnable> delayedAdapterNotifications = new LinkedList<Runnable>();
@@ -77,6 +77,7 @@ public class QuestionsListFragment
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String QUESTIONS_OFFSET = "QUESTIONS_OFFSET";
+        public static final String CURRENT_SECTION = "CURRENT_SECTION";
     }
 
     public static QuestionsListFragment create(ContentSection section) {
@@ -95,9 +96,6 @@ public class QuestionsListFragment
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
-
-        adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this);
-        recyclerView.setAdapter(adapter);
 
         //this thing waits for user to stop scrolling and adds new data or refreshes existing data
         //because it's impossible to notify*() adapter when scrolling
@@ -244,10 +242,6 @@ public class QuestionsListFragment
                 Toaster.toastLong(getActivity().getApplicationContext(), msg);
             }
         });
-        Log.d(TAG, "restarting loader...");
-        Bundle args = new Bundle();
-        args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
-        getLoaderManager().initLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -269,9 +263,18 @@ public class QuestionsListFragment
                 mSwipeRefreshLayout.setRefreshing(false);
             }
 
-            questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET);
+            currentSection = ContentSection.fromInt(savedInstanceState.getInt(BundleKeys.CURRENT_SECTION));
+            questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET); // TODO: probably it's not valid
         }
         initialized = true;
+
+        adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this);
+        recyclerView.setAdapter(adapter);
+
+        Log.d(TAG, "restarting loader...");
+        Bundle args = new Bundle();
+        args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
+        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -279,6 +282,7 @@ public class QuestionsListFragment
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
         outState.putInt(BundleKeys.QUESTIONS_OFFSET, questionsOffset);
+        outState.putInt(BundleKeys.CURRENT_SECTION, currentSection.toInt());
     }
 
     @Override
@@ -436,9 +440,10 @@ public class QuestionsListFragment
                 if (entryPos != null) {
                     adapter.swapCursor(newCursor, entryPos);
                 } else if (count != null) {
-                    questionsOffset += newCursor.getCount();
+                    questionsOffset += count;
                     adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
                 } else {
+                    questionsOffset += newCursor.getCount();
                     adapter.swapCursor(newCursor);
                 }
             }
