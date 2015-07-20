@@ -71,19 +71,21 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     }
 
     @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
-        if (cb == null) {
-            cb = new AccountManagerCallback<Bundle>() {
-                @Override
-                public void run(AccountManagerFuture<Bundle> future) {
-                    if (future.isCancelled()) {
-                        setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
-                        finish();
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(final AccountManagerCallback<Bundle> cb) {
+        AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                if (future.isCancelled()) {
+                    setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
+                    finish();
+                } else {
+                    if (cb != null) {
+                        cb.run(future);
                     }
                 }
-            };
-        }
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+            }
+        };
+        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override
@@ -132,6 +134,10 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
             }
         });
 
+        getUserInfo();
+    }
+
+    private void getUserInfo() {
         if (apiUI.getCurrentUserId() != null) {
             serviceHelper.getUser(apiUI.getCurrentUserId(), callbacksKeeper.getCallback(OperationType.USER_GET));
         }
@@ -231,9 +237,17 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     }
 
     private void logout() {
+        drawer.closeDrawer();
         CacheHelper.deleteCache(this);
         AccountManager am = AccountManager.get(this);
         Account[] accounts = am.getAccountsByType(getApplicationContext().getPackageName());
+
+        final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                getUserInfo();
+            }
+        };
 
         if (accounts.length != 0) {
             Account account = accounts[0];
@@ -242,11 +256,11 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 public void run(AccountManagerFuture<Boolean> future) {
                     // restart activity, it will request authorization and receive new user's data
 
-                    getAuthToken(null);
+                    getAuthTokenOrExit(cb);
                 }
             }, null);
         } else {
-            getAuthToken(null);
+            getAuthTokenOrExit(cb);
         }
     }
 
