@@ -30,72 +30,42 @@ public class QuestionsGetProcessor extends RequestProcessor<QuestionsGetRequest>
         super(context, request);
     }
 
+    @Override
+    protected String getTag() {
+        return TAG;
+    }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.getQuestions(getRequest());
+    }
 
-        transactionStarted(operationType, requestId);
-
-        Bundle result = getInitialBundle();
-        try {
-            JSONObject response = apiUI.getQuestions(getRequest());
-            Log.i(TAG, response.toString());
-
-            if (getRequest().getLoadIntention() == LoadIntention.REFRESH) {
-                QuestionHelper.deleteAll(getRequest().getContentSection());
-            }
-
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-
-            JSONArray data = response.getJSONArray("data");
-            if (data.length() == 0) {
-                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, 0);
-                result.putBoolean(ServiceCallback.GetQuestionsExtras.FEED_FINISHED, true);
-            } else {
-                ActiveAndroid.beginTransaction();
-                try {
-                    for (int i = 0; i < data.length(); ++i) {
-                        JSONObject q = data.getJSONObject(i);
-                        QuestionEntry question = QuestionEntry.fromJson(q);
-
-                        QuestionHelper.saveQuestion(getRequest().getContentSection(), question);
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-
-                    result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
-                } finally {
-                    ActiveAndroid.endTransaction();
-                }
-                transactionFinished(operationType, requestId);
-            }
-
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(e.getMessage(), result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        if (getRequest().getLoadIntention() == LoadIntention.REFRESH) {
+            QuestionHelper.deleteAll(getRequest().getContentSection());
         }
 
+        JSONArray data = response.getJSONArray("data");
+        if (data.length() == 0) {
+            result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, 0);
+            result.putBoolean(ServiceCallback.GetQuestionsExtras.FEED_FINISHED, true);
+        } else {
+            ActiveAndroid.beginTransaction();
+            try {
+                for (int i = 0; i < data.length(); ++i) {
+                    JSONObject q = data.getJSONObject(i);
+                    QuestionEntry question = QuestionEntry.fromJson(q);
+
+                    QuestionHelper.saveQuestion(getRequest().getContentSection(), question);
+                }
+                ActiveAndroid.setTransactionSuccessful();
+
+                result.putInt(ServiceCallback.GetQuestionsExtras.COUNT, data.length());
+            } finally {
+                ActiveAndroid.endTransaction();
+            }
+        }
     }
 
     @Override
