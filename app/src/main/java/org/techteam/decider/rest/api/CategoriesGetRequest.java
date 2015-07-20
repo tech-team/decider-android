@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class CategoriesGetRequest {
+public class CategoriesGetRequest extends ApiRequest {
     private final String locale;
 
     public static final String URL = "categories";
@@ -22,5 +22,10 @@ public class CategoriesGetRequest {
 
     public String getLocale() {
         return locale;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

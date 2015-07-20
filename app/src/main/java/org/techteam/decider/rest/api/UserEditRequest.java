@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.content.UserData;
 
-public class UserEditRequest {
+public class UserEditRequest extends ApiRequest {
     public static final String URL = "user";
 
     private final UserData userData;
@@ -24,5 +24,10 @@ public class UserEditRequest {
 
     public UserData getUserData() {
         return userData;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

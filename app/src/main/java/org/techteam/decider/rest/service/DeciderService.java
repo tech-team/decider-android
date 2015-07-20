@@ -7,9 +7,11 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CommentCreateRequest;
+import org.techteam.decider.rest.api.EntityVoteRequest;
 import org.techteam.decider.rest.api.QuestionCreateRequest;
 import org.techteam.decider.rest.api.CategoriesGetRequest;
 import org.techteam.decider.rest.api.CommentsGetRequest;
+import org.techteam.decider.rest.api.QuestionLikeRequest;
 import org.techteam.decider.rest.api.QuestionsGetRequest;
 import org.techteam.decider.rest.api.UserEditRequest;
 import org.techteam.decider.rest.api.UserGetRequest;
@@ -20,6 +22,7 @@ import org.techteam.decider.rest.processors.CommentCreateProcessor;
 import org.techteam.decider.rest.processors.QuestionCreateProcessor;
 import org.techteam.decider.rest.processors.CategoriesGetProcessor;
 import org.techteam.decider.rest.processors.CommentsGetProcessor;
+import org.techteam.decider.rest.processors.QuestionLikeProcessor;
 import org.techteam.decider.rest.processors.QuestionsGetProcessor;
 import org.techteam.decider.rest.processors.UserEditProcessor;
 import org.techteam.decider.rest.processors.UserGetProcessor;
@@ -108,6 +111,11 @@ public class DeciderService extends IntentService {
             case POLL_VOTE: {
                 PollVoteRequest request = PollVoteRequest.fromBundle(extras);
                 processor = new PollVoteProcessor(getBaseContext(), request);
+                break;
+            }
+            case QUESTION_LIKE: {
+                QuestionLikeRequest request = QuestionLikeRequest.fromBundle(extras);
+                processor = new QuestionLikeProcessor(getBaseContext(), request);
                 break;
             }
             case COMMENTS_GET: {

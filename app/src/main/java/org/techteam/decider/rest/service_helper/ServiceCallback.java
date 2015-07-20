@@ -39,6 +39,12 @@ public interface ServiceCallback {
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
     }
 
+    class EntityVoteExtras {
+        public static final String ENTITY_ID = "ENTITY_ID";
+        public static final String ENTRY_POSITION = "ENTRY_POSITION";
+        public static final String VOTES_COUNT = "VOTES_COUNT";
+    }
+
     class GetCommentsExtras {
         public static final String FEED_FINISHED = "FEED_FINISHED";
         public static final String COUNT = "COUNT";

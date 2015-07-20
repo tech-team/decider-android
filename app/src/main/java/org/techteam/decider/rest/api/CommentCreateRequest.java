@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.content.question.CommentData;
 
-public class CommentCreateRequest {
+public class CommentCreateRequest extends ApiRequest {
     private final CommentData commentData;
 
     public static final String URL = "comments";
@@ -24,5 +24,10 @@ public class CommentCreateRequest {
 
     public CommentData getCommentData() {
         return commentData;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

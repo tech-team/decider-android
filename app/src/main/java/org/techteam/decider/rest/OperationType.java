@@ -10,6 +10,7 @@ public enum OperationType {
     POLL_VOTE,
     QUESTION_CREATE,
     QUESTIONS_GET(true),
+    QUESTION_LIKE,
     USER_GET,
     USER_EDIT;
 

@@ -105,7 +105,7 @@ public class ApiUI {
             params.add("categories[]", category);
         }
 
-        HttpResponse response = makeProtectedGetCall(resolveApiUrl(QuestionsGetRequest.URL), params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -116,7 +116,7 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("locale", request.getLocale());
 
-        HttpResponse response = makeProtectedGetCall(resolveApiUrl(CategoriesGetRequest.URL), params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -182,7 +182,7 @@ public class ApiUI {
                 imageParamFacades[i].write(params, originalPicKey, previewPicKey);
             }
 
-            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(QuestionCreateRequest.URL), params);
+            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(request.getPath()), params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -199,7 +199,7 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("data", data.toJson().toString());
 
-        HttpResponse response = makeProtectedPostCall(resolveApiUrl(CommentCreateRequest.URL), params);
+        HttpResponse response = makeProtectedPostCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -214,7 +214,7 @@ public class ApiUI {
         try {
             imageParamFacade.write(params, "image", "preview");
 
-            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(ImageUploadRequest.URL), params);
+            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(request.getPath()), params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -229,7 +229,19 @@ public class ApiUI {
         params.add("question_id", request.getQuestionId());
         params.add("poll_item_id", request.getPollItemId());
 
-        HttpResponse response = makeProtectedPostCall(resolveApiUrl(PollVoteRequest.URL), params);
+        HttpResponse response = makeProtectedPostCall(resolveApiUrl(request.getPath()), params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
+    public JSONObject entityVote(EntityVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+        UrlParams params = new UrlParams();
+        params.add("entity", request.getEntityType());
+        params.add("entity_id", request.getEntityId());
+
+        HttpResponse response = makeProtectedPostCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -242,7 +254,7 @@ public class ApiUI {
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
 
-        HttpResponse response = makeProtectedGetCall(resolveApiUrl(CommentsGetRequest.URL), params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -253,7 +265,7 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("user_id", request.getUserId());
 
-        HttpResponse response = makeProtectedGetCall(resolveApiUrl(UserGetRequest.URL), params);
+        HttpResponse response = makeProtectedGetCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -279,7 +291,7 @@ public class ApiUI {
                 imageParamFacade.write(params, null, "avatar");
             }
 
-            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(UserEditRequest.URL), params);
+            HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(request.getPath()), params);
             if (response == null || response.getBody() == null) {
                 return null;
             }
@@ -296,7 +308,7 @@ public class ApiUI {
         params.add("instanceId", request.getInstanceId());
         params.add("reg_token", request.getRegToken());
 
-        HttpResponse response = makeProtectedPostCall(resolvePushUrl(PushAuthRequest.URL), params);
+        HttpResponse response = makeProtectedPostCall(resolvePushUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
         }

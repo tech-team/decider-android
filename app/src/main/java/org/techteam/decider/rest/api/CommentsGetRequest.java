@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class CommentsGetRequest {
+public class CommentsGetRequest extends ApiRequest {
     private final int questionId;
     private final int limit;
     private final int offset;
@@ -47,5 +47,10 @@ public class CommentsGetRequest {
 
     public int getLoadIntention() {
         return loadIntention;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

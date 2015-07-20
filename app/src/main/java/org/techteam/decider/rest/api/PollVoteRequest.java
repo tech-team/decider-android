@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class PollVoteRequest {
+public class PollVoteRequest extends ApiRequest {
     public static final String URL = "poll";
 
     private final int entryPosition;
@@ -38,5 +38,10 @@ public class PollVoteRequest {
 
     public int getPollItemId() {
         return pollItemId;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }
