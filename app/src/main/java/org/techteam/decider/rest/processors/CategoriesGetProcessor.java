@@ -21,14 +21,13 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class CategoriesGetProcessor extends Processor {
+public class CategoriesGetProcessor extends RequestProcessor<CategoriesGetRequest> {
     private static final String TAG = CategoriesGetProcessor.class.getName();
-    private final CategoriesGetRequest request;
 
     public CategoriesGetProcessor(Context context, CategoriesGetRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
+
 
     @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
@@ -37,7 +36,7 @@ public class CategoriesGetProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getCategories(request);
+            JSONObject response = apiUI.getCategories(getRequest());
             Log.i(TAG, response.toString());
 
             if (response == null) {

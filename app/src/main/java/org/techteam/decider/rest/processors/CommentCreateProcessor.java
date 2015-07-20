@@ -20,14 +20,13 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class CommentCreateProcessor extends Processor {
+public class CommentCreateProcessor extends RequestProcessor<CommentCreateRequest> {
     private static final String TAG = CommentCreateProcessor.class.getName();
-    private final CommentCreateRequest request;
 
     public CommentCreateProcessor(Context context, CommentCreateRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
+
 
     @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
@@ -36,7 +35,7 @@ public class CommentCreateProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.createComment(request);
+            JSONObject response = apiUI.createComment(getRequest());
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");
@@ -83,7 +82,7 @@ public class CommentCreateProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getCommentData().getQuestionId());
+        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, getRequest().getCommentData().getQuestionId());
         return data;
     }
 }

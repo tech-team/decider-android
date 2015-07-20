@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ServerErrorException;
+import org.techteam.decider.rest.api.UserEditRequest;
 import org.techteam.decider.rest.api.UserGetRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
@@ -20,13 +21,11 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class UserGetProcessor extends Processor {
+public class UserGetProcessor extends RequestProcessor<UserGetRequest> {
     private static final String TAG = UserGetProcessor.class.getName();
-    private final UserGetRequest request;
 
     public UserGetProcessor(Context context, UserGetRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class UserGetProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getUser(request);
+            JSONObject response = apiUI.getUser(getRequest());
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");
@@ -84,7 +83,7 @@ public class UserGetProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putString(ServiceCallback.GetUserExtras.USER_ID, request.getUserId());
+        data.putString(ServiceCallback.GetUserExtras.USER_ID, getRequest().getUserId());
         return data;
     }
 }

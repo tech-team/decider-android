@@ -20,13 +20,11 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class PollVoteProcessor extends Processor {
+public class PollVoteProcessor extends RequestProcessor<PollVoteRequest> {
     private static final String TAG = PollVoteProcessor.class.getName();
-    private final PollVoteRequest request;
 
     public PollVoteProcessor(Context context, PollVoteRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
 
     @Override
@@ -36,7 +34,7 @@ public class PollVoteProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.pollVote(request);
+            JSONObject response = apiUI.pollVote(getRequest());
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");
@@ -50,7 +48,7 @@ public class PollVoteProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                PollItemEntry entry = PollItemEntry.byPId(request.getPollItemId());
+                PollItemEntry entry = PollItemEntry.byPId(getRequest().getPollItemId());
                 entry.votesCount = votesCount;
                 entry.voted = true;
                 entry.save();
@@ -88,9 +86,9 @@ public class PollVoteProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.PollVoteExtras.ENTRY_POSITION, request.getEntryPosition());
-        data.putInt(ServiceCallback.PollVoteExtras.QUESTION_ID, request.getQuestionId());
-        data.putInt(ServiceCallback.PollVoteExtras.POLL_ITEM_ID, request.getPollItemId());
+        data.putInt(ServiceCallback.PollVoteExtras.ENTRY_POSITION, getRequest().getEntryPosition());
+        data.putInt(ServiceCallback.PollVoteExtras.QUESTION_ID, getRequest().getQuestionId());
+        data.putInt(ServiceCallback.PollVoteExtras.POLL_ITEM_ID, getRequest().getPollItemId());
         return data;
     }
 }

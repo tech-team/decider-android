@@ -20,13 +20,11 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class UserEditProcessor extends Processor {
+public class UserEditProcessor extends RequestProcessor<UserEditRequest> {
     private static final String TAG = UserEditProcessor.class.getName();
-    private final UserEditRequest request;
 
     public UserEditProcessor(Context context, UserEditRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
 
     @Override
@@ -36,7 +34,7 @@ public class UserEditProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.editUser(request);
+            JSONObject response = apiUI.editUser(getRequest());
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");

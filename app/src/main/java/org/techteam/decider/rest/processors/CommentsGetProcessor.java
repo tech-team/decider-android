@@ -22,13 +22,11 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class CommentsGetProcessor extends Processor {
+public class CommentsGetProcessor extends RequestProcessor<CommentsGetRequest> {
     private static final String TAG = CommentsGetProcessor.class.getName();
-    private final CommentsGetRequest request;
 
     public CommentsGetProcessor(Context context, CommentsGetRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
 
     @Override
@@ -38,10 +36,10 @@ public class CommentsGetProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getComments(request);
+            JSONObject response = apiUI.getComments(getRequest());
             Log.i(TAG, response.toString());
 
-            if (request.getLoadIntention() == LoadIntention.REFRESH) {
+            if (getRequest().getLoadIntention() == LoadIntention.REFRESH) {
                 CommentEntry.deleteAll();
             }
 
@@ -103,8 +101,8 @@ public class CommentsGetProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetCommentsExtras.LOAD_INTENTION, request.getLoadIntention());
-        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, request.getQuestionId());
+        data.putInt(ServiceCallback.GetCommentsExtras.LOAD_INTENTION, getRequest().getLoadIntention());
+        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, getRequest().getQuestionId());
         return data;
     }
 }

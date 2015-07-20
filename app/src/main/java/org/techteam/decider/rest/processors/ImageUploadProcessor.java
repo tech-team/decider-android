@@ -20,14 +20,13 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class ImageUploadProcessor extends Processor {
+public class ImageUploadProcessor extends RequestProcessor<ImageUploadRequest> {
     private static final String TAG = ImageUploadProcessor.class.getName();
-    private final ImageUploadRequest request;
 
     public ImageUploadProcessor(Context context, ImageUploadRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
+
 
     @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
@@ -36,7 +35,7 @@ public class ImageUploadProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.uploadImage(request);
+            JSONObject response = apiUI.uploadImage(getRequest());
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");
@@ -50,7 +49,7 @@ public class ImageUploadProcessor extends Processor {
 
             ActiveAndroid.beginTransaction();
             try {
-                UploadedImageEntry entry = new UploadedImageEntry(uid, request.getImageOrdinalId());
+                UploadedImageEntry entry = new UploadedImageEntry(uid, getRequest().getImageOrdinalId());
                 entry.save();
                 ActiveAndroid.setTransactionSuccessful();
 
@@ -95,7 +94,7 @@ public class ImageUploadProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.ImageUploadExtras.IMAGE_ORDINAL_ID, request.getImageOrdinalId());
+        data.putInt(ServiceCallback.ImageUploadExtras.IMAGE_ORDINAL_ID, getRequest().getImageOrdinalId());
         return data;
     }
 }

@@ -101,6 +101,6 @@
     <string name="gender_none">Бесполое существо</string>
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
-    <string name="no_questions">No question here yet</string>
+    <string name="no_questions">No questions here yet</string>
 
 </resources>

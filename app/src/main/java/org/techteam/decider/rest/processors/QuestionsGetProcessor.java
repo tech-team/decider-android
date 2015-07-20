@@ -23,14 +23,13 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class QuestionsGetProcessor extends Processor {
+public class QuestionsGetProcessor extends RequestProcessor<QuestionsGetRequest> {
     private static final String TAG = QuestionsGetProcessor.class.getName();
-    private final QuestionsGetRequest request;
 
     public QuestionsGetProcessor(Context context, QuestionsGetRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
+
 
     @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
@@ -39,11 +38,11 @@ public class QuestionsGetProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.getQuestions(request);
+            JSONObject response = apiUI.getQuestions(getRequest());
             Log.i(TAG, response.toString());
 
-            if (request.getLoadIntention() == LoadIntention.REFRESH) {
-                QuestionHelper.deleteAll(request.getContentSection());
+            if (getRequest().getLoadIntention() == LoadIntention.REFRESH) {
+                QuestionHelper.deleteAll(getRequest().getContentSection());
             }
 
             String status = response.getString("status");
@@ -64,7 +63,7 @@ public class QuestionsGetProcessor extends Processor {
                         JSONObject q = data.getJSONObject(i);
                         QuestionEntry question = QuestionEntry.fromJson(q);
 
-                        QuestionHelper.saveQuestion(request.getContentSection(), question);
+                        QuestionHelper.saveQuestion(getRequest().getContentSection(), question);
                     }
                     ActiveAndroid.setTransactionSuccessful();
 
@@ -102,8 +101,8 @@ public class QuestionsGetProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, request.getLoadIntention());
-        data.putInt(ServiceCallback.GetQuestionsExtras.SECTION, request.getContentSection().toInt());
+        data.putInt(ServiceCallback.GetQuestionsExtras.LOAD_INTENTION, getRequest().getLoadIntention());
+        data.putInt(ServiceCallback.GetQuestionsExtras.SECTION, getRequest().getContentSection().toInt());
         return data;
     }
 }

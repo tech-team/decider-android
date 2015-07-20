@@ -16,13 +16,11 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class LoginRegisterProcessor extends Processor {
+public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterRequest> {
     private static final String TAG = LoginRegisterProcessor.class.getName();
-    private final LoginRegisterRequest request;
 
     public LoginRegisterProcessor(Context context, LoginRegisterRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
 
     @Override
@@ -31,7 +29,7 @@ public class LoginRegisterProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.loginRegister(operationType, request);
+            JSONObject response = apiUI.loginRegister(operationType, getRequest());
             Log.i(TAG, response.toString());
 
 
@@ -82,8 +80,8 @@ public class LoginRegisterProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle bundle = new Bundle();
-        bundle.putString(ServiceCallback.LoginRegisterExtras.LOGIN, request.getEmail());
-        bundle.putString(ServiceCallback.LoginRegisterExtras.PASSWORD, request.getPassword());
+        bundle.putString(ServiceCallback.LoginRegisterExtras.LOGIN, getRequest().getEmail());
+        bundle.putString(ServiceCallback.LoginRegisterExtras.PASSWORD, getRequest().getPassword());
 
         return bundle;
     }

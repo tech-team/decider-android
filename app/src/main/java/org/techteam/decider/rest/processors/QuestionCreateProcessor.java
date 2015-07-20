@@ -20,13 +20,11 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
 
-public class QuestionCreateProcessor extends Processor {
+public class QuestionCreateProcessor extends RequestProcessor<QuestionCreateRequest> {
     private static final String TAG = QuestionCreateProcessor.class.getName();
-    private final QuestionCreateRequest request;
 
     public QuestionCreateProcessor(Context context, QuestionCreateRequest request) {
-        super(context);
-        this.request = request;
+        super(context, request);
     }
 
     @Override
@@ -36,7 +34,7 @@ public class QuestionCreateProcessor extends Processor {
 
         Bundle result = getInitialBundle();
         try {
-            JSONObject response = apiUI.createQuestion(request);
+            JSONObject response = apiUI.createQuestion(getRequest());
             Log.i(TAG, response.toString());
 
             String status = response.getString("status");
