@@ -210,6 +210,33 @@ public class QuestionsListFragment
                 Toaster.toastLong(getActivity().getApplicationContext(), msg);
             }
         });
+
+        callbacksKeeper.addCallback(OperationType.QUESTION_LIKE, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toastLong(getActivity().getApplicationContext(), "Like accepted");
+
+                int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
+                Bundle args = new Bundle();
+                args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
+                getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        QuestionsListFragment.this.activity.getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                String msg = "Error. " + message;
+                Toaster.toastLong(getActivity().getApplicationContext(), msg);
+            }
+        });
         Log.d(TAG, "restarting loader...");
         Bundle args = new Bundle();
         args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
@@ -286,6 +313,7 @@ public class QuestionsListFragment
     @Override
     public void onLikeClick(int entryPosition, QuestionEntry post) {
         Toaster.toast(getActivity(), "Like clicked");
+        serviceHelper.likeQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_LIKE));
     }
 
     @Override
