@@ -48,11 +48,13 @@ public class QuestionLikeProcessor extends RequestProcessor<QuestionLikeRequest>
             JSONObject data = response.getJSONObject("data");
             int entityId = data.getInt("entity_id");
             int likesCount = data.getInt("likes_count");
+            boolean voted = data.has("voted") ? data.getBoolean("voted") : true;
 
             ActiveAndroid.beginTransaction();
             try {
                 QuestionEntry entry = QuestionEntry.byQId(entityId);
                 entry.likesCount = likesCount;
+                entry.voted = voted;
                 entry.save();
                 ActiveAndroid.setTransactionSuccessful();
             } finally {
