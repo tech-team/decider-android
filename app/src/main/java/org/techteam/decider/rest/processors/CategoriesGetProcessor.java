@@ -28,70 +28,34 @@ public class CategoriesGetProcessor extends RequestProcessor<CategoriesGetReques
         super(context, request);
     }
 
+    @Override
+    protected String getTag() {
+        return TAG;
+    }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.getCategories(getRequest());
+    }
 
-        transactionStarted(operationType, requestId);
-
-        Bundle result = getInitialBundle();
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        ActiveAndroid.beginTransaction();
         try {
-            JSONObject response = apiUI.getCategories(getRequest());
-            Log.i(TAG, response.toString());
-
-            if (response == null) {
-                transactionError(operationType, requestId);
-                cb.onError("No categories found", result);
-                return;
-            }
-
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-
-            ActiveAndroid.beginTransaction();
-            try {
-                JSONArray data = response.getJSONArray("data");
-                for (int i = 0; i < data.length(); ++i) {
-                    JSONObject q = data.getJSONObject(i);
-                    CategoryEntry entry = CategoryEntry.fromJson(q);
-                    CategoryEntry dbEntry = CategoryEntry.byUid(entry.getUid());
-                    if (dbEntry == null || !dbEntry.contentEquals(entry)) {
-                        entry.save();
-                    }
+            JSONArray data = response.getJSONArray("data");
+            for (int i = 0; i < data.length(); ++i) {
+                JSONObject q = data.getJSONObject(i);
+                CategoryEntry entry = CategoryEntry.fromJson(q);
+                CategoryEntry dbEntry = CategoryEntry.byUid(entry.getUid());
+                if (dbEntry == null || !dbEntry.contentEquals(entry)) {
+                    entry.save();
                 }
-                ActiveAndroid.setTransactionSuccessful();
-
-                result.putInt(ServiceCallback.GetCategoriesExtras.COUNT, data.length());
-            } finally {
-                ActiveAndroid.endTransaction();
             }
+            ActiveAndroid.setTransactionSuccessful();
 
-            transactionFinished(operationType, requestId);
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(null, result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+            result.putInt(ServiceCallback.GetCategoriesExtras.COUNT, data.length());
+        } finally {
+            ActiveAndroid.endTransaction();
         }
-
     }
 }

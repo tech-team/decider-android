@@ -27,68 +27,32 @@ public class ImageUploadProcessor extends RequestProcessor<ImageUploadRequest> {
         super(context, request);
     }
 
+    @Override
+    protected String getTag() {
+        return TAG;
+    }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.uploadImage(getRequest());
+    }
 
-        transactionStarted(operationType, requestId);
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        JSONObject data = response.getJSONObject("data");
+        String uid = data.getString("uid");
 
-        Bundle result = getInitialBundle();
+        ActiveAndroid.beginTransaction();
         try {
-            JSONObject response = apiUI.uploadImage(getRequest());
-            Log.i(TAG, response.toString());
+            UploadedImageEntry entry = new UploadedImageEntry(uid, getRequest().getImageOrdinalId());
+            entry.save();
+            ActiveAndroid.setTransactionSuccessful();
 
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-            JSONObject data = response.getJSONObject("data");
-            String uid = data.getString("uid");
-
-            ActiveAndroid.beginTransaction();
-            try {
-                UploadedImageEntry entry = new UploadedImageEntry(uid, getRequest().getImageOrdinalId());
-                entry.save();
-                ActiveAndroid.setTransactionSuccessful();
-
-            } finally {
-                ActiveAndroid.endTransaction();
-            }
-
-
-            if (uid == null) {
-                transactionError(operationType, requestId);
-                cb.onError("Received a null image uid", result);
-                return;
-            }
-
-            result.putString(ServiceCallback.ImageUploadExtras.UID, uid);
-
-            transactionFinished(operationType, requestId);
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(e.getMessage(), result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+        } finally {
+            ActiveAndroid.endTransaction();
         }
 
+        result.putString(ServiceCallback.ImageUploadExtras.UID, uid);
     }
 
     @Override

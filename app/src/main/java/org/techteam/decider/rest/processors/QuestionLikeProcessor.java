@@ -27,65 +27,36 @@ public class QuestionLikeProcessor extends RequestProcessor<QuestionLikeRequest>
         super(context, request);
     }
 
+    @Override
+    protected String getTag() {
+        return TAG;
+    }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.entityVote(getRequest());
+    }
 
-        transactionStarted(operationType, requestId);
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        JSONObject data = response.getJSONObject("data");
+        int entityId = data.getInt("entity_id");
+        int likesCount = data.getInt("likes_count");
+        boolean voted = data.has("voted") ? data.getBoolean("voted") : true;
 
-        Bundle result = getInitialBundle();
+        ActiveAndroid.beginTransaction();
         try {
-            JSONObject response = apiUI.entityVote(getRequest());
-            Log.i(TAG, response.toString());
-
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-
-            JSONObject data = response.getJSONObject("data");
-            int entityId = data.getInt("entity_id");
-            int likesCount = data.getInt("likes_count");
-            boolean voted = data.has("voted") ? data.getBoolean("voted") : true;
-
-            ActiveAndroid.beginTransaction();
-            try {
-                QuestionEntry entry = QuestionEntry.byQId(entityId);
-                entry.likesCount = likesCount;
-                entry.voted = voted;
-                entry.save();
-                ActiveAndroid.setTransactionSuccessful();
-            } finally {
-                ActiveAndroid.endTransaction();
-            }
-
-            result.putInt(ServiceCallback.EntityVoteExtras.ENTITY_ID, entityId);
-            result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, likesCount);
-            transactionFinished(operationType, requestId);
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(e.getMessage(), result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+            QuestionEntry entry = QuestionEntry.byQId(entityId);
+            entry.likesCount = likesCount;
+            entry.voted = voted;
+            entry.save();
+            ActiveAndroid.setTransactionSuccessful();
+        } finally {
+            ActiveAndroid.endTransaction();
         }
 
+        result.putInt(ServiceCallback.EntityVoteExtras.ENTITY_ID, entityId);
+        result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, likesCount);
     }
 
     @Override

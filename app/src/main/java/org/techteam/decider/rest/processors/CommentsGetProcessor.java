@@ -30,72 +30,43 @@ public class CommentsGetProcessor extends RequestProcessor<CommentsGetRequest> {
     }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    protected String getTag() {
+        return TAG;
+    }
 
-        transactionStarted(operationType, requestId);
+    @Override
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.getComments(getRequest());
+    }
 
-        Bundle result = getInitialBundle();
-        try {
-            JSONObject response = apiUI.getComments(getRequest());
-            Log.i(TAG, response.toString());
-
-            if (getRequest().getLoadIntention() == LoadIntention.REFRESH) {
-                CommentEntry.deleteAll();
-            }
-
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-
-            JSONObject data = response.getJSONObject("data");
-            int remainig = data.getInt("remaining"); // TODO
-            JSONArray comments = data.getJSONArray("comments");
-
-            if (comments.length() == 0) {
-                result.putBoolean(ServiceCallback.GetCommentsExtras.FEED_FINISHED, true);
-            } else {
-
-                ActiveAndroid.beginTransaction();
-                try {
-                    for (int i = 0; i < comments.length(); ++i) {
-                        JSONObject q = comments.getJSONObject(i);
-                        CommentEntry entry = CommentEntry.fromJson(q);
-                        entry.saveTotal();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-
-                    result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
-                } finally {
-                    ActiveAndroid.endTransaction();
-                }
-
-                transactionFinished(operationType, requestId);
-            }
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(e.getMessage(), result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        if (getRequest().getLoadIntention() == LoadIntention.REFRESH) {
+            CommentEntry.deleteAll();
         }
 
+        JSONObject data = response.getJSONObject("data");
+        int remainig = data.getInt("remaining"); // TODO
+        JSONArray comments = data.getJSONArray("comments");
+
+        if (comments.length() == 0) {
+            result.putBoolean(ServiceCallback.GetCommentsExtras.FEED_FINISHED, true);
+        } else {
+
+            ActiveAndroid.beginTransaction();
+            try {
+                for (int i = 0; i < comments.length(); ++i) {
+                    JSONObject q = comments.getJSONObject(i);
+                    CommentEntry entry = CommentEntry.fromJson(q);
+                    entry.saveTotal();
+                }
+                ActiveAndroid.setTransactionSuccessful();
+
+                result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
+            } finally {
+                ActiveAndroid.endTransaction();
+            }
+        }
     }
 
     @Override

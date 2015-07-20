@@ -28,57 +28,28 @@ public class QuestionCreateProcessor extends RequestProcessor<QuestionCreateRequ
     }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    protected String getTag() {
+        return TAG;
+    }
 
-        transactionStarted(operationType, requestId);
+    @Override
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.createQuestion(getRequest());
+    }
 
-        Bundle result = getInitialBundle();
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        ActiveAndroid.beginTransaction();
         try {
-            JSONObject response = apiUI.createQuestion(getRequest());
-            Log.i(TAG, response.toString());
+            JSONObject data = response.getJSONObject("data");
+            QuestionEntry entry = QuestionEntry.fromJson(data);
+            entry.saveTotal();
+            result.putInt(ServiceCallback.CreateQuestionExtras.QID, entry.getQId());
+            ActiveAndroid.setTransactionSuccessful();
 
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-
-            ActiveAndroid.beginTransaction();
-            try {
-                JSONObject data = response.getJSONObject("data");
-                QuestionEntry entry = QuestionEntry.fromJson(data);
-                entry.saveTotal();
-                result.putInt(ServiceCallback.CreateQuestionExtras.QID, entry.getQId());
-                ActiveAndroid.setTransactionSuccessful();
-
-            } finally {
-                ActiveAndroid.endTransaction();
-            }
-
-            transactionFinished(operationType, requestId);
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(null, result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+        } finally {
+            ActiveAndroid.endTransaction();
         }
-
     }
 
     @Override

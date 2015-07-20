@@ -28,59 +28,31 @@ public class PollVoteProcessor extends RequestProcessor<PollVoteRequest> {
     }
 
     @Override
-    public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
+    protected String getTag() {
+        return TAG;
+    }
 
-        transactionStarted(operationType, requestId);
+    @Override
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+        return apiUI.pollVote(getRequest());
+    }
 
-        Bundle result = getInitialBundle();
+    @Override
+    public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        int votesCount = response.getInt("votes_count");
+
+        ActiveAndroid.beginTransaction();
         try {
-            JSONObject response = apiUI.pollVote(getRequest());
-            Log.i(TAG, response.toString());
-
-            String status = response.getString("status");
-            if (!status.equalsIgnoreCase("ok")) {
-                transactionError(operationType, requestId);
-                cb.onError("status is not ok. resp = " + response.toString(), result);
-                return;
-            }
-
-            int votesCount = response.getInt("votes_count");
-
-            ActiveAndroid.beginTransaction();
-            try {
-                PollItemEntry entry = PollItemEntry.byPId(getRequest().getPollItemId());
-                entry.votesCount = votesCount;
-                entry.voted = true;
-                entry.save();
-                ActiveAndroid.setTransactionSuccessful();
-            } finally {
-                ActiveAndroid.endTransaction();
-            }
-
-            result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, votesCount);
-            transactionFinished(operationType, requestId);
-            cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            cb.onError(e.getMessage(), result);
-        } catch (InvalidAccessTokenException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
-            cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
-            e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
-            transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
-            cb.onError(e.getMessage(), result);
+            PollItemEntry entry = PollItemEntry.byPId(getRequest().getPollItemId());
+            entry.votesCount = votesCount;
+            entry.voted = true;
+            entry.save();
+            ActiveAndroid.setTransactionSuccessful();
+        } finally {
+            ActiveAndroid.endTransaction();
         }
 
+        result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, votesCount);
     }
 
     @Override
