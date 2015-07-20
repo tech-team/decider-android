@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.content.ImageData;
 
-public class ImageUploadRequest {
+public class ImageUploadRequest extends ApiRequest {
         public static final String URL = "images";
     private final ImageData image;
     private final int imageOrdinalId;
@@ -33,5 +33,10 @@ public class ImageUploadRequest {
 
     public int getImageOrdinalId() {
         return imageOrdinalId;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

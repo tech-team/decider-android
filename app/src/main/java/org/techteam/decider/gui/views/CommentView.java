@@ -13,15 +13,20 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.ProfileActivity;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
 
 
 public class CommentView extends PostView {
+
+    public interface EventListener {
+    }
+
     // data
     private CommentEntry entry;
-    private CommentInteractor commentInteractor;
+    private EventListener eventListener;
 
     private static final int POST_TEXT_MAX_LINES = 5;
 
@@ -76,10 +81,9 @@ public class CommentView extends PostView {
      * Call this from onBindViewHolder
      * @param entry data source
      */
-    public void reuse(CommentEntry entry, CommentInteractor commentInteractor) {
+    public void reuse(CommentEntry entry, EventListener eventListener) {
         this.entry = entry;
-        this.commentInteractor = commentInteractor;
-
+        this.eventListener = eventListener;
         fillFields();
     }
 

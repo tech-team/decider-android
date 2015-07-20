@@ -128,7 +128,7 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void pollVote(int questionId, int pollItemId, ServiceCallback cb) {
+    public void pollVote(int entryPosition, int questionId, int pollItemId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.POLL_VOTE;
@@ -137,7 +137,23 @@ public class ServiceHelper {
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.pollVoteIntent(context, op, requestId, questionId, pollItemId);
+            Intent intent = ServiceIntentBuilder.pollVoteIntent(context, op, requestId, entryPosition, questionId, pollItemId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
+    public void likeQuestion(int entryPosition, int questionId, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.QUESTION_LIKE;
+
+        String requestId = createRequestId(op, questionId);
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.likeQuestionIntent(context, op, requestId, entryPosition, questionId);
             context.startService(intent);
         }
 

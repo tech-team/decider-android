@@ -2,7 +2,7 @@ package org.techteam.decider.rest.api;
 
 import android.os.Bundle;
 
-public class UserGetRequest {
+public class UserGetRequest extends ApiRequest {
     private final String userId;
 
     public static final String URL = "user";
@@ -22,5 +22,10 @@ public class UserGetRequest {
 
     public String getUserId() {
         return userId;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

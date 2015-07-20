@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.content.UserData;
 
-public class PushAuthRequest {
+public class PushAuthRequest extends ApiRequest {
     public static final String URL = "auth";
 
     private final String instanceId;
@@ -32,5 +32,10 @@ public class PushAuthRequest {
 
     public String getRegToken() {
         return regToken;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

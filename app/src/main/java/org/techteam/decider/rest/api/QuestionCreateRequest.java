@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.content.question.QuestionData;
 
-public class QuestionCreateRequest {
+public class QuestionCreateRequest extends ApiRequest {
     private final QuestionData questionData;
 
     public static final String URL = "questions";
@@ -24,5 +24,10 @@ public class QuestionCreateRequest {
 
     public QuestionData getQuestionData() {
         return questionData;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

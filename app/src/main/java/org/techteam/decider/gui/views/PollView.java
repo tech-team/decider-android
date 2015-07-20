@@ -60,9 +60,9 @@ public class PollView extends LinearLayout {
     }
 
     protected void onEntryClick(PollItemView pollItemView, PollItemEntry pollItemEntry) {
-        for (PollItemView item: pollItemViews) {
-            item.setMarked(false);
-        }
+//        for (PollItemView item: pollItemViews) {
+//            item.setMarked(false);
+//        }
 
         if (listener != null) {
             listener.polled(pollItemEntry.getPid());

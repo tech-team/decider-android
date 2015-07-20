@@ -12,9 +12,9 @@ import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.views.CommentInteractor;
 import org.techteam.decider.gui.views.CommentView;
-import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.gui.views.QuestionView;
 
 import java.util.ArrayList;
@@ -24,11 +24,10 @@ public class CommentsListAdapter
         extends CursorRecyclerViewAdapter<CommentsListAdapter.ViewHolder> {
 
     private final QuestionEntry questionEntry;
-    private final QuestionInteractor questionInteractor;
+    private final OnQuestionEventCallback onQuestionEventCallback;
+    private final OnCommentEventCallback onCommentEventCallback;
 
-    private final OnCommentEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private final CommentInteractor commentInteractor;
     private List<CommentEntry> dataset = new ArrayList<>();;
 
     private Context context;
@@ -69,17 +68,15 @@ public class CommentsListAdapter
     public CommentsListAdapter(Cursor contentCursor,
                                Context context,
                                QuestionEntry questionEntry,
-                               QuestionInteractor questionInteractor,
-                               OnCommentEventCallback eventCallback,
-                               OnListScrolledDownCallback scrolledDownCallback,
-                               CommentInteractor commentInteractor) {
+                               OnQuestionEventCallback onQuestionEventCallback,
+                               OnCommentEventCallback onCommentEventCallback,
+                               OnListScrolledDownCallback scrolledDownCallback) {
         super(contentCursor, true);
         this.context = context;
         this.questionEntry = questionEntry;
-        this.questionInteractor = questionInteractor;
-        this.eventCallback = eventCallback;
+        this.onQuestionEventCallback = onQuestionEventCallback;
+        this.onCommentEventCallback = onCommentEventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
-        this.commentInteractor = commentInteractor;
     }
 
     // Create new views (invoked by the layout manager)
@@ -93,7 +90,22 @@ public class CommentsListAdapter
                         .inflate(R.layout.fragment_question_card, parent, false);
 
                 QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
-                questionView.reuse(questionEntry, questionInteractor);
+                questionView.reuse(questionEntry, new QuestionView.EventListener() {
+                    @Override
+                    public void onLikeClick(QuestionEntry post) {
+                        onQuestionEventCallback.onLikeClick(-1, post);
+                    }
+
+                    @Override
+                    public void onVoteClick(QuestionEntry post, int voteId) {
+                        onQuestionEventCallback.onVoteClick(-1, post, voteId);
+                    }
+
+                    @Override
+                    public void onCommentsClick(QuestionEntry post) {
+                        onQuestionEventCallback.onCommentsClick(-1, post);
+                    }
+                });
                 break;
             case VIEW_TYPE_ENTRY:
                 v = LayoutInflater.from(parent.getContext())
@@ -112,7 +124,7 @@ public class CommentsListAdapter
         if (getItemViewType(position) == VIEW_TYPE_ENTRY) {
             cursor.moveToPosition(position - 1);
             CommentEntry entry = CommentEntry.fromCursor(cursor);
-            holder.commentView.reuse(entry, commentInteractor);
+            holder.commentView.reuse(entry, new CommentView.EventListener() {});
         }
 
         //footer visible

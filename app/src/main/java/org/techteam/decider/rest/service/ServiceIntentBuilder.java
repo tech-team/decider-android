@@ -11,6 +11,7 @@ import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.question.QuestionData;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CommentCreateRequest;
+import org.techteam.decider.rest.api.EntityVoteRequest;
 import org.techteam.decider.rest.api.QuestionCreateRequest;
 import org.techteam.decider.rest.api.CategoriesGetRequest;
 import org.techteam.decider.rest.api.CommentsGetRequest;
@@ -77,10 +78,18 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
-    public static Intent pollVoteIntent(Context context, OperationType op, String requestId, int questionId, int pollItemId) {
+    public static Intent pollVoteIntent(Context context, OperationType op, String requestId, int entryPosition, int questionId, int pollItemId) {
         Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(PollVoteRequest.IntentExtras.ENTRY_POSITION, entryPosition);
         intent.putExtra(PollVoteRequest.IntentExtras.QUESTION_ID, questionId);
         intent.putExtra(PollVoteRequest.IntentExtras.POLL_ITEM_ID, pollItemId);
+        return intent;
+    }
+
+    public static Intent likeQuestionIntent(Context context, OperationType op, String requestId, int entryPosition, int questionId) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(EntityVoteRequest.IntentExtras.ENTRY_POSITION, entryPosition);
+        intent.putExtra(EntityVoteRequest.IntentExtras.ENTITY_ID, questionId);
         return intent;
     }
 

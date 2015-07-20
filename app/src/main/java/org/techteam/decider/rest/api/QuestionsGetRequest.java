@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.content.ContentSection;
 
-public class QuestionsGetRequest {
+public class QuestionsGetRequest extends ApiRequest {
     private final ContentSection contentSection;
     private final int limit;
     private final int offset;
@@ -58,5 +58,10 @@ public class QuestionsGetRequest {
 
     public int getLoadIntention() {
         return loadIntention;
+    }
+
+    @Override
+    public String getPath() {
+        return URL;
     }
 }

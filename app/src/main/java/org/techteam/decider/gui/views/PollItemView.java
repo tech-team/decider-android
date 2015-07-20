@@ -74,7 +74,7 @@ public class PollItemView extends FrameLayout {
     protected void onImageClick() {
         if (listener != null) {
             listener.polled(this, this.entry);
-            setMarked(true);
+//            setMarked(true);
         }
     }
 
