@@ -1,6 +1,7 @@
 package org.techteam.decider.gui.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
@@ -18,6 +19,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
+import org.techteam.decider.gui.activities.PreviewImageActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
@@ -61,9 +63,17 @@ public class PollItemView extends FrameLayout {
         imageView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onImageClick();
+                previewImage();
             }
         });
+        imageView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                vote();
+                return true;
+            }
+        });
+
 
         cardView = (CardView) v.findViewById(R.id.item_frame);
         setMarked(false);
@@ -71,11 +81,17 @@ public class PollItemView extends FrameLayout {
         ratingText = (TextView) v.findViewById(R.id.poll_rating);
     }
 
-    protected void onImageClick() {
+    protected void vote() {
         if (listener != null) {
             listener.polled(this, this.entry);
 //            setMarked(true);
         }
+    }
+
+    protected void previewImage() {
+        Intent intent = new Intent(getContext(), PreviewImageActivity.class);
+        intent.putExtra(PreviewImageActivity.IMAGE_URL, ApiUI.resolveUrl(entry.getImageUrl()));
+        getContext().startActivity(intent);
     }
 
     public void setMarked(boolean marked) {
