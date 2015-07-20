@@ -32,6 +32,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.content.entities.DbHelper;
 import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
@@ -238,30 +239,43 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
 
     private void logout() {
         drawer.closeDrawer();
-        CacheHelper.deleteCache(this);
-        AccountManager am = AccountManager.get(this);
-        Account[] accounts = am.getAccountsByType(getApplicationContext().getPackageName());
 
-        final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
+        CleanDataTask task = new CleanDataTask() {
             @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                getUserInfo();
+            protected Void doInBackground(Void... params) {
+                CacheHelper.deleteCache(MainActivity.this);
+                DbHelper.cleanDb();
+                return null;
             }
-        };
 
-        if (accounts.length != 0) {
-            Account account = accounts[0];
-            am.removeAccount(account, new AccountManagerCallback<Boolean>() {
-                @Override
-                public void run(AccountManagerFuture<Boolean> future) {
-                    // restart activity, it will request authorization and receive new user's data
+            @Override
+            protected void onPostExecute(Void v) {
+                AccountManager am = AccountManager.get(MainActivity.this);
+                Account[] accounts = am.getAccountsByType(getApplicationContext().getPackageName());
 
+                final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
+                    @Override
+                    public void run(AccountManagerFuture<Bundle> future) {
+                        getUserInfo();
+                    }
+                };
+
+                if (accounts.length != 0) {
+                    Account account = accounts[0];
+                    am.removeAccount(account, new AccountManagerCallback<Boolean>() {
+                        @Override
+                        public void run(AccountManagerFuture<Boolean> future) {
+                            // restart activity, it will request authorization and receive new user's data
+
+                            getAuthTokenOrExit(cb);
+                        }
+                    }, null);
+                } else {
                     getAuthTokenOrExit(cb);
                 }
-            }, null);
-        } else {
-            getAuthTokenOrExit(cb);
-        }
+            }
+        };
+        task.execute();
     }
 
     public List<CategoryEntry> getSelectedCategories() {
@@ -318,5 +332,14 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
 
             drawer.setHeader(drawerHeader.getView());
         }
+    }
+
+    abstract class CleanDataTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        abstract protected Void doInBackground(Void... params);
+
+        @Override
+        abstract protected void onPostExecute(Void v);
     }
 }

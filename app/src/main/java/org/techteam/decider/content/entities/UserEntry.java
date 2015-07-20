@@ -5,6 +5,7 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.json.JSONException;
@@ -164,5 +165,9 @@ public class UserEntry extends Model {
 
     public Date getBirthday() {
         return birthday;
+    }
+
+    public static void deleteAll() {
+        new Delete().from(UserEntry.class).execute();
     }
 }

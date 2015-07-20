@@ -42,7 +42,7 @@ public class QuestionsLoader extends CursorLoader {
     @Override
     public Cursor loadInBackground() {
         Uri uri = ContentProvider.createUri(QuestionHelper.getClass(contentSection), null);
-        return getContext().getContentResolver().query(uri, null, null, null, "_ID ASC");
+        return getContext().getContentResolver().query(uri, null, null, null, "_id ASC");
     }
 
     public Integer getEntryPosition() {

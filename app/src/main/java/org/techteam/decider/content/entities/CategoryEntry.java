@@ -7,6 +7,7 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.json.JSONException;
@@ -111,5 +112,9 @@ public class CategoryEntry extends Model {
             return true;
         }
         return uid == rhs.getUid() && localizedLabel.equals(rhs.localizedLabel);
+    }
+
+    public static void deleteAll() {
+        new Delete().from(CategoryEntry.class).execute();
     }
 }

@@ -5,6 +5,7 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.json.JSONException;
@@ -76,5 +77,9 @@ public class PollItemEntry extends Model {
 
     public static PollItemEntry byPId(int pid) {
         return new Select().from(PollItemEntry.class).where("pid = ?", pid).executeSingle();
+    }
+
+    public static void deleteAll() {
+        new Delete().from(PollItemEntry.class).execute();
     }
 }

@@ -5,6 +5,7 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 
 import org.techteam.decider.rest.OperationType;
 
@@ -43,5 +44,8 @@ public class TransactionEntry extends Model {
         return operationType;
     }
 
+    public static void deleteAll() {
+        new Delete().from(TransactionEntry.class).execute();
+    }
 
 }
