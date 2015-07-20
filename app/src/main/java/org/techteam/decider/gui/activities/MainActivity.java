@@ -1,8 +1,13 @@
 package org.techteam.decider.gui.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -21,6 +27,8 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
@@ -34,6 +42,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.ImageLoaderInitializer;
 import org.techteam.decider.util.Toaster;
 
 import java.util.List;
@@ -41,6 +50,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements IAuthTokenGetter {
     public static final int AUTH_REQUEST_CODE = 101;
+    private static final int LOGOUT_ID = 1;
     public static String PACKAGE_NAME;
 
 
@@ -147,6 +157,25 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     public void createDrawer(Toolbar toolbar, CategoriesListAdapter categoriesListAdapter) {
         this.categoriesListAdapter = categoriesListAdapter;
 
+        DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
+            @Override
+            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+                ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(MainActivity.this);
+                imageLoader.displayImage(uri.toString(), imageView);
+            }
+
+            @Override
+            public void cancel(ImageView imageView) {
+                ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(MainActivity.this);
+                imageLoader.cancelDisplayTask(imageView);
+            }
+
+            @Override
+            public Drawable placeholder(Context ctx) {
+                return getResources().getDrawable(R.drawable.profile);
+            }
+        });
+
         // Create the AccountHeader
         drawerHeader = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -162,15 +191,40 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 .addDrawerItems(
                         new CategoriesDrawerItem(categoriesListAdapter),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName(R.string.drawer_item_logout)
+                        new SecondaryDrawerItem()
+                                .withName(R.string.drawer_item_logout)
+                                .withIdentifier(LOGOUT_ID)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
-                        return false;
+                        if (iDrawerItem.getIdentifier() == LOGOUT_ID) {
+                            logout();
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
                 })
                 .build();
+    }
+
+    private void logout() {
+        AccountManager am = AccountManager.get(this);
+        Account[] accounts = am.getAccountsByType(getApplicationContext().getPackageName());
+
+        if (accounts.length != 0) {
+            Account account = accounts[0];
+            am.removeAccount(account, new AccountManagerCallback<Boolean>() {
+                @Override
+                public void run(AccountManagerFuture<Boolean> future) {
+                    // restart activity, it will request authorization and receive new user's data
+                    recreate();
+                }
+            }, null);
+        } else {
+            recreate();
+        }
     }
 
     public List<CategoryEntry> getSelectedCategories() {
@@ -195,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
 
             String fullname = "";
             if (entry.getFirstName() != null && entry.getLastName() != null)
-                fullname = entry.getUsername() + " " + entry.getLastName();
+                fullname = entry.getFirstName() + " " + entry.getLastName();
 
             ProfileDrawerItem profile = new ProfileDrawerItem()
                     .withName(username)
