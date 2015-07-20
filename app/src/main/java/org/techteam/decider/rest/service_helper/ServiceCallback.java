@@ -50,6 +50,7 @@ public interface ServiceCallback {
         public static final String COUNT = "COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
         public static final String QUESTION_ID = "QUESTION_ID";
+        public static final String REMAINING = "REMAINING";
     }
 
     class CreateQuestionExtras {

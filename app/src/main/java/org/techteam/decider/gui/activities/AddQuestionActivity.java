@@ -88,8 +88,10 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         // find controls
         postText = (EditText) findViewById(R.id.add_post_text);
