@@ -129,6 +129,11 @@ public class QuestionView extends PostView {
         fillFields();
     }
 
+    public void update(QuestionEntry entry) {
+        this.entry = entry;
+        fillFields();
+    }
+
     protected void fillFields() {
         final Context context = getContext();
 

@@ -175,6 +175,56 @@ public class QuestionDetailsActivity extends AppCompatActivity
             }
         });
 
+        callbacksKeeper.addCallback(OperationType.POLL_VOTE, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toastLong(getApplicationContext(), "Successfully voted");
+
+                QuestionUpdateTask task = new QuestionUpdateTask();
+                task.execute();
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                String msg = "Error. " + message;
+                Toaster.toastLong(getApplicationContext(), msg);
+            }
+        });
+
+        callbacksKeeper.addCallback(OperationType.QUESTION_LIKE, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toastLong(getApplicationContext(), "Like accepted");
+
+                QuestionUpdateTask task = new QuestionUpdateTask();
+                task.execute();
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                String msg = "Error. " + message;
+                Toaster.toastLong(getApplicationContext(), msg);
+            }
+        });
+
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
@@ -234,12 +284,14 @@ public class QuestionDetailsActivity extends AppCompatActivity
 
     @Override
     public void onLikeClick(int entryPosition, QuestionEntry post) {
-
+        Toaster.toast(getApplicationContext(), "Like clicked");
+        serviceHelper.likeQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_LIKE));
     }
 
     @Override
     public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
-
+        Toaster.toast(getApplicationContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
+        serviceHelper.pollVote(entryPosition, post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
     }
 
     @Override
@@ -270,6 +322,26 @@ public class QuestionDetailsActivity extends AppCompatActivity
                     commentsOffset,
                     LoadIntention.REFRESH,
                     callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
+        }
+    }
+
+    class QuestionUpdateTask extends AsyncTask<Void, Void, QuestionEntry> {
+
+        @Override
+        protected QuestionEntry doInBackground(Void... params) {
+            int qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+            Assert.assertNotSame("Q_ID is null", qid, -1);
+
+            QuestionEntry entry = QuestionEntry.byQId(qid);
+            Assert.assertNotSame("entry is null", entry, null);
+
+            return entry;
+        }
+
+        @Override
+        protected void onPostExecute(QuestionEntry entry) {
+            // QuestionView will be migrated into list element
+            adapter.updateQuestionEntry(entry);
         }
     }
 

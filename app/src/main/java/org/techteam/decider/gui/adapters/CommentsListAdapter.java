@@ -23,12 +23,12 @@ import java.util.List;
 public class CommentsListAdapter
         extends CursorRecyclerViewAdapter<CommentsListAdapter.ViewHolder> {
 
-    private final QuestionEntry questionEntry;
+    private QuestionEntry questionEntry;
     private final OnQuestionEventCallback onQuestionEventCallback;
     private final OnCommentEventCallback onCommentEventCallback;
 
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private List<CommentEntry> dataset = new ArrayList<>();;
+    private List<CommentEntry> dataset = new ArrayList<>();
 
     private Context context;
 
@@ -77,6 +77,11 @@ public class CommentsListAdapter
         this.onQuestionEventCallback = onQuestionEventCallback;
         this.onCommentEventCallback = onCommentEventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
+    }
+
+    public void updateQuestionEntry(QuestionEntry questionEntry) {
+        this.questionEntry = questionEntry;
+        notifyItemChanged(0);
     }
 
     // Create new views (invoked by the layout manager)
