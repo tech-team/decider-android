@@ -123,8 +123,9 @@ public class QuestionView extends PostView {
      * Call this from onBindViewHolder
      * @param entry data source
      */
-    public void reuse(QuestionEntry entry) {
+    public void reuse(QuestionEntry entry, EventListener eventListener) {
         this.entry = entry;
+        this.eventListener = eventListener;
         fillFields();
     }
 
@@ -309,9 +310,5 @@ public class QuestionView extends PostView {
                 return null;
             }
         }
-    }
-
-    public void setEventListener(EventListener cb) {
-        eventListener = cb;
     }
 }

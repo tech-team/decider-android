@@ -94,7 +94,8 @@ public class QuestionsListAdapter
             scrolledDownCallback.onScrolledDown();
             return;
         }
-        holder.questionView.setEventListener(new QuestionView.EventListener() {
+        QuestionEntry entry = QuestionHelper.fromCursor(currentSection, cursor);
+        holder.questionView.reuse(entry, new QuestionView.EventListener() {
             @Override
             public void onLikeClick(QuestionEntry post) {
                 onQuestionEventCallback.onLikeClick(position, post);
@@ -110,9 +111,6 @@ public class QuestionsListAdapter
                 onQuestionEventCallback.onCommentsClick(position, post);
             }
         });
-
-        QuestionEntry entry = QuestionHelper.fromCursor(currentSection, cursor);
-        holder.questionView.reuse(entry);
     }
 
     private void share(Context context, QuestionEntry entry) {

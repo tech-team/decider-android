@@ -24,6 +24,7 @@ import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
+import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
@@ -37,7 +38,7 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends AppCompatActivity
-            implements OnListScrolledDownCallback, IAuthTokenGetter, OnQuestionEventCallback {
+            implements OnListScrolledDownCallback, IAuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
     private RetrieveEntryTask retrieveEntryTask;
 
     // children
@@ -100,7 +101,7 @@ public class QuestionDetailsActivity extends AppCompatActivity
         QuestionEntry entry = QuestionEntry.byQId(qid);
         Assert.assertNotSame("entry is null", entry, null);
 
-        adapter = new CommentsListAdapter(null, this, entry, this, null, QuestionDetailsActivity.this, null);
+        adapter = new CommentsListAdapter(null, this, entry, this, this, this);
         commentsView.setAdapter(adapter);
 
         sendCommentButton.setOnClickListener(new View.OnClickListener() {

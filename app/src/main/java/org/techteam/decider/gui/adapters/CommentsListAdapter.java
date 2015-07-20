@@ -25,10 +25,9 @@ public class CommentsListAdapter
 
     private final QuestionEntry questionEntry;
     private final OnQuestionEventCallback onQuestionEventCallback;
+    private final OnCommentEventCallback onCommentEventCallback;
 
-    private final OnCommentEventCallback eventCallback;
     private final OnListScrolledDownCallback scrolledDownCallback;
-    private final CommentInteractor commentInteractor;
     private List<CommentEntry> dataset = new ArrayList<>();;
 
     private Context context;
@@ -70,16 +69,14 @@ public class CommentsListAdapter
                                Context context,
                                QuestionEntry questionEntry,
                                OnQuestionEventCallback onQuestionEventCallback,
-                               OnCommentEventCallback eventCallback,
-                               OnListScrolledDownCallback scrolledDownCallback,
-                               CommentInteractor commentInteractor) {
+                               OnCommentEventCallback onCommentEventCallback,
+                               OnListScrolledDownCallback scrolledDownCallback) {
         super(contentCursor, true);
         this.context = context;
         this.questionEntry = questionEntry;
         this.onQuestionEventCallback = onQuestionEventCallback;
-        this.eventCallback = eventCallback;
+        this.onCommentEventCallback = onCommentEventCallback;
         this.scrolledDownCallback = scrolledDownCallback;
-        this.commentInteractor = commentInteractor;
     }
 
     // Create new views (invoked by the layout manager)
@@ -93,7 +90,7 @@ public class CommentsListAdapter
                         .inflate(R.layout.fragment_question_card, parent, false);
 
                 QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
-                questionView.setEventListener(new QuestionView.EventListener() {
+                questionView.reuse(questionEntry, new QuestionView.EventListener() {
                     @Override
                     public void onLikeClick(QuestionEntry post) {
                         onQuestionEventCallback.onLikeClick(-1, post);
@@ -109,7 +106,6 @@ public class CommentsListAdapter
                         onQuestionEventCallback.onCommentsClick(-1, post);
                     }
                 });
-                questionView.reuse(questionEntry);
                 break;
             case VIEW_TYPE_ENTRY:
                 v = LayoutInflater.from(parent.getContext())
@@ -128,7 +124,7 @@ public class CommentsListAdapter
         if (getItemViewType(position) == VIEW_TYPE_ENTRY) {
             cursor.moveToPosition(position - 1);
             CommentEntry entry = CommentEntry.fromCursor(cursor);
-            holder.commentView.reuse(entry, commentInteractor);
+            holder.commentView.reuse(entry, new CommentView.EventListener() {});
         }
 
         //footer visible
