@@ -5,12 +5,14 @@ import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -261,6 +263,31 @@ public class AddQuestionActivity extends AppCompatActivity implements ActivitySt
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        // if fields are empty
+        if (postText.getText().toString().isEmpty()
+                && leftImageSelector.getImageData() == null
+                && rightImageSelector.getImageData() == null) {
+            super.onBackPressed();
+            return;
+        }
+
+        // if no, ask user if he really wants to exit
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getString(R.string.creating_post))
+                .setMessage(getString(R.string.exit_question_creation))
+                .setPositiveButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
+    }
 
     private class LoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
         @Override
