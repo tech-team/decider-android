@@ -26,10 +26,9 @@ import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
-import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
-import org.techteam.decider.gui.views.QuestionInteractor;
+import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
@@ -155,11 +154,12 @@ public class QuestionsListFragment
                 }
 
                 adapter.setFeedFinished(isFeedFinished);
-                if (insertedCount == 0 && isFeedFinished) {
-                    recyclerView.setVisibility(View.GONE);
+                // 1 is like 0, ... but 1 ("Loading..." entry)
+                if (insertedCount == 0 && adapter.getItemCount() == 1 && isFeedFinished) {
+                    //recyclerView.setVisibility(View.GONE);
                     emptyListView.setVisibility(View.VISIBLE);
                 } else {
-                    recyclerView.setVisibility(View.VISIBLE);
+                    //recyclerView.setVisibility(View.VISIBLE);
                     emptyListView.setVisibility(View.GONE);
                 }
 

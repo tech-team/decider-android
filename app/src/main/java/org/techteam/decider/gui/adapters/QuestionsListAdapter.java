@@ -1,7 +1,6 @@
 package org.techteam.decider.gui.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import org.techteam.decider.content.QuestionHelper;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
-import org.techteam.decider.gui.views.QuestionInteractor;
 import org.techteam.decider.gui.views.QuestionView;
 
 import java.util.ArrayList;
@@ -71,9 +69,7 @@ public class QuestionsListAdapter
             return;
         }
 
-        holder.questionView.setOnQuestionEventCallback(onQuestionEventCallback);
         QuestionEntry entry = QuestionHelper.fromCursor(currentSection, cursor);
-        holder.questionView.reuse(entry, questionInteractor);
         holder.questionView.reuse(entry, new QuestionView.EventListener() {
             @Override
             public void onLikeClick(QuestionEntry post) {
@@ -107,10 +103,6 @@ public class QuestionsListAdapter
             return VIEW_TYPE_ENTRY;
         else
             return VIEW_TYPE_FOOTER;
-    }
-
-    public void setOnQuestionEventCallback(OnQuestionEventCallback cb) {
-        onQuestionEventCallback = cb;
     }
 
     public void setFeedFinished(boolean feedFinished) {
