@@ -278,7 +278,7 @@ public class QuestionsListFragment
     @Override
     public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
         Toaster.toast(activity.getBaseContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
-        serviceHelper.pollVote(post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
+        serviceHelper.pollVote(entryPosition, post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
     }
 
     @Override
@@ -352,11 +352,10 @@ public class QuestionsListFragment
                     insertedCount = args.getInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, -1);
                     insertedCount = insertedCount == -1 ? null : insertedCount;
 
-                    loadIntention = args.getInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+                    loadIntention = args.getInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.NONE);
                     loadedSection = ContentSection.fromInt(args.getInt(QuestionsLoader.BundleKeys.SECTION));
                 }
 
-                //TODO: you may ask: why don't just store section and categories here, as field? idk
                 return new QuestionsLoader(getActivity(), loadedSection, entryPos, insertedCount, loadIntention);
             }
             throw new IllegalArgumentException("Loader with given id is not found");

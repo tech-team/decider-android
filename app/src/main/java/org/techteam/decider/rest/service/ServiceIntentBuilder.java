@@ -77,8 +77,9 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
-    public static Intent pollVoteIntent(Context context, OperationType op, String requestId, int questionId, int pollItemId) {
+    public static Intent pollVoteIntent(Context context, OperationType op, String requestId, int entryPosition, int questionId, int pollItemId) {
         Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(PollVoteRequest.IntentExtras.ENTRY_POSITION, entryPosition);
         intent.putExtra(PollVoteRequest.IntentExtras.QUESTION_ID, questionId);
         intent.putExtra(PollVoteRequest.IntentExtras.POLL_ITEM_ID, pollItemId);
         return intent;

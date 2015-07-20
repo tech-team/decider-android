@@ -88,6 +88,7 @@ public class PollVoteProcessor extends Processor {
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
+        data.putInt(ServiceCallback.PollVoteExtras.ENTRY_POSITION, request.getEntryPosition());
         data.putInt(ServiceCallback.PollVoteExtras.QUESTION_ID, request.getQuestionId());
         data.putInt(ServiceCallback.PollVoteExtras.POLL_ITEM_ID, request.getPollItemId());
         return data;
