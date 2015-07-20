@@ -46,13 +46,12 @@ public class CommentsGetProcessor extends RequestProcessor<CommentsGetRequest> {
         }
 
         JSONObject data = response.getJSONObject("data");
-        int remainig = data.getInt("remaining"); // TODO
+        int remaining = data.getInt("remaining");
         JSONArray comments = data.getJSONArray("comments");
 
         if (comments.length() == 0) {
             result.putBoolean(ServiceCallback.GetCommentsExtras.FEED_FINISHED, true);
         } else {
-
             ActiveAndroid.beginTransaction();
             try {
                 for (int i = 0; i < comments.length(); ++i) {
@@ -63,6 +62,7 @@ public class CommentsGetProcessor extends RequestProcessor<CommentsGetRequest> {
                 ActiveAndroid.setTransactionSuccessful();
 
                 result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
+                result.putInt(ServiceCallback.GetCommentsExtras.REMAINING, remaining);
             } finally {
                 ActiveAndroid.endTransaction();
             }

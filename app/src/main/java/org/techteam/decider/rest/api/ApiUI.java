@@ -237,13 +237,9 @@ public class ApiUI {
     }
 
     public JSONObject entityVote(EntityVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
-        JSONObject data = new JSONObject();
-        data.put("entity", request.getEntityType());
-        data.put("entity_id", request.getEntityId());
         UrlParams params = new UrlParams();
-//        params.add("entity", request.getEntityType()); // TODO: wait for server fix
-//        params.add("entity_id", request.getEntityId());
-        params.add("data", data.toString());
+        params.add("entity", request.getEntityType());
+        params.add("entity_id", request.getEntityId());
 
         HttpResponse response = makeProtectedPostCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {

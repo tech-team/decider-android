@@ -79,8 +79,10 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         // find children
         profileImage = (ImageView) findViewById(R.id.profile_image);

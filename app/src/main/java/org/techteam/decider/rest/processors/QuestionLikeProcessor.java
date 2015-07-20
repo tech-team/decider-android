@@ -56,7 +56,7 @@ public class QuestionLikeProcessor extends RequestProcessor<QuestionLikeRequest>
         }
 
         result.putInt(ServiceCallback.EntityVoteExtras.ENTITY_ID, entityId);
-        result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, likesCount);
+        result.putInt(ServiceCallback.EntityVoteExtras.VOTES_COUNT, likesCount);
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.PollItemEntry;
@@ -39,20 +40,35 @@ public class PollVoteProcessor extends RequestProcessor<PollVoteRequest> {
 
     @Override
     public void postExecute(JSONObject response, Bundle result) throws JSONException {
-        int votesCount = response.getInt("votes_count");
+        JSONArray data = response.getJSONArray("data");
+
+        int requestedItemVotesCount = -1;
 
         ActiveAndroid.beginTransaction();
         try {
-            PollItemEntry entry = PollItemEntry.byPId(getRequest().getPollItemId());
-            entry.votesCount = votesCount;
-            entry.voted = true;
-            entry.save();
+            for (int i = 0; i < data.length(); ++i) {
+                JSONObject item = data.getJSONObject(i);
+                int pollItemId = item.getInt("poll_item_id");
+                int votesCount = item.getInt("votes_count");
+                boolean voted = item.has("voted") ? item.getBoolean("voted") : false;
+                if (pollItemId == getRequest().getPollItemId()) {
+                    requestedItemVotesCount = votesCount;
+                    if (!voted) {
+                        voted = true;
+                    }
+                }
+
+                PollItemEntry entry = PollItemEntry.byPId(pollItemId);
+                entry.votesCount = votesCount;
+                entry.voted = voted;
+                entry.save();
+            }
             ActiveAndroid.setTransactionSuccessful();
         } finally {
             ActiveAndroid.endTransaction();
         }
 
-        result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, votesCount);
+        result.putInt(ServiceCallback.PollVoteExtras.VOTES_COUNT, requestedItemVotesCount);
     }
 
     @Override
