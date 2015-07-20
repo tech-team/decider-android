@@ -3,6 +3,7 @@ package org.techteam.decider.gui.activities;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +25,16 @@ import com.vk.sdk.VKUIHelper;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
+import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
+import org.techteam.decider.rest.service_helper.ServiceCallback;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.Toaster;
 
 import java.util.List;
 
@@ -40,9 +47,13 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     // drawer related stuff
     private AccountHeader drawerHeader;
     private Drawer drawer;
+    private RetrieveUserTask retrieveUserTask;
 
     private CategoriesListAdapter categoriesListAdapter;
     private ApiUI apiUI;
+
+    private ServiceHelper serviceHelper;
+    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
@@ -67,6 +78,31 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
         }
 
         apiUI = new ApiUI(this);
+        serviceHelper = new ServiceHelper(this);
+        callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toast(getApplicationContext(), "GetUser: ok");
+                retrieveUserTask = new RetrieveUserTask();
+                retrieveUserTask.execute();
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                        getAuthToken(null);
+                        return;
+                    case ErrorsExtras.Codes.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                Toaster.toastLong(getApplicationContext(), "GetUser: failed. " + message);
+            }
+        });
+
+        serviceHelper.getUser(apiUI.getCurrentUserId(), callbacksKeeper.getCallback(OperationType.USER_GET));
     }
 
     private void finishAuthorization() {
@@ -115,25 +151,7 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
         drawerHeader = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
-                .addProfiles(
-                        new ProfileDrawerItem()
-                                .withName("Alekseyl")
-                                .withEmail("alekseyl@list.ru")
-                                .withIcon(this
-                                        .getResources()
-                                        .getDrawable(R.drawable.profile))
-                )
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                        String uid = apiUI.getCurrentUserId();
-                        intent.putExtra(ProfileActivity.USER_ID, uid);
-                        startActivity(intent);
-
-                        return false;
-                    }
-                })
+                .addProfiles(new ProfileDrawerItem())
                 .build();
 
         //Now create your drawer and pass the AccountHeader.Result
@@ -155,18 +173,59 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
                 .build();
     }
 
-    public AccountHeader getDrawerHeader() {
-        return drawerHeader;
-    }
-
-    public Drawer getDrawer() {
-        return drawer;
-    }
-
     public List<CategoryEntry> getSelectedCategories() {
         if (categoriesListAdapter == null)
             return null;
 
         return CategoryEntry.getSelected();
+    }
+
+    class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {
+
+        @Override
+        protected UserEntry doInBackground(Void... params) {
+            return UserEntry.byUId(apiUI.getCurrentUserId());
+        }
+
+        @Override
+        protected void onPostExecute(UserEntry entry) {
+            String username = entry.getUsername();
+            if (username == null || username.isEmpty())
+                username = getString(R.string.no_nick);
+
+            String fullname = "";
+            if (entry.getFirstName() != null && entry.getLastName() != null)
+                fullname = entry.getUsername() + " " + entry.getLastName();
+
+            ProfileDrawerItem profile = new ProfileDrawerItem()
+                    .withName(username)
+                    .withEmail(fullname);
+
+            String avatar = entry.getAvatar();
+            if (avatar == null || avatar.isEmpty())
+                profile.withIcon(getResources().getDrawable(R.drawable.profile));
+            else
+                profile.withIcon(ApiUI.resolveUrl(avatar));
+
+
+            drawerHeader = new AccountHeaderBuilder()
+                    .withActivity(MainActivity.this)
+                    .withHeaderBackground(R.drawable.header)
+                    .addProfiles(profile)
+                    .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                        @Override
+                        public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                            String uid = apiUI.getCurrentUserId();
+                            intent.putExtra(ProfileActivity.USER_ID, uid);
+                            startActivity(intent);
+
+                            return false;
+                        }
+                    })
+                    .build();
+
+            drawer.setHeader(drawerHeader.getView());
+        }
     }
 }

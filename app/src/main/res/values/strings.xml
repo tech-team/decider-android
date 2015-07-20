@@ -102,5 +102,7 @@
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
     <string name="no_questions">No questions here yet</string>
+    <string name="error_no_accounts">Error: No accounts to show in drawer.</string>
+    <string name="no_nick">user</string>
 
 </resources>
