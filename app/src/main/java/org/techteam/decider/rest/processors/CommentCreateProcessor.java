@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.CommentEntry;
@@ -39,11 +40,13 @@ public class CommentCreateProcessor extends RequestProcessor<CommentCreateReques
 
     @Override
     public void postExecute(JSONObject response, Bundle result) throws JSONException {
+        JSONArray data = response.getJSONArray("data");
         ActiveAndroid.beginTransaction();
         try {
-            JSONObject data = response.getJSONObject("data");
-            CommentEntry entry = CommentEntry.fromJson(data);
-            entry.saveTotal();
+            for (int i = 0; i < data.length(); ++i) {
+                CommentEntry entry = CommentEntry.fromJson(data.getJSONObject(i));
+                entry.saveTotal();
+            }
             ActiveAndroid.setTransactionSuccessful();
 
         } finally {
