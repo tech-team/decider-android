@@ -7,10 +7,11 @@ public interface ServiceCallback {
     void onError(String operationId, Bundle data, String message);
 
     class ErrorsExtras {
-        public static final String ERROR_CODE = "ERROR_CODE";
+        public static final String GENERIC_ERROR_CODE = "GENERIC_ERROR_CODE";
         public static final String SERVER_ERROR_CODE = "SERVER_ERROR_CODE";
+        public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
-        public class Codes {
+        public class GenericErrors {
             public static final int INVALID_TOKEN = 1;
             public static final int SERVER_ERROR = 2;
         }
@@ -68,5 +69,14 @@ public interface ServiceCallback {
 
     class GetUserExtras {
         public static final String USER_ID = "USER_ID";
+    }
+
+    class EditUserExtras {
+        public static final String USER_ID = "USER_ID";
+        public static final String USERNAME = "USERNAME";
+
+        public class ErrorCodes {
+            public static final int USERNAME_TAKEN = 7006;
+        }
     }
 }

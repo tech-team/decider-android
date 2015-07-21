@@ -9,15 +9,11 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.webkit.ValueCallback;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
@@ -120,12 +116,12 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         getAuthTokenOrExit(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
                 }
