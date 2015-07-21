@@ -120,7 +120,7 @@ public class ImageSelector implements View.OnClickListener {
                 Uri selectedImage = imageHolder.getSource();
 
                 // we've just taken a photo
-                if (data != null) {
+                if (data != null && requestCode == SELECT_IMAGE) {
                     selectedImage = fixUri(data.getData());
                 }
 
