@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -47,7 +46,7 @@ import java.util.List;
 
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
-public class EditProfileActivity extends AppCompatActivity implements ActivityStarter, IAuthTokenGetter {
+public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
     public final static String USER_ID = "USER_ID";
 
     private UserEntry entry;

@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,7 +36,7 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
-public class QuestionDetailsActivity extends AppCompatActivity
+public class QuestionDetailsActivity extends ToolbarActivity
             implements OnListScrolledDownCallback, IAuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
     private RetrieveEntryTask retrieveEntryTask;
 
