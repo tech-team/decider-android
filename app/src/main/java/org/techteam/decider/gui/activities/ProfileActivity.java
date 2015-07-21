@@ -110,22 +110,7 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
         cityText = (TextView) findViewById(R.id.city_text);
         birthdayText = (TextView) findViewById(R.id.birthday_text);
 
-        // edit button available only for current profile
         editButton = (Button) findViewById(R.id.edit_button);
-
-        if (!entry.getUid().equals(ApiUI.getCurrentUserId(this))) {
-            editButton.setVisibility(View.GONE);
-        } else {
-            editButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                    intent.putExtra(EditProfileActivity.USER_ID, getIntent().getStringExtra(USER_ID));
-                    startActivityForResult(intent, EDIT_PROFILE);
-                }
-            });
-        }
-
 
         serviceHelper = new ServiceHelper(this);
         callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
@@ -202,6 +187,21 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
             if (birthday != null) {
                 String date = DateFormat.getDateFormat(ProfileActivity.this).format(birthday);
                 birthdayText.setText(date);
+            }
+
+            // edit button available only for current profile
+            if (!entry.getUid().equals(ApiUI.getCurrentUserId(ProfileActivity.this))) {
+                editButton.setVisibility(View.GONE);
+            } else {
+                editButton.setVisibility(View.VISIBLE);
+                editButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                        intent.putExtra(EditProfileActivity.USER_ID, getIntent().getStringExtra(USER_ID));
+                        startActivityForResult(intent, EDIT_PROFILE);
+                    }
+                });
             }
 
             waitDialog.dismiss();
