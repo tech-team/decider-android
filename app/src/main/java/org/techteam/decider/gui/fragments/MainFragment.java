@@ -87,12 +87,12 @@ public class MainFragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         MainFragment.this.activity.getAuthTokenOrExit(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
                 }
@@ -191,9 +191,7 @@ public class MainFragment
     }
 
     public void invalidatePages() {
-        if (mSectionsPagerAdapter != null) {
-            mSectionsPagerAdapter.invalidateFragments();
-        }
+
     }
 
     //TODO: refactor this out
@@ -230,16 +228,6 @@ public class MainFragment
         @Override
         public int getTextColor() {
             return android.R.color.white;
-        }
-
-        public void invalidateFragments() {
-//            for (int position = 0; position < getCount(); ++position) {
-//                if (fragments[position] != null) {
-//                    destroyItem(null, position, fragments[position]);
-//                }
-//            }
-            fragments = new Fragment[getCount()];
-            onCategorySelectedListeners.clear();
         }
     }
 

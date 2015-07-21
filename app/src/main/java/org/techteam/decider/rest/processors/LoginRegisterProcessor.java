@@ -85,8 +85,8 @@ public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterReques
         } catch (ServerErrorException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
+            result.putInt(ServiceCallback.ErrorsExtras.GENERIC_ERROR_CODE, ServiceCallback.ErrorsExtras.GenericErrors.SERVER_ERROR);
+            result.putInt(ServiceCallback.ErrorsExtras.INTERNAL_SERVER_ERROR, e.getCode());
             cb.onError(e.getMessage(), result);
         }
     }

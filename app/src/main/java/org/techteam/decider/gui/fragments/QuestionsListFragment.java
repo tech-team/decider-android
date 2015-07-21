@@ -24,7 +24,6 @@ import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.ActivityHelper;
-import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
@@ -177,12 +176,12 @@ public class QuestionsListFragment
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 mSwipeRefreshLayout.setRefreshing(false);
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
                 }
@@ -205,12 +204,12 @@ public class QuestionsListFragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
                 }
@@ -232,12 +231,12 @@ public class QuestionsListFragment
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
                 }

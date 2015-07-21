@@ -189,14 +189,24 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 waitDialog.dismiss();
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
-                switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                int genericError = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
+                switch (genericError) {
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         getAuthToken(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                }
+
+                int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
+                switch (serverErrorCode) {
+                    case EditUserExtras.ErrorCodes.USERNAME_TAKEN:
+                        String username = data.getString(EditUserExtras.USERNAME);
+                        Toaster.toastLong(EditProfileActivity.this, "Username \'" + username + "\' is already taken" + message);
+                        return;
+                    default:
+                        break;
                 }
                 Toaster.toastLong(EditProfileActivity.this, "Profile not saved: " + message);
             }
@@ -212,12 +222,12 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onError(String operationId, Bundle data, String message) {
                 waitDialog.dismiss();
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         getAuthToken(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
                 }

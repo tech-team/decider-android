@@ -116,12 +116,12 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                int code = data.getInt(ErrorsExtras.ERROR_CODE);
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
-                    case ErrorsExtras.Codes.INVALID_TOKEN:
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
                         getAuthTokenOrExit(null);
                         return;
-                    case ErrorsExtras.Codes.SERVER_ERROR:
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
                 }

@@ -8,10 +8,7 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.techteam.decider.content.entities.TransactionEntry;
-import org.techteam.decider.content.entities.TransactionStatus;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
 import org.techteam.decider.rest.api.ServerErrorException;
 import org.techteam.decider.rest.api.TokenRefreshFailException;
@@ -40,6 +37,8 @@ public abstract class RequestProcessor<T> extends Processor {
         }
         String status = response.getString("status");
         if (!status.equalsIgnoreCase("ok")) {
+            int code = response.getInt("code");
+            postExecuteError(response, code, result);
             transactionError(operationType, requestId);
             cb.onError("status is not ok. resp = " + response.toString(), result);
             return false;
@@ -49,6 +48,9 @@ public abstract class RequestProcessor<T> extends Processor {
 
     public abstract JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException;
     public abstract void postExecute(JSONObject response, Bundle result) throws JSONException;
+    public void postExecuteError(JSONObject response, int errorCode, Bundle result) throws JSONException {
+        result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, errorCode);
+    }
 
     @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
@@ -72,7 +74,7 @@ public abstract class RequestProcessor<T> extends Processor {
         } catch (InvalidAccessTokenException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.INVALID_TOKEN);
+            result.putInt(ServiceCallback.ErrorsExtras.GENERIC_ERROR_CODE, ServiceCallback.ErrorsExtras.GenericErrors.INVALID_TOKEN);
             cb.onError(e.getMessage(), result);
         } catch (AuthenticatorException e) {
             e.printStackTrace();
@@ -81,8 +83,8 @@ public abstract class RequestProcessor<T> extends Processor {
         } catch (ServerErrorException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
-            result.putInt(ServiceCallback.ErrorsExtras.ERROR_CODE, ServiceCallback.ErrorsExtras.Codes.SERVER_ERROR);
-            result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, e.getCode());
+            result.putInt(ServiceCallback.ErrorsExtras.GENERIC_ERROR_CODE, ServiceCallback.ErrorsExtras.GenericErrors.SERVER_ERROR);
+            result.putInt(ServiceCallback.ErrorsExtras.INTERNAL_SERVER_ERROR, e.getCode());
             cb.onError(e.getMessage(), result);
         }
     }
