@@ -124,6 +124,11 @@ public class QuestionsListFragment
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
@@ -340,8 +345,7 @@ public class QuestionsListFragment
 
     @Override
     public void categorySelected(CategoryEntry category, boolean isChecked) {
-        // TODO:
-        // onRefresh();
+         onRefresh();
     }
 
     @Override
