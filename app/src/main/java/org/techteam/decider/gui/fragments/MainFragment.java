@@ -20,7 +20,6 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
-import org.techteam.decider.gui.activities.ActivityHelper;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
@@ -35,6 +34,9 @@ import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class MainFragment
         extends Fragment
         implements OnCategorySelectedListener {
@@ -45,7 +47,7 @@ public class MainFragment
 
     private Toolbar toolbar;
     private CategoriesListAdapter categoriesListAdapter;
-    private OnCategorySelectedListener onCategorySelectedListener;
+    private List<OnCategorySelectedListener> onCategorySelectedListeners = new LinkedList<>();
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -176,9 +178,16 @@ public class MainFragment
     public void categorySelected(CategoryEntry category, boolean isChecked) {
         Toaster.toast(getActivity(), "Selected");
         category.setSelectedAsync(isChecked);
-        if (onCategorySelectedListener != null) {
-            onCategorySelectedListener.categorySelected(category, isChecked);
-        }
+        int currentFragment = mViewPager.getCurrentItem();
+        QuestionsListFragment f =(QuestionsListFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, currentFragment);
+        f.categorySelected(category, isChecked);
+//        if (onCategorySelectedListeners != null) {
+//            for (OnCategorySelectedListener listener : onCategorySelectedListeners) {
+//                if (listener != null) {
+//                    listener.categorySelected(category, isChecked);
+//                }
+//            }
+//        }
     }
 
     public void invalidatePages() {
@@ -201,7 +210,7 @@ public class MainFragment
         public Fragment getItem(int position) {
             if (fragments[position] == null) {
                 QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
-                // onCategorySelectedListener = f; // TODO: too bad, it's not going to be called every time it is expected
+                onCategorySelectedListeners.add(f);
                 fragments[position] = f;
             }
             return fragments[position];
@@ -230,6 +239,7 @@ public class MainFragment
 //                }
 //            }
             fragments = new Fragment[getCount()];
+            onCategorySelectedListeners.clear();
         }
     }
 
