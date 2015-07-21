@@ -67,19 +67,18 @@ public class QuestionDetailsActivity extends AppCompatActivity
     }
 
     @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
-        if (cb == null) {
-            cb = new AccountManagerCallback<Bundle>() {
-                @Override
-                public void run(AccountManagerFuture<Bundle> future) {
-                    if (future.isCancelled()) {
-                        setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
-                        finish();
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(final AccountManagerCallback<Bundle> cb) {
+        AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                if (!future.isCancelled()) {
+                    if (cb != null) {
+                        cb.run(future);
                     }
                 }
-            };
-        }
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+            }
+        };
+        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

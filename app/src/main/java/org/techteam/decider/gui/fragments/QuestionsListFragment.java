@@ -357,15 +357,6 @@ public class QuestionsListFragment
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == ActivityHelper.GLOBAL_EXIT_RETURN_CODE) {
-            getActivity().setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
-            getActivity().finish();
-            return;
-        }
-    }
-
-    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (isAdded()) {
             Resources res = getResources();

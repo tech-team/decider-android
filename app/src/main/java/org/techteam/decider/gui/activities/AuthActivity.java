@@ -259,7 +259,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        this.finishAffinity();
     }
 
     @Override
