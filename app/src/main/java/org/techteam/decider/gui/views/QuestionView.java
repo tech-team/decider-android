@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
@@ -65,6 +64,8 @@ public class QuestionView extends PostView {
 
     private Button commentsButton;
 
+    ImageLoader imageLoader;
+
     private PorterDuffColorFilter pressedStateFilter =
             new PorterDuffColorFilter(getContext().getResources().getColor(R.color.accent_dark), PorterDuff.Mode.SRC_ATOP);
 
@@ -85,6 +86,8 @@ public class QuestionView extends PostView {
 
     protected void init(Context context) {
         View v = View.inflate(context, R.layout.view_question_entry, this);
+
+        imageLoader = ImageLoaderInitializer.getImageLoader(context);
 
         // find children
         // header
@@ -134,8 +137,10 @@ public class QuestionView extends PostView {
 
         String avatar = entry.getAuthor().getAvatar();
         if (avatar != null) {
-            ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(context);
+            imageLoader.cancelDisplayTask(avatarImage);
             imageLoader.displayImage(ApiUI.resolveUrl(avatar), avatarImage);
+        } else {
+            avatarImage.setImageDrawable(context.getResources().getDrawable(R.drawable.profile));
         }
 
         authorText.setText(entry.getAuthor().getUsername());
@@ -185,17 +190,6 @@ public class QuestionView extends PostView {
                 }
             }
         });
-
-        //TODO: text justification, see:
-        //http://stackoverflow.com/questions/1292575/android-textview-justify-text
-
-        // TODO: mark liked and so on
-
-//        toolbarView.setRating(entry.getRating());
-//        toolbarView._setBayaned(entry.getIsBayan());
-//        toolbarView._setFaved(entry.isFavorite());
-
-        //TODO: set handlers
 
         postText.addEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
             @Override
