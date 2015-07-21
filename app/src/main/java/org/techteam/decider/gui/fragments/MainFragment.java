@@ -164,11 +164,6 @@ public class MainFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == ActivityHelper.GLOBAL_EXIT_RETURN_CODE) {
-            getActivity().setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
-            getActivity().finish();
-            return;
-        }
         if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
             int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
             Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);

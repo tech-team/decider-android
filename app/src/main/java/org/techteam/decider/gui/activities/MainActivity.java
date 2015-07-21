@@ -75,10 +75,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
         AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
             @Override
             public void run(AccountManagerFuture<Bundle> future) {
-                if (future.isCancelled()) {
-                    setResult(ActivityHelper.GLOBAL_EXIT_RETURN_CODE);
-                    finish();
-                } else {
+                if (!future.isCancelled()) {
                     if (cb != null) {
                         cb.run(future);
                     }
