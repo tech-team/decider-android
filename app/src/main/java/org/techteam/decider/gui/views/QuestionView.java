@@ -64,7 +64,7 @@ public class QuestionView extends PostView {
 
     private Button commentsButton;
 
-    ImageLoader imageLoader;
+    private ImageLoader imageLoader;
 
     private PorterDuffColorFilter pressedStateFilter =
             new PorterDuffColorFilter(getContext().getResources().getColor(R.color.accent_dark), PorterDuff.Mode.SRC_ATOP);
@@ -136,12 +136,11 @@ public class QuestionView extends PostView {
         final Context context = getContext();
 
         String avatar = entry.getAuthor().getAvatar();
-        if (avatar != null) {
-            imageLoader.cancelDisplayTask(avatarImage);
+        imageLoader.cancelDisplayTask(avatarImage);
+        if (avatar != null)
             imageLoader.displayImage(ApiUI.resolveUrl(avatar), avatarImage);
-        } else {
+        else
             avatarImage.setImageDrawable(context.getResources().getDrawable(R.drawable.profile));
-        }
 
         authorText.setText(entry.getAuthor().getUsername());
         dateText.setText(getDateString(entry.getCreationDate()));

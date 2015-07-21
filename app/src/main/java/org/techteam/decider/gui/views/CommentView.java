@@ -13,7 +13,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
-import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.ProfileActivity;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
@@ -27,6 +26,8 @@ public class CommentView extends PostView {
     // data
     private CommentEntry entry;
     private EventListener eventListener;
+    private ImageLoader imageLoader;
+
 
     private static final int POST_TEXT_MAX_LINES = 5;
 
@@ -56,6 +57,8 @@ public class CommentView extends PostView {
 
     protected void init(Context context) {
         View v = View.inflate(context, R.layout.view_comment_entry, this);
+
+        imageLoader = ImageLoaderInitializer.getImageLoader(context);
 
         // find children
         // header
@@ -91,10 +94,11 @@ public class CommentView extends PostView {
         Context context = getContext();
 
         String avatar = entry.getAuthor().getAvatar();
-        if (avatar != null) {
-            ImageLoader imageLoader = ImageLoaderInitializer.getImageLoader(context);
+        imageLoader.cancelDisplayTask(avatarImage);
+        if (avatar != null)
             imageLoader.displayImage(ApiUI.resolveUrl(avatar), avatarImage);
-        }
+        else
+            avatarImage.setImageDrawable(context.getResources().getDrawable(R.drawable.profile));
 
         authorText.setText(entry.getAuthor().getUsername());
         dateText.setText(getDateString(entry.getCreationDate()));
