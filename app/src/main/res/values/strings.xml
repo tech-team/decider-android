@@ -109,5 +109,6 @@
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
     <string name="more_comments">More comments</string>
+    <string name="gcm_sender_id">620471085989</string>
 
 </resources>

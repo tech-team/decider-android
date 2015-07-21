@@ -295,7 +295,7 @@ public class ApiUI {
 
     public JSONObject authPush(PushAuthRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
-        params.add("instanceId", request.getInstanceId());
+        params.add("instance_id", request.getInstanceId());
         params.add("reg_token", request.getRegToken());
 
         HttpResponse response = makeProtectedPostCall(resolvePushUrl(request.getPath()), params);

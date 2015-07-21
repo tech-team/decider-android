@@ -4,14 +4,19 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,6 +38,7 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.DbHelper;
 import org.techteam.decider.content.entities.UserEntry;
+import org.techteam.decider.gcm.GcmPreferences;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
@@ -49,6 +55,8 @@ import java.util.List;
 
 
 public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
+    private static final String TAG = MainActivity.class.getName();
+
     public static final int AUTH_REQUEST_CODE = 101;
     private static final int LOGOUT_ID = 1;
     public static String PACKAGE_NAME;
@@ -63,6 +71,8 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
     private ServiceHelper serviceHelper;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+
+    private BroadcastReceiver gcmRegistrationBroadcastReceiver;
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
@@ -129,6 +139,19 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
             }
         });
 
+        gcmRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences.getBoolean(GcmPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.d(TAG, "send token successful");
+                } else {
+                    Log.d(TAG, "send token failed");
+                }
+            }
+        };
+
         getUserInfo();
     }
 
@@ -145,8 +168,18 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
+        serviceHelper.init();
+        LocalBroadcastManager.getInstance(this).registerReceiver(gcmRegistrationBroadcastReceiver,
+                new IntentFilter(GcmPreferences.REGISTRATION_COMPLETE));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        serviceHelper.release();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(gcmRegistrationBroadcastReceiver);
     }
 
     @Override

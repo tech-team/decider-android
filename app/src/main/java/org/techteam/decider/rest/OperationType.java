@@ -12,7 +12,8 @@ public enum OperationType {
     QUESTIONS_GET(true),
     QUESTION_LIKE,
     USER_GET,
-    USER_EDIT;
+    USER_EDIT,
+    PUSH_AUTH;
 
     private boolean canRefresh = false;
 

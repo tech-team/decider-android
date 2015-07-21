@@ -4,11 +4,16 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKSdk;
@@ -25,6 +31,8 @@ import com.vk.sdk.api.VKError;
 
 import org.techteam.decider.R;
 import org.techteam.decider.auth.AccountGeneral;
+import org.techteam.decider.gcm.GcmPreferences;
+import org.techteam.decider.gcm.GcmRegistrationIntentService;
 import org.techteam.decider.gui.activities.lib.AccountAuthenticatorActivity;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -33,6 +41,7 @@ import org.techteam.decider.rest.api.SocialProviders;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Keyboard;
+import org.techteam.decider.util.ServicesChecker;
 import org.techteam.decider.util.Toaster;
 
 
@@ -65,6 +74,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     private Button registerButton;
     private Button loginButton;
     private ImageButton loginViaVKButton;
+
+    private BroadcastReceiver gcmRegistrationBroadcastReceiver;
 
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
@@ -231,6 +242,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
         setAccountAuthenticatorResult(data);
 
+        subscribeGcm();
+
         setResult(Activity.RESULT_OK);
         finish();
     }
@@ -243,17 +256,38 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         saveToken(data, login, password);
     }
 
+    private void subscribeGcm() {
+
+        ServicesChecker.CheckerResult res = ServicesChecker.checkPlayServices(AuthActivity.this);
+
+        switch (res) {
+            case OK:
+                Intent intent = new Intent(this, GcmRegistrationIntentService.class);
+                startService(intent);
+                break;
+            case NOT_OK:
+                break;
+            case NOT_SUPPORTED:
+                Log.i(TAG, "GCM is not supported on this device.");
+                finishAffinity();
+                break;
+        }
+    }
+
 
     @Override
     public void onResume() {
         super.onResume();
         serviceHelper.init();
+        LocalBroadcastManager.getInstance(this).registerReceiver(gcmRegistrationBroadcastReceiver,
+                new IntentFilter(GcmPreferences.REGISTRATION_COMPLETE));
     }
 
     @Override
     public void onPause() {
         super.onPause();
         serviceHelper.release();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(gcmRegistrationBroadcastReceiver);
     }
 
     @Override

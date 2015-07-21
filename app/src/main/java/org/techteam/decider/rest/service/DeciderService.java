@@ -8,6 +8,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CommentCreateRequest;
 import org.techteam.decider.rest.api.EntityVoteRequest;
+import org.techteam.decider.rest.api.PushAuthRequest;
 import org.techteam.decider.rest.api.QuestionCreateRequest;
 import org.techteam.decider.rest.api.CategoriesGetRequest;
 import org.techteam.decider.rest.api.CommentsGetRequest;
@@ -19,6 +20,7 @@ import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.ImageUploadRequest;
 import org.techteam.decider.rest.processors.CommentCreateProcessor;
+import org.techteam.decider.rest.processors.PushAuthProcessor;
 import org.techteam.decider.rest.processors.QuestionCreateProcessor;
 import org.techteam.decider.rest.processors.CategoriesGetProcessor;
 import org.techteam.decider.rest.processors.CommentsGetProcessor;
@@ -136,6 +138,11 @@ public class DeciderService extends IntentService {
             case USER_EDIT: {
                 UserEditRequest request = UserEditRequest.fromBundle(extras);
                 processor = new UserEditProcessor(getBaseContext(), request);
+                break;
+            }
+            case PUSH_AUTH: {
+                PushAuthRequest request = PushAuthRequest.fromBundle(extras);
+                processor = new PushAuthProcessor(getBaseContext(), request);
                 break;
             }
 

@@ -21,8 +21,8 @@ public class DeciderGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
+        Log.i(TAG, "From: " + from);
+        Log.i(TAG, "Message: " + message);
 
         /**
          * Production applications would usually process the message here.
@@ -35,7 +35,7 @@ public class DeciderGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+        sendNotification(data.toString());
     }
 
     private void sendNotification(String message) {
@@ -46,7 +46,7 @@ public class DeciderGcmListenerService extends GcmListenerService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.ic_stat_ic_notification)
+                .setSmallIcon(R.drawable.gender_icon)
                 .setContentTitle("GCM Message")
                 .setContentText(message)
                 .setAutoCancel(true)

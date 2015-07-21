@@ -89,10 +89,6 @@
             android:label="@string/auth_title" >
         </activity>
 
-        <service
-            android:name=".rest.service.DeciderService"
-            android:exported="false" >
-        </service>
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"
@@ -108,6 +104,18 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+
+
+        <service
+            android:name=".rest.service.DeciderService"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name=".gcm.GcmRegistrationIntentService"
+            android:exported="false" >
+        </service>
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
