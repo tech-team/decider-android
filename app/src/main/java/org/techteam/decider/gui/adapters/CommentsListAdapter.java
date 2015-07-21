@@ -6,19 +6,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
-import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.fragments.OnMoreCommentsRequestedCallback;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
-import org.techteam.decider.gui.views.CommentInteractor;
 import org.techteam.decider.gui.views.CommentView;
 import org.techteam.decider.gui.views.QuestionView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommentsListAdapter
         extends CursorRecyclerViewAdapter<CommentsListAdapter.ViewHolder> {
@@ -27,32 +24,16 @@ public class CommentsListAdapter
     private final OnQuestionEventCallback onQuestionEventCallback;
     private final OnCommentEventCallback onCommentEventCallback;
 
-    private final OnListScrolledDownCallback scrolledDownCallback;
-    private List<CommentEntry> dataset = new ArrayList<>();
+    private final OnMoreCommentsRequestedCallback onMoreCommentsRequestedCallback;
 
     private Context context;
+    private Button moreCommentsButton;
 
-    private static final int VIEW_TYPE_ENTRY = 0;
-    private static final int VIEW_TYPE_FOOTER = 1;
-    private static final int VIEW_TYPE_QUESTION = 2;
+    private static final int VIEW_TYPE_QUESTION = 0;
+    private static final int VIEW_TYPE_MORE_COMMENTS_BUTTON = 1;
+    private static final int VIEW_TYPE_COMMENT = 2;
+    private boolean feedFinished;
 
-
-    public void setAll(ArrayList<CommentEntry> entries) {
-        dataset.clear();
-        dataset.addAll(entries);
-    }
-
-    public void addAll(ArrayList<CommentEntry> entries) {
-        dataset.addAll(entries);
-    }
-
-    public boolean isEmpty() {
-        return getItemCount() - 2 == 0; //-footer
-    }
-
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
@@ -60,7 +41,6 @@ public class CommentsListAdapter
 
         public ViewHolder(View v) {
             super(v);
-
             commentView = (CommentView) v.findViewById(R.id.comment_view);
         }
     }
@@ -70,13 +50,13 @@ public class CommentsListAdapter
                                QuestionEntry questionEntry,
                                OnQuestionEventCallback onQuestionEventCallback,
                                OnCommentEventCallback onCommentEventCallback,
-                               OnListScrolledDownCallback scrolledDownCallback) {
+                               OnMoreCommentsRequestedCallback onMoreCommentsRequestedCallback) {
         super(contentCursor, true);
         this.context = context;
         this.questionEntry = questionEntry;
         this.onQuestionEventCallback = onQuestionEventCallback;
         this.onCommentEventCallback = onCommentEventCallback;
-        this.scrolledDownCallback = scrolledDownCallback;
+        this.onMoreCommentsRequestedCallback = onMoreCommentsRequestedCallback;
     }
 
     public void updateQuestionEntry(QuestionEntry questionEntry) {
@@ -84,11 +64,11 @@ public class CommentsListAdapter
         notifyItemChanged(0);
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public CommentsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                             int viewType) {
-        View v;
+        View v = null;
+
         switch (viewType) {
             case VIEW_TYPE_QUESTION:
                 v = LayoutInflater.from(parent.getContext())
@@ -112,37 +92,52 @@ public class CommentsListAdapter
                     }
                 });
                 break;
-            case VIEW_TYPE_ENTRY:
+            case VIEW_TYPE_MORE_COMMENTS_BUTTON:
+                v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.more_comments_button, parent, false);
+                moreCommentsButton = (Button) v.findViewById(R.id.more_comments_button);
+                moreCommentsButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onMoreCommentsRequestedCallback.moreCommentsRequested();
+                    }
+                });
+
+                break;
+            case VIEW_TYPE_COMMENT:
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.fragment_comment_card, parent, false);
                 break;
-            default:
-                v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.list_loading_entry, parent, false);
-                break;
         }
+
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor, final int position) {
-        if (getItemViewType(position) == VIEW_TYPE_ENTRY) {
-            cursor.moveToPosition(position - 1);
+        if (getItemViewType(position) == VIEW_TYPE_COMMENT) {
+            cursor.moveToPosition(position - 2);
             CommentEntry entry = CommentEntry.fromCursor(cursor);
             holder.commentView.reuse(entry, new CommentView.EventListener() {});
-        }
-
-        //footer visible
-        if (position > cursor.getCount() - 2) {
-            scrolledDownCallback.onScrolledDown();
+        } else if (getItemViewType(position) == VIEW_TYPE_MORE_COMMENTS_BUTTON) {
+            updateLoadingEntry();
         }
     }
 
-    public CommentEntry get(int position) {
-        return dataset.get(position);
+    public void setFeedFinished(boolean feedFinished) {
+        this.feedFinished = feedFinished;
+        updateLoadingEntry();
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    private void updateLoadingEntry() {
+        if (moreCommentsButton != null) {
+            if (feedFinished)
+                moreCommentsButton.setVisibility(View.GONE);
+            else
+                moreCommentsButton.setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     public int getItemCount() {
         Cursor cursor = getCursor();
@@ -155,9 +150,9 @@ public class CommentsListAdapter
     public int getItemViewType(int position) {
         if (position == 0)
             return VIEW_TYPE_QUESTION;
-        else if (position < CommentsListAdapter.this.getItemCount() - 1)
-            return VIEW_TYPE_ENTRY;
+        else if (position == 1)
+            return VIEW_TYPE_MORE_COMMENTS_BUTTON;
         else
-            return VIEW_TYPE_FOOTER;
+            return VIEW_TYPE_COMMENT;
     }
 }
