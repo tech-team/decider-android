@@ -110,15 +110,21 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
         cityText = (TextView) findViewById(R.id.city_text);
         birthdayText = (TextView) findViewById(R.id.birthday_text);
 
+        // edit button available only for current profile
         editButton = (Button) findViewById(R.id.edit_button);
-        editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                intent.putExtra(EditProfileActivity.USER_ID, getIntent().getStringExtra(USER_ID));
-                startActivityForResult(intent, EDIT_PROFILE);
-            }
-        });
+        ApiUI apiUI = new ApiUI(this);
+        if (!entry.getUid().equals(apiUI.getCurrentUserId())) {
+            editButton.setVisibility(View.GONE);
+        } else {
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                    intent.putExtra(EditProfileActivity.USER_ID, getIntent().getStringExtra(USER_ID));
+                    startActivityForResult(intent, EDIT_PROFILE);
+                }
+            });
+        }
 
 
         serviceHelper = new ServiceHelper(this);
