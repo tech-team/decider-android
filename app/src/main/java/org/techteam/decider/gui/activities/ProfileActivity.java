@@ -29,6 +29,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.ImageLoaderInitializer;
 import org.techteam.decider.util.Toaster;
 
 import java.util.Date;
@@ -54,6 +55,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
 
     private Button editButton;
 
+    private ImageLoader imageLoader;
 
     private ServiceHelper serviceHelper;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
@@ -98,6 +100,8 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
+        imageLoader = ImageLoaderInitializer.getImageLoader(this);
 
         // find children
         profileImage = (ImageView) findViewById(R.id.profile_image);
@@ -181,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity implements IAuthTokenGett
         protected void onPostExecute(UserEntry entry) {
             String avatarUrl = entry.getAvatar();
             if (avatarUrl != null) {
-                ImageLoader.getInstance().displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
+                imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
             }
 
             toolbar.setTitle(getString(R.string.profile_toolbar_title) + ": " + entry.getUsername());

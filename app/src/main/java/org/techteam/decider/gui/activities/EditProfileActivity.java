@@ -34,6 +34,7 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
+import org.techteam.decider.util.ImageLoaderInitializer;
 import org.techteam.decider.util.Keyboard;
 import org.techteam.decider.util.Toaster;
 import org.techteam.decider.util.image_selector.ActivityStarter;
@@ -72,6 +73,8 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
     private ProgressDialog waitDialog;
+
+    private ImageLoader imageLoader;
 
     private Date birthday;
 
@@ -115,6 +118,8 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
+        imageLoader = ImageLoaderInitializer.getImageLoader(this);
 
         // find children
         profileImage = (ImageView) findViewById(R.id.profile_image);
@@ -269,7 +274,7 @@ public class EditProfileActivity extends AppCompatActivity implements ActivitySt
         protected void onPostExecute(UserEntry entry) {
             String avatarUrl = entry.getAvatar();
             if (avatarUrl != null) {
-                ImageLoader.getInstance().displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
+                imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
             }
 
             nameText.setText(entry.getFirstName());

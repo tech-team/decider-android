@@ -4,10 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -22,24 +22,16 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
-import org.techteam.decider.gui.WorkingFileProvider;
 import org.techteam.decider.gui.activities.ProfileActivity;
 import org.techteam.decider.gui.fragments.ShareHelper;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class QuestionView extends PostView {
@@ -72,6 +64,9 @@ public class QuestionView extends PostView {
     private Button likeButton;
 
     private Button commentsButton;
+
+    private PorterDuffColorFilter pressedStateFilter =
+            new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
 
     public QuestionView(Context context) {
         super(context);
@@ -147,6 +142,10 @@ public class QuestionView extends PostView {
         dateText.setText(getDateString(entry.getCreationDate()));
         postText.setText(entry.getText());
         likeButton.setText("+" + entry.getLikesCount());
+        final int LEFT = 0;
+        // Order: Left, top, right, and bottom
+        likeButton.getCompoundDrawables()[LEFT].setColorFilter(entry.isVoted() ? pressedStateFilter : null);
+
         commentsButton.setText(Integer.toString(entry.getCommentsCount()));
 
         //configure according to SharedPreferences
