@@ -113,8 +113,8 @@ public class MainFragment
             serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
         }
 
-        toolbar = (Toolbar) this.activity.findViewById(R.id.main_toolbar);
-        this.activity.setSupportActionBar(toolbar);
+        toolbar = (Toolbar) activity.findViewById(R.id.main_toolbar);
+        activity.setSupportActionBar(toolbar);
 
 //        ActionBar actionBar = this.activity.getSupportActionBar();
 //        if (actionBar != null) {
@@ -123,23 +123,23 @@ public class MainFragment
 //        }
 
         // setup drawer
-        categoriesListAdapter = new CategoriesListAdapter(null, this.getActivity(), this);
+        categoriesListAdapter = new CategoriesListAdapter(null, activity, this);
         activity.createDrawer(toolbar, categoriesListAdapter);
 
         // sections
         mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) this.activity.findViewById(R.id.sections_pager);
+        mViewPager = (ViewPager) activity.findViewById(R.id.sections_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
         // it's PagerAdapter set.
-        mSlidingTabLayout = (SlidingTabLayout) this.activity.findViewById(R.id.sections_pager_tabs);
+        mSlidingTabLayout = (SlidingTabLayout)activity.findViewById(R.id.sections_pager_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
 
-        mSlidingTabLayout.setBackgroundColor(this.activity.getResources().getColor(R.color.primary));
+        mSlidingTabLayout.setBackgroundColor(activity.getResources().getColor(R.color.primary));
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {

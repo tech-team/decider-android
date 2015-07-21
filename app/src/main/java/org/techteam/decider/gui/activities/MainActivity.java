@@ -9,15 +9,11 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.webkit.ValueCallback;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
@@ -217,7 +213,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
                             logout();
                             return true;
                         } else {
-                            return false;
+                            return true;
                         }
                     }
                 })
@@ -309,6 +305,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
                     .withActivity(MainActivity.this)
                     .withHeaderBackground(R.drawable.header)
                     .addProfiles(profile)
+                    .withDrawer(drawer)
                     .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                         @Override
                         public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
@@ -317,7 +314,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
                             intent.putExtra(ProfileActivity.USER_ID, uid);
                             startActivity(intent);
 
-                            return false;
+                            return true;
                         }
                     })
                     .build();
