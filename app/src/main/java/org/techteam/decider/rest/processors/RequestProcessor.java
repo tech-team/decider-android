@@ -49,7 +49,9 @@ public abstract class RequestProcessor<T> extends Processor {
     public abstract JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException;
     public abstract void postExecute(JSONObject response, Bundle result) throws JSONException;
     public void postExecuteError(JSONObject response, int errorCode, Bundle result) throws JSONException {
+        String msg = response.getString("msg");
         result.putInt(ServiceCallback.ErrorsExtras.SERVER_ERROR_CODE, errorCode);
+        result.putString(ServiceCallback.ErrorsExtras.SERVER_ERROR_MSG, msg);
     }
 
     @Override

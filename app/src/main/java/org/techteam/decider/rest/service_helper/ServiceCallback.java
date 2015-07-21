@@ -9,6 +9,7 @@ public interface ServiceCallback {
     class ErrorsExtras {
         public static final String GENERIC_ERROR_CODE = "GENERIC_ERROR_CODE";
         public static final String SERVER_ERROR_CODE = "SERVER_ERROR_CODE";
+        public static final String SERVER_ERROR_MSG = "SERVER_ERROR_MSG";
         public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
         public class GenericErrors {

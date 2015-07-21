@@ -53,12 +53,13 @@ public class UserEditProcessor extends RequestProcessor<UserEditRequest> {
     @Override
     public void postExecuteError(JSONObject response, int errorCode, Bundle result) throws JSONException {
         super.postExecuteError(response, errorCode, result);
-        result.putString(ServiceCallback.EditUserExtras.USERNAME, getRequest().getUserData().getUsername());
+
     }
 
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
+        data.putString(ServiceCallback.EditUserExtras.USERNAME, getRequest().getUserData().getUsername());
         return data;
     }
 }
