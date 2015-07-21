@@ -29,6 +29,7 @@
             android:drawableEnd="@android:drawable/ic_menu_edit"
             android:drawableRight="@android:drawable/ic_menu_edit"
             android:drawablePadding="8dp"
+            android:visibility="gone"
             android:contentDescription="@string/edit_profile_hint" />
 
 
