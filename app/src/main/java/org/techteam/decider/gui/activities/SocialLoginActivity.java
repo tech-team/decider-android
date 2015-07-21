@@ -1,28 +1,22 @@
 package org.techteam.decider.gui.activities;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import org.techteam.decider.R;
-import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.api.SocialProviders;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
-public class SocialLoginActivity extends AppCompatActivity {
+public class SocialLoginActivity extends ToolbarActivity {
     private static final String TAG = SocialLoginActivity.class.getName();
 
     private WebView webView;
@@ -88,5 +82,4 @@ public class SocialLoginActivity extends AppCompatActivity {
         setResult(Activity.RESULT_CANCELED);
         finish();
     }
-
 }

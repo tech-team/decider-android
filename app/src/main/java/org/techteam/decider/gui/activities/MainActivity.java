@@ -4,7 +4,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,7 +48,7 @@ import org.techteam.decider.util.Toaster;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements IAuthTokenGetter {
+public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
     public static final int AUTH_REQUEST_CODE = 101;
     private static final int LOGOUT_ID = 1;
     public static String PACKAGE_NAME;
@@ -161,20 +159,8 @@ public class MainActivity extends AppCompatActivity implements IAuthTokenGetter 
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-//        if (getFragmentManager().getBackStackEntryCount() == 0) {
-//            super.onBackPressed();
-//            return;
-//        }
-//
-//        getFragmentManager().popBackStack();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 onBackPressed();
                 return true;

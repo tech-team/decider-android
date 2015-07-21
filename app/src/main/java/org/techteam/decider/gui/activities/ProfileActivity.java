@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -34,7 +33,7 @@ import org.techteam.decider.util.Toaster;
 
 import java.util.Date;
 
-public class ProfileActivity extends AppCompatActivity implements IAuthTokenGetter {
+public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter {
     public final static String USER_ID = "USER_ID";
 
     public final static int EDIT_PROFILE = 0;

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -39,7 +38,7 @@ import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageHolder;
 import org.techteam.decider.util.image_selector.ImageSelector;
 
-public class AddQuestionActivity extends AppCompatActivity implements ActivityStarter, IAuthTokenGetter {
+public class AddQuestionActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
     private static final String TAG = AddQuestionActivity.class.getName();
 
     public static final String QUESTION_ID = "QUESTION_ID";

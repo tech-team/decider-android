@@ -64,25 +64,16 @@
             android:name=".gui.activities.QuestionDetailsActivity"
             android:label="@string/add_post_toolbar_title"
             android:windowSoftInputMode="adjustResize|stateHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.techteam.decider.gui.activities.MainActivity" />
         </activity>
         <activity
             android:name=".gui.activities.ProfileActivity"
             android:label="@string/profile_toolbar_title"
             android:windowSoftInputMode="adjustResize|stateHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.techteam.decider.gui.activities.MainActivity" />
         </activity>
         <activity
             android:name=".gui.activities.EditProfileActivity"
             android:label="@string/profile_toolbar_title"
             android:windowSoftInputMode="adjustResize|stateHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.techteam.decider.gui.activities.ProfileActivity" />
         </activity>
         <activity
             android:name=".gui.activities.PreviewImageActivity"
@@ -96,9 +87,6 @@
         <activity
             android:name=".gui.activities.SocialLoginActivity"
             android:label="@string/auth_title" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.techteam.decider.gui.activities.AuthActivity" />
         </activity>
 
         <service
