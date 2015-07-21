@@ -9,11 +9,15 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.webkit.ValueCallback;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
@@ -253,11 +257,12 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
                         @Override
                         public void run(AccountManagerFuture<Boolean> future) {
                             // restart activity, it will request authorization and receive new user's data
-
+//                            recreate();
                             getAuthTokenOrExit(cb);
                         }
                     }, null);
                 } else {
+//                    recreate();
                     getAuthTokenOrExit(cb);
                 }
             }
