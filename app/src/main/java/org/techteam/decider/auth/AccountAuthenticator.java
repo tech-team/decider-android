@@ -88,7 +88,6 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(System.currentTimeMillis() + expires * 1000));
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.USER_ID, userId);
-                    apiUI.setCurrentUserId(userId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -112,8 +112,8 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
 
         // edit button available only for current profile
         editButton = (Button) findViewById(R.id.edit_button);
-        ApiUI apiUI = new ApiUI(this);
-        if (!entry.getUid().equals(apiUI.getCurrentUserId())) {
+
+        if (!entry.getUid().equals(ApiUI.getCurrentUserId(this))) {
             editButton.setVisibility(View.GONE);
         } else {
             editButton.setOnClickListener(new View.OnClickListener() {

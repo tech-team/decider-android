@@ -60,7 +60,6 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
     private RetrieveUserTask retrieveUserTask;
 
     private CategoriesListAdapter categoriesListAdapter;
-    private ApiUI apiUI;
 
     private ServiceHelper serviceHelper;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
@@ -106,7 +105,6 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
             });
         }
 
-        apiUI = new ApiUI(this);
         serviceHelper = new ServiceHelper(this);
         callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
             @Override
@@ -135,8 +133,9 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
     }
 
     private void getUserInfo() {
-        if (apiUI.getCurrentUserId() != null) {
-            serviceHelper.getUser(apiUI.getCurrentUserId(), callbacksKeeper.getCallback(OperationType.USER_GET));
+        String currentUserId = ApiUI.getCurrentUserId(MainActivity.this);
+        if (currentUserId != null) {
+            serviceHelper.getUser(currentUserId, callbacksKeeper.getCallback(OperationType.USER_GET));
         }
     }
 
@@ -277,7 +276,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
         @Override
         protected UserEntry doInBackground(Void... params) {
-            return UserEntry.byUId(apiUI.getCurrentUserId());
+            return UserEntry.byUId(ApiUI.getCurrentUserId(MainActivity.this));
         }
 
         @Override
@@ -309,7 +308,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
                         @Override
                         public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
                             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                            String uid = apiUI.getCurrentUserId();
+                            String uid = ApiUI.getCurrentUserId(MainActivity.this);
                             intent.putExtra(ProfileActivity.USER_ID, uid);
                             startActivity(intent);
 

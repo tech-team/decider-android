@@ -77,14 +77,8 @@ public class ApiUI {
         return res.getString(AccountManager.KEY_AUTHTOKEN);
     }
 
-    public void setCurrentUserId(String userId) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PrefsKeys.CURRENT_USER, userId);
-        editor.apply();
-    }
-
-    public String getCurrentUserId() {
-        AccountManager am = AccountManager.get(this.context);
+    public static String getCurrentUserId(Context context) {
+        AccountManager am = AccountManager.get(context);
         Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
         if (accounts.length == 0) {
             return null;

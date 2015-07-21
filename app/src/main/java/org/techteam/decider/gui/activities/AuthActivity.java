@@ -222,7 +222,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(expires));
         mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
         mAccountManager.setUserData(account, ServiceCallback.LoginRegisterExtras.USER_ID, userId);
-        apiUI.setCurrentUserId(userId);
 
 
         data.putString(AccountManager.KEY_ACCOUNT_NAME, login);
