@@ -75,7 +75,7 @@
     <string name="city_hint">Город...</string>
     <string name="country_hint">Страна...</string>
     <string name="creating_post">Создание вопроса</string>
-    <string name="date_hint">01.02.1992</string>
+    <string name="date_hint">День рождения...</string>
     <string name="divider">Разделитель</string>
     <string name="edit_profile_hint">Редактировать профиль</string>
     <string name="error_no_accounts">Ошибка: Нет учётной записи для отображения.</string>

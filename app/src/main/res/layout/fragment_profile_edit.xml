@@ -124,6 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/gender_icon"
+                    android:layout_gravity="center_vertical"
                     android:contentDescription="@string/gender_icon" />
 
                 <Spinner
@@ -146,15 +147,16 @@
                     android:id="@+id/date_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:src="@android:drawable/ic_menu_today"
                     android:contentDescription="@string/birthday_icon" />
 
-                <EditText
+                <Button
                     android:id="@+id/birthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="date"
-                    android:ems="10"
+                    android:gravity="start|center"
+                    style="?android:borderlessButtonStyle"
                     android:hint="@string/date_hint"/>
 
                 <ImageView
@@ -170,6 +172,7 @@
                     android:id="@+id/country_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:src="@android:drawable/ic_menu_myplaces"
                     android:contentDescription="@string/location_icon" />
 
@@ -202,6 +205,7 @@
                     android:id="@+id/about_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:src="@android:drawable/ic_menu_edit"
                     android:contentDescription="@string/about_icon" />
 

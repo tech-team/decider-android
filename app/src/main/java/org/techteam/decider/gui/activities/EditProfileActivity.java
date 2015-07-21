@@ -65,7 +65,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     private ArrayAdapter<Gender> genderAdapter;
     private EditText countryText;
     private EditText cityText;
-    private EditText birthdayText;
+    private Button birthdayText;
 
     private Button saveButton;
 
@@ -135,7 +135,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         genderSpinner = (Spinner) findViewById(R.id.gender);
         countryText = (EditText) findViewById(R.id.country);
         cityText = (EditText) findViewById(R.id.city);
-        birthdayText = (EditText) findViewById(R.id.birthday);
+        birthdayText = (Button) findViewById(R.id.birthday);
 
         List<Gender> genders = new ArrayList<>();
         genders.add(new Gender(UserEntry.Gender.None));
@@ -159,7 +159,9 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             public void onClick(View v) {
                 Date date = entry.getBirthday();
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTime(date);
+
+                if (date != null)
+                    calendar.setTime(date);
 
                 DatePickerDialog dialog = new DatePickerDialog(EditProfileActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -280,6 +282,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
             }
 
+            nickNameText.setText(entry.getUsername());
             nameText.setText(entry.getFirstName());
             surnameText.setText(entry.getLastName());
             countryText.setText(entry.getCountry());

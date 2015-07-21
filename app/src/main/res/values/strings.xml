@@ -81,7 +81,7 @@
     <string name="country_hint">Country...</string>
     <string name="about_hint">I am...</string>
     <string name="about_icon">About icon</string>
-    <string name="date_hint">01.02.1992</string>
+    <string name="date_hint">Birthday...</string>
     <string name="profile_edit_toolbar_title">Edit profile</string>
     <string name="save_profile">Save</string>
     <string name="save_profile_hint">Save profile</string>
