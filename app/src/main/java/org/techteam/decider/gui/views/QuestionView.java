@@ -66,7 +66,7 @@ public class QuestionView extends PostView {
     private Button commentsButton;
 
     private PorterDuffColorFilter pressedStateFilter =
-            new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
+            new PorterDuffColorFilter(getContext().getResources().getColor(R.color.accent_dark), PorterDuff.Mode.SRC_ATOP);
 
     public QuestionView(Context context) {
         super(context);
