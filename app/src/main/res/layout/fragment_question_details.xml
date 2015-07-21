@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:paddingTop="8dp"
+        android:paddingTop="4dp"
         android:background="@android:color/white"
         >
 
@@ -43,7 +43,7 @@
             android:id="@+id/comment_send"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/comment_send_button"
+            android:src="@drawable/ic_action_send_now"
             style="?android:attr/borderlessButtonStyle"
             android:contentDescription="@string/send_comment" />
 
