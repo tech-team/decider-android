@@ -24,7 +24,7 @@ import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
-import org.techteam.decider.gui.fragments.OnListScrolledDownCallback;
+import org.techteam.decider.gui.fragments.OnMoreCommentsRequestedCallback;
 import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
@@ -37,7 +37,7 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends ToolbarActivity
-            implements OnListScrolledDownCallback, IAuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
+            implements OnMoreCommentsRequestedCallback, IAuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
     private RetrieveEntryTask retrieveEntryTask;
 
     // children
@@ -135,9 +135,11 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int questionId = data.getInt(GetCommentsExtras.QUESTION_ID, -1);
                 int insertedCount = data.getInt(GetCommentsExtras.COUNT, -1);
                 int loadIntention = data.getInt(GetCommentsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
+                int remaining = data.getInt(GetCommentsExtras.REMAINING, 0);
 
                 commentsOffset += insertedCount;
 
+                adapter.setFeedFinished(remaining == 0);
                 if (!isFeedFinished) {
                     Bundle args = new Bundle();
                     args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
@@ -285,7 +287,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
     }
 
     @Override
-    public void onScrolledDown() {
+    public void moreCommentsRequested() {
 //        int intention;
 //        if (adapter.getCursor().getCount() == 0) {
 //            intention = LoadIntention.REFRESH;
