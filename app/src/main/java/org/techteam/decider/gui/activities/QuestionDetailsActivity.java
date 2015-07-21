@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import junit.framework.Assert;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
@@ -282,7 +283,18 @@ public class QuestionDetailsActivity extends ToolbarActivity
         String text = commentEdit.getText().toString();
         commentEdit.setText("");
 
-        serviceHelper.createComment(new CommentData(text, getIntent().getIntExtra(BundleKeys.Q_ID, -1), false),
+        int questionId = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+        int lastCommentId = CommentData.NO_LAST_COMMENT_ID;
+
+        Cursor commentsCursor = adapter.getCursor();
+        int prevPosition = commentsCursor.getPosition();
+        if (commentsCursor.moveToLast()) {
+            CommentEntry commentEntry = CommentEntry.fromCursor(commentsCursor);
+            lastCommentId = commentEntry.getCid();
+            commentsCursor.moveToPosition(prevPosition);
+        }
+
+        serviceHelper.createComment(new CommentData(text, questionId, lastCommentId, false),
                 callbacksKeeper.getCallback(OperationType.COMMENT_CREATE));
     }
 
