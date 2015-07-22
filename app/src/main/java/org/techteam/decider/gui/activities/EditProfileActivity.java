@@ -4,11 +4,13 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -49,6 +51,8 @@ import static org.techteam.decider.content.entities.UserEntry.byUId;
 
 public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
     public final static String USER_ID = "USER_ID";
+    public final static String REGISTRATION_DATA = "REGISTRATION_DATA";
+
     private final String USER_DATA = "USER_DATA";
 
     private UserEntry entry;
@@ -186,8 +190,9 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
+                //TODO: translate toasts
                 Toaster.toast(EditProfileActivity.this, "Profile saved");
-                setResult(RESULT_OK);
+                setResult(RESULT_OK, getIntent());  // data loopback
                 finish();
             }
 
@@ -242,7 +247,16 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
         if (savedInstanceState == null) {
             waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait), true);
-            serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
+
+            Bundle registrationData = getIntent().getBundleExtra(REGISTRATION_DATA);
+            if (registrationData != null) {
+                // we are at the last phase of registration
+                String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
+                //TODO: pass token explicitly
+                //serviceHelper.getUser(uid, token, callbacksKeeper.getCallback(OperationType.USER_GET));
+            } else {
+                serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
+            }
         } else {
             UserData userData = savedInstanceState.getParcelable(USER_DATA);
             if (userData != null) {
@@ -253,7 +267,16 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     private void saveData() {
         UserData userData = serialize();
-        serviceHelper.editUser(userData, callbacksKeeper.getCallback(OperationType.USER_EDIT));
+
+        Bundle registrationData = getIntent().getBundleExtra(REGISTRATION_DATA);
+        if (registrationData != null) {
+            // we are at the last phase of registration
+            String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
+            //TODO: pass token explicitly
+            //serviceHelper.editUser(userData, token, callbacksKeeper.getCallback(OperationType.USER_EDIT));
+        } else {
+            serviceHelper.editUser(userData, callbacksKeeper.getCallback(OperationType.USER_EDIT));
+        }
     }
 
     private UserData serialize() {
@@ -366,4 +389,20 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         return 0;
     }
 
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getString(R.string.editing_profile))
+                .setMessage(getString(R.string.exit_profile_editing))
+                .setPositiveButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
+    }
 }

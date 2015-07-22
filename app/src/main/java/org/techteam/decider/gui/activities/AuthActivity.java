@@ -2,32 +2,19 @@ package org.techteam.decider.gui.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
-
-import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.VKSdk;
-import com.vk.sdk.VKSdkListener;
-import com.vk.sdk.VKUIHelper;
-import com.vk.sdk.api.VKError;
 
 import org.techteam.decider.R;
 import org.techteam.decider.auth.AccountGeneral;
@@ -36,7 +23,6 @@ import org.techteam.decider.gcm.GcmRegistrationIntentService;
 import org.techteam.decider.gui.activities.lib.AccountAuthenticatorActivity;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
-import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.api.SocialProviders;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
@@ -53,18 +39,10 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
     public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
 
-    public static final String KEY_ERROR_MESSAGE = "ERR_MSG";
-
     public final static String PARAM_USER_PASS = "USER_PASS";
-
-    private final int REQ_SIGNUP = 1;
 
     private final static String PACKAGE_NAME = "org.techteam.decider";
 
-    private static final String VK_APP_ID = "4855698";
-    private static final String VK_AUTH_SCOPE = "";
-
-    private ApiUI apiUI;
     private AccountManager mAccountManager;
 
     // controls
@@ -86,6 +64,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private static final class ActivityCodes {
         public static final int SOCIAL_LOGIN = 1001;
+        public static final int FINISH_REGISTRATION = 1002;
     }
 
     @Override
@@ -95,7 +74,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.fragment_auth);
 
-        apiUI = new ApiUI(this);
         mAccountManager = AccountManager.get(getBaseContext());
 
         // find controls
@@ -143,7 +121,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(AuthActivity.this, "Register: ok");
-                finishLogin(data);
+                requestUsername(data);
             }
 
             @Override
@@ -163,6 +141,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         }
     }
 
+    private void requestUsername(Bundle registrationData) {
+        Intent finishRegistrationIntent = new Intent(AuthActivity.this, EditProfileActivity.class);
+        finishRegistrationIntent.putExtra(EditProfileActivity.REGISTRATION_DATA, registrationData);
+        String uid = registrationData.getString(ServiceCallback.LoginRegisterExtras.USER_ID);
+        finishRegistrationIntent.putExtra(EditProfileActivity.USER_ID, uid);
+        startActivityForResult(finishRegistrationIntent, ActivityCodes.FINISH_REGISTRATION);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -176,7 +162,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         String password = passwordText.getText().toString();
 
         if (email.equals("") || password.equals("")) {
-            Toaster.toast(AuthActivity.this, "email or password are empty");
+            Toaster.toast(AuthActivity.this, getString(R.string.empty_credentials));
             return;
         }
 
@@ -191,7 +177,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
 
         if (email.equals("") || password.equals("")) {
-            Toaster.toast(AuthActivity.this, "email or password are empty");
+            Toaster.toast(AuthActivity.this, getString(R.string.empty_credentials));
             return;
         }
 
@@ -297,15 +283,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK)
+            return;
+
         if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
-            if (resultCode == Activity.RESULT_OK) {
-                String username = data.getStringExtra(ServiceCallback.LoginRegisterExtras.USER_ID);
-
-                saveToken(data.getExtras(), username, "dummy");
-            }
-
-        } else {
+            requestUsername(data.getExtras());
+        } else if (requestCode == ActivityCodes.FINISH_REGISTRATION) {
+            Bundle registrationData = data.getBundleExtra(EditProfileActivity.REGISTRATION_DATA);
+            finishLogin(registrationData);
         }
     }
 }

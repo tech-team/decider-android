@@ -104,4 +104,5 @@
     <string name="save_profile_hint">Сохранить профиль</string>
     <string name="saving_profile">Сохранение профиля</string>
     <string name="surname_hint">Фамилия...</string>
+    <string name="empty_credentials">Пожалуйста, заполните поля логин и пароль</string>
 </resources>
