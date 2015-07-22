@@ -109,7 +109,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(AuthActivity.this, "Login: ok");
-                finishLogin(data);
+                String username = data.getString(LoginRegisterExtras.USERNAME);
+                String password = data.getString(LoginRegisterExtras.PASSWORD);
+                saveToken(data, username, password);
             }
 
             @Override
@@ -234,14 +236,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         finish();
     }
 
-    private void finishLogin(Bundle data) {
-        Log.d(TAG, "> finishLogin");
-
-        String login = data.getString(ServiceCallback.LoginRegisterExtras.LOGIN);
-        String password = data.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
-        saveToken(data, login, password);
-    }
-
     private void subscribeGcm() {
 
         ServicesChecker.CheckerResult res = ServicesChecker.checkPlayServices(AuthActivity.this);
@@ -290,7 +284,12 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             requestUsername(data.getExtras());
         } else if (requestCode == ActivityCodes.FINISH_REGISTRATION) {
             Bundle registrationData = data.getExtras();
-            finishLogin(registrationData);
+            String username = registrationData.getString(ServiceCallback.LoginRegisterExtras.USERNAME);
+            String password = registrationData.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
+            if (password == null) {
+                password = "dummy";
+            }
+            saveToken(registrationData, username, password);
         }
     }
 }

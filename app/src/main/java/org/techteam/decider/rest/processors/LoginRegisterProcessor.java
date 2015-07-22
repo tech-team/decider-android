@@ -43,6 +43,7 @@ public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterReques
         JSONObject userJson = data.getJSONObject("user");
 
         String uid = null;
+        String username = null;
 
         ActiveAndroid.beginTransaction();
         try {
@@ -51,10 +52,12 @@ public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterReques
             ActiveAndroid.setTransactionSuccessful();
 
             uid = entry.getUid();
+            username = entry.getUsername();
         } finally {
             ActiveAndroid.endTransaction();
         }
 
+        result.putString(ServiceCallback.LoginRegisterExtras.USERNAME, username);
         result.putString(ServiceCallback.LoginRegisterExtras.TOKEN, apiUI.extractToken(data));
         result.putLong(ServiceCallback.LoginRegisterExtras.EXPIRES, System.currentTimeMillis() + apiUI.extractTokenExpires(data) * 1000);
         result.putString(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, apiUI.extractRefreshToken(data));

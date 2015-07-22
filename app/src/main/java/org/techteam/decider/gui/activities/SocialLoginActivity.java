@@ -60,7 +60,7 @@ public class SocialLoginActivity extends ToolbarActivity {
                     String accessToken = finalUri.getQueryParameter("access_token");
                     long expires = System.currentTimeMillis() + Long.parseLong(finalUri.getQueryParameter("expires")) * 1000;
                     String refreshToken = finalUri.getQueryParameter("refresh_token");
-                    String userId = finalUri.getQueryParameter("user_id"); // TODO: not sure about parameter name
+                    String userId = finalUri.getQueryParameter("user_id");
 
                     Intent data = new Intent();
                     data.putExtra(ServiceCallback.LoginRegisterExtras.TOKEN, accessToken);

@@ -200,16 +200,16 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
-                //TODO: translate toasts
-                Toaster.toast(EditProfileActivity.this, "Profile saved");
 
-                // social auth
-                Intent intent = getIntent();
-                if (intent.getStringExtra(ServiceCallback.LoginRegisterExtras.LOGIN) == null) {
-                    intent.putExtra(ServiceCallback.LoginRegisterExtras.LOGIN, nickNameText.getText().toString());
-                }
+                Toaster.toast(EditProfileActivity.this, R.string.profile_saved);
 
-                setResult(RESULT_OK, intent);  // data loopback
+                String username = data.getString(EditUserExtras.USERNAME);
+
+                Intent intent = new Intent();
+                intent.putExtras(getIntent().getBundleExtra(REGISTRATION_DATA));
+                intent.putExtra(LoginRegisterExtras.USERNAME, username);
+
+                setResult(RESULT_OK, intent);
                 finish();
             }
 

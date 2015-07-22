@@ -114,5 +114,6 @@
     <string name="editing_profile">Profile editing</string>
     <string name="exit_profile_editing">Do you really want to exit?\nData won\'t be saved.</string>
     <string name="shared_by">Shared by Decider app</string>
+    <string name="profile_saved">Profile saved</string>
 
 </resources>
