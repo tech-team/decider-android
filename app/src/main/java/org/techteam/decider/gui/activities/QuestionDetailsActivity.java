@@ -187,6 +187,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 Bundle args = new Bundle();
                 args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
                 args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
+                args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.APPEND);
                 getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
             }
 
@@ -444,11 +445,14 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 if (entryPos != null) {
                     adapter.swapCursor(newCursor, entryPos);
                 } else if (count != null) {
+                    count -= 1;
                     commentsOffset += count;
                     if (prepend) {
                         adapter.swapCursor(newCursor, 0, count);
+                        commentsView.scrollToPosition(count + 2);
                     } else {
-                        adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
+                        adapter.swapCursor(newCursor, 2 + newCursor.getCount() - count, count);
+                        commentsView.scrollToPosition(adapter.getItemCount() - 1);
                     }
                 } else {
                     commentsOffset = newCursor.getCount();
