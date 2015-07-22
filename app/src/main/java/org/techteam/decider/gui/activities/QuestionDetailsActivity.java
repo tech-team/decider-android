@@ -155,6 +155,8 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     Bundle args = new Bundle();
                     args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
                     args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
+                    args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
+                    args.putBoolean(CommentsLoader.BundleKeys.PREPEND, true);
                     getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
                 }
             }
@@ -406,6 +408,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 Integer entryPos = null;
                 Integer insertedCount = null;
                 int loadIntention = LoadIntention.REFRESH;
+                boolean prepend = false;
                 if (args != null) {
                     questionId = args.getInt(CommentsLoader.BundleKeys.QUESTION_ID, -1);
                     if (questionId == -1) questionId = null;
@@ -417,9 +420,11 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     if (insertedCount == -1) insertedCount = null;
 
                     loadIntention = args.getInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
+
+                    prepend = args.getBoolean(CommentsLoader.BundleKeys.PREPEND, false);
                 }
 
-                return new CommentsLoader(QuestionDetailsActivity.this, questionId, entryPos, insertedCount, loadIntention);
+                return new CommentsLoader(QuestionDetailsActivity.this, questionId, entryPos, insertedCount, loadIntention, prepend);
             }
             throw new IllegalArgumentException("Loader with given id is not found");
         }
@@ -430,6 +435,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
             Integer entryPos = questionsLoader.getEntryPosition();
             Integer count = questionsLoader.getInsertedCount();
             int loadIntention = questionsLoader.getLoadIntention();
+            boolean prepend = questionsLoader.isPrepend();
 
             if (loadIntention == LoadIntention.REFRESH) {
                 commentsOffset = newCursor.getCount();
@@ -439,7 +445,11 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     adapter.swapCursor(newCursor, entryPos);
                 } else if (count != null) {
                     commentsOffset += count;
-                    adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
+                    if (prepend) {
+                        adapter.swapCursor(newCursor, 0, count);
+                    } else {
+                        adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
+                    }
                 } else {
                     commentsOffset = newCursor.getCount();
                     adapter.swapCursor(newCursor);

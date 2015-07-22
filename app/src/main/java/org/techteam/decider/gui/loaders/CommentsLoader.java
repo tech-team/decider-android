@@ -15,6 +15,7 @@ public class CommentsLoader extends CursorLoader {
     private Integer entryPosition;
     private Integer insertedCount;
     private int loadIntention;
+    private boolean prepend;
 
     public Integer getInsertedCount() {
         return insertedCount;
@@ -25,14 +26,16 @@ public class CommentsLoader extends CursorLoader {
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
         public static final String INSERTED_COUNT = "INSERTED_COUNT";
         public static final String LOAD_INTENTION = "LOAD_INTENTION";
+        public static final String PREPEND = "PREPEND";
     }
 
-    public CommentsLoader(Context context, Integer questionId, Integer entryPosition, Integer insertedCount, int loadIntention) {
+    public CommentsLoader(Context context, Integer questionId, Integer entryPosition, Integer insertedCount, int loadIntention, boolean prepend) {
         super(context);
         this.questionId = questionId;
         this.entryPosition = entryPosition;
         this.insertedCount = insertedCount;
         this.loadIntention = loadIntention;
+        this.prepend = prepend;
     }
 
     @Override
@@ -51,5 +54,9 @@ public class CommentsLoader extends CursorLoader {
 
     public int getLoadIntention() {
         return loadIntention;
+    }
+
+    public boolean isPrepend() {
+        return prepend;
     }
 }
