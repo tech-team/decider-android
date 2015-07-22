@@ -13,6 +13,8 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import org.techteam.decider.R;
+import org.techteam.decider.gcm.data.Push;
+import org.techteam.decider.gcm.data.PushParser;
 import org.techteam.decider.gui.activities.MainActivity;
 
 public class DeciderGcmListenerService extends GcmListenerService {
@@ -20,9 +22,8 @@ public class DeciderGcmListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
         Log.i(TAG, "From: " + from);
-        Log.i(TAG, "Message: " + message);
+        Log.i(TAG, "Message: " + data.toString());
 
         /**
          * Production applications would usually process the message here.
@@ -31,27 +32,19 @@ public class DeciderGcmListenerService extends GcmListenerService {
          *     - Update UI.
          */
 
-        /**
-         * In some cases it may be useful to show a notification indicating to the user
-         * that a message was received.
-         */
-        sendNotification(data.toString());
+        Push push = PushParser.parse(data);
+        sendNotification(push);
     }
 
-    private void sendNotification(String message) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    private void sendNotification(Push push) {
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.gender_icon)
-                .setContentTitle("GCM Message")
-                .setContentText(message)
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(push.getTitle(this))
+                .setContentText(push.getMessage(this))
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(push.buildContentIntent(this));
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
