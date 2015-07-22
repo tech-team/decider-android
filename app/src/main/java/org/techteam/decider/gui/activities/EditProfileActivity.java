@@ -366,6 +366,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             surnameText.setText(entry.getLastName());
             countryText.setText(entry.getCountry());
             cityText.setText(entry.getCity());
+            aboutText.setText(entry.getAbout());
 
             Date birthday = entry.getBirthday();
             if (birthday != null) {

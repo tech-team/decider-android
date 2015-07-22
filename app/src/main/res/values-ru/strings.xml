@@ -96,7 +96,6 @@
     <string name="no_nick" translatable="false">пользователь</string>
     <string name="no_questions">Вопросов тут пока нет</string>
     <string name="please_wait">Пожалуйста, подождите...</string>
-    <string name="poll_item_image">poll_item_image</string>
     <string name="poll_item_selection_mark">Помечено как выбранное</string>
     <string name="preview_toolbar_title">Предпросмотр</string>
     <string name="profile_edit_toolbar_title">Редактировать профиль</string>
@@ -105,4 +104,6 @@
     <string name="saving_profile">Сохранение профиля</string>
     <string name="surname_hint">Фамилия...</string>
     <string name="empty_credentials">Пожалуйста, заполните поля логин и пароль</string>
+    <string name="exit_profile_editing">Действительно выйти?\nИзменения не будут сохранены.</string>
+    <string name="editing_profile">Редактирование профиля</string>
 </resources>
