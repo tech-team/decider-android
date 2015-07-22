@@ -51,6 +51,8 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
     private TextView countryText;
     private TextView cityText;
     private TextView birthdayText;
+    private TextView genderText;
+    private TextView aboutText;
 
     private Button editButton;
 
@@ -109,6 +111,8 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
         countryText = (TextView) findViewById(R.id.country_text);
         cityText = (TextView) findViewById(R.id.city_text);
         birthdayText = (TextView) findViewById(R.id.birthday_text);
+        genderText = (TextView) findViewById(R.id.gender_text);
+        aboutText = (TextView) findViewById(R.id.about_text);
 
         editButton = (Button) findViewById(R.id.edit_button);
 
@@ -188,6 +192,9 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
                 String date = DateFormat.getDateFormat(ProfileActivity.this).format(birthday);
                 birthdayText.setText(date);
             }
+
+            genderText.setText(new GenderInfo(ProfileActivity.this, entry.getGender()).toString());
+            aboutText.setText(entry.getAbout());
 
             // edit button available only for current profile
             if (!entry.getUid().equals(ApiUI.getCurrentUserId(ProfileActivity.this))) {

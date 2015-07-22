@@ -98,7 +98,7 @@
     <string name="gender_placeholder">male</string>
     <string name="gender_icon">Gender icon</string>
     <string name="gender_hint">Male/female</string>
-    <string name="gender_none">Бесполое существо</string>
+    <string name="gender_none">Unknown</string>
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
     <string name="no_questions">No questions here yet</string>
@@ -109,6 +109,6 @@
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
     <string name="more_comments">More comments</string>
-    <string name="gcm_sender_id">620471085989</string>
+    <string name="gcm_sender_id" translatable="false">620471085989</string>
 
 </resources>
