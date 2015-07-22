@@ -408,7 +408,10 @@ public class QuestionsListFragment
                     insertedCount = insertedCount == -1 ? null : insertedCount;
 
                     loadIntention = args.getInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.NONE);
-                    loadedSection = ContentSection.fromInt(args.getInt(QuestionsLoader.BundleKeys.SECTION));
+                    int loadedSectionId = args.getInt(QuestionsLoader.BundleKeys.SECTION, -1);
+                    if (loadedSectionId != -1) {
+                        loadedSection = ContentSection.fromInt(loadedSectionId);
+                    }
 
                     feedFinished = args.getBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, false);
                 }
