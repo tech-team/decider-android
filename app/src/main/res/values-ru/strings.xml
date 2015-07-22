@@ -93,7 +93,7 @@
     <string name="name">Имя</string>
     <string name="name_hint">Имя...</string>
     <string name="nick_hint">Псевдоним...</string>
-    <string name="no_nick" translatable="false">пользователь</string>
+    <string name="no_nick">пользователь</string>
     <string name="no_questions">Вопросов тут пока нет</string>
     <string name="please_wait">Пожалуйста, подождите...</string>
     <string name="poll_item_selection_mark">Помечено как выбранное</string>

@@ -160,7 +160,14 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onClick(View v) {
                 Keyboard.hideSoftKeyboard(EditProfileActivity.this, getWindow().getDecorView());
-                waitDialog = ProgressDialog.show(EditProfileActivity.this, getString(R.string.saving_profile), getString(R.string.please_wait), true);
+                waitDialog = ProgressDialog.show(EditProfileActivity.this, getString(R.string.saving_profile), getString(R.string.please_wait),
+                        true, true, new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                // just close dialog, request is already sent anyway
+                                dialog.dismiss();
+                            }
+                        });
                 saveData();
             }
         });
@@ -249,7 +256,14 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         });
 
         if (savedInstanceState == null) {
-            waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait), true);
+            waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait),
+                    true, true, new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            setResult(RESULT_CANCELED);
+                            finish();
+                        }
+                    });
 
             Bundle registrationData = getIntent().getBundleExtra(REGISTRATION_DATA);
             if (registrationData != null) {

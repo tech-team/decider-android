@@ -105,13 +105,13 @@
     <string name="error_no_accounts">Error: No accounts to show in drawer.</string>
     <string name="no_nick">user</string>
     <string name="preview_toolbar_title">Preview</string>
-    <string name="exit_question_creation">Do you really want to exit?\nThis question won\\'t be saved.</string>
+    <string name="exit_question_creation">Do you really want to exit?\nThis question won\'t be saved.</string>
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
     <string name="more_comments">More comments</string>
     <string name="gcm_sender_id" translatable="false">620471085989</string>
     <string name="empty_credentials">Please fill login and password fields</string>
     <string name="editing_profile">Profile editing</string>
-    <string name="exit_profile_editing">Do you really want to exit?\nData won\\'t be saved.</string>
+    <string name="exit_profile_editing">Do you really want to exit?\nData won\'t be saved.</string>
 
 </resources>

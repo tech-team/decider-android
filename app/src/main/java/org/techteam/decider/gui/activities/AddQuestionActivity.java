@@ -271,7 +271,14 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
             return false;
         }
 
-        waitDialog = ProgressDialog.show(this, getString(R.string.creating_post), getString(R.string.please_wait), true);
+        waitDialog = ProgressDialog.show(this, getString(R.string.creating_post), getString(R.string.please_wait),
+                true, true, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        // question data is probably already on server so.. just close dialog
+                        dialog.dismiss();
+                    }
+                });
         serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.QUESTION_CREATE));
 
         return true;

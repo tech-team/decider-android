@@ -4,6 +4,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -144,7 +145,13 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
             }
         });
 
-        waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait), true);
+        waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait),
+                true, true, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                ProfileActivity.this.finish();
+            }
+        });
         serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
     }
 
