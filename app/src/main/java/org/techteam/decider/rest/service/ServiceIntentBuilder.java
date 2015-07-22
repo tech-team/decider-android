@@ -115,9 +115,23 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
+    public static Intent getUserIntent(Context context, OperationType op, String requestId, String userId, String accessToken) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(UserGetRequest.IntentExtras.USER_ID, userId);
+        intent.putExtra(UserGetRequest.IntentExtras.ACCESS_TOKEN, accessToken);
+        return intent;
+    }
+
     public static Intent editUserIntent(Context context, OperationType op, String requestId, UserData userData) {
         Intent intent = getBasicIntent(context, requestId, op);
         intent.putExtra(UserEditRequest.IntentExtras.USER_DATA, userData);
+        return intent;
+    }
+
+    public static Intent editUserIntent(Context context, OperationType op, String requestId, UserData userData, String accessToken) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(UserEditRequest.IntentExtras.USER_DATA, userData);
+        intent.putExtra(UserEditRequest.IntentExtras.ACCESS_TOKEN, accessToken);
         return intent;
     }
 }

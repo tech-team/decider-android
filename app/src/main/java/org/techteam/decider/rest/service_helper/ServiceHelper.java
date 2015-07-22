@@ -208,6 +208,22 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
+    public void getUser(String userId, String accessToken, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.USER_GET;
+
+        String requestId = createRequestId(op, userId);
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.getUserIntent(context, op, requestId, userId, accessToken);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
     public void editUser(UserData userData, ServiceCallback cb) {
         init();
 
@@ -218,6 +234,22 @@ public class ServiceHelper {
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
             Intent intent = ServiceIntentBuilder.editUserIntent(context, op, requestId, userData);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
+    public void editUser(UserData userData, String accessToken, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.USER_EDIT;
+
+        String requestId = createRequestId(op, userData.createFingerprint());
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.editUserIntent(context, op, requestId, userData, accessToken);
             context.startService(intent);
         }
 

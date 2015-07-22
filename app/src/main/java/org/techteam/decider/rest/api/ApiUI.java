@@ -129,7 +129,7 @@ public class ApiUI {
             default:
                 throw new RuntimeException(new IllegalArgumentException("unexpected operationType on loginRegister"));
         }
-        HttpResponse response = makeAuthPostCall(resolveApiUrl(path), params);
+        HttpResponse response = makePostCall(resolveApiUrl(path), params);
         if (response == null || response.getBody() == null) {
             return null;
         }
@@ -255,6 +255,10 @@ public class ApiUI {
         UrlParams params = new UrlParams();
         params.add("user_id", request.getUserId());
 
+        if (request.getAccessToken() != null) {
+            params.add("access_token", request.getAccessToken());
+        }
+
         HttpResponse response = makeProtectedGetCall(resolveApiUrl(request.getPath()), params);
         if (response == null || response.getBody() == null) {
             return null;
@@ -264,6 +268,7 @@ public class ApiUI {
 
     public JSONObject editUser(UserEditRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UserData userData = request.getUserData();
+        String accessToken = request.getAccessToken();
 
         ImageParamFacade imageParamFacade = null;
         try {
@@ -279,6 +284,10 @@ public class ApiUI {
             if (userData.hasAvatar()) {
                 imageParamFacade = new ImageParamFacade(userData.getAvatar());
                 imageParamFacade.write(params, null, "avatar");
+            }
+
+            if (accessToken != null) {
+                params.add("access_token", accessToken);
             }
 
             HttpResponse response = makeProtectedMultipartPostCall(resolveApiUrl(request.getPath()), params);
@@ -306,11 +315,13 @@ public class ApiUI {
     }
 
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, IOException {
-        String accessToken = getAccessToken();
-        if (accessToken == null) {
-            throw new InvalidAccessTokenException();
+        if (params.get("access_token") == null) {
+            String accessToken = getAccessToken();
+            if (accessToken == null) {
+                throw new InvalidAccessTokenException();
+            }
+            params.add("access_token", accessToken);
         }
-        params.add("access_token", accessToken);
         httpRequest.setParams(params);
         return httpRequest;
     }
@@ -382,7 +393,7 @@ public class ApiUI {
     }
 
 
-    private HttpResponse makeAuthPostCall(String url, UrlParams params) throws IOException, JSONException {
+    private HttpResponse makePostCall(String url, UrlParams params) throws IOException, JSONException {
         HttpRequest httpRequest = new HttpRequest(url);
         httpRequest.setParams(params);
         httpRequest.setRequestType(HttpRequest.Type.POST);

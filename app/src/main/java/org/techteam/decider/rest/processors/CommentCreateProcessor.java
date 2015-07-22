@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.content.entities.CommentEntry;
+import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CommentCreateRequest;
 import org.techteam.decider.rest.api.InvalidAccessTokenException;
@@ -47,6 +48,10 @@ public class CommentCreateProcessor extends RequestProcessor<CommentCreateReques
                 CommentEntry entry = CommentEntry.fromJson(data.getJSONObject(i));
                 entry.saveTotal();
             }
+
+            QuestionEntry questionEntry = QuestionEntry.byQId(getRequest().getCommentData().getQuestionId());
+            questionEntry.commentsCount += data.length();
+
             ActiveAndroid.setTransactionSuccessful();
 
             result.putInt(ServiceCallback.CreateQuestionExtras.COUNT, data.length());
