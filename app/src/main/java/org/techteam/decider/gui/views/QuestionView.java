@@ -289,11 +289,9 @@ public class QuestionView extends PostView {
 
         sb.append(context.getString(R.string.shared_by));
         sb.append(endLine);
-        sb.append(entry.getText());
+        sb.append(hashTag);
         sb.append(endLine);
         sb.append(ApiUI.resolveShareImageUrl(entry));
-        sb.append(endLine);
-        sb.append(hashTag);
 
         return sb.toString();
     }
