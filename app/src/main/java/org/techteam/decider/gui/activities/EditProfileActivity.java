@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -54,6 +55,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     public final static String REGISTRATION_DATA = "REGISTRATION_DATA";
 
     private final String USER_DATA = "USER_DATA";
+
+    private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
     private UserEntry entry;
     private String uid;
@@ -374,7 +377,14 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             int position = getGenderPositionByValue(genderValue);
             genderSpinner.setSelection(position);
 
-            waitDialog.dismiss();
+            // wait for render event
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    waitDialog.dismiss();
+                }
+            }, WAIT_DIALOG_DISMISS_DELAY);
         }
     }
 

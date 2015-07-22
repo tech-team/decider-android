@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +38,8 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
     public final static String USER_ID = "USER_ID";
 
     public final static int EDIT_PROFILE = 0;
+
+    private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
     private UserEntry entry;
     private String uid;
@@ -211,7 +214,14 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
                 });
             }
 
-            waitDialog.dismiss();
+            // wait for render event
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    waitDialog.dismiss();
+                }
+            }, WAIT_DIALOG_DISMISS_DELAY);
         }
     }
 }
