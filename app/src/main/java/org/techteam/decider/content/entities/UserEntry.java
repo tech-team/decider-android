@@ -48,6 +48,9 @@ public class UserEntry extends Model {
     @Column(name="birthday")
     private Date birthday = null;
 
+    @Column(name="about")
+    private String about = "";
+
     public static final SimpleDateFormat BIRTHDAY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public enum Gender {
@@ -131,6 +134,9 @@ public class UserEntry extends Model {
                 }
             }
         }
+        if (obj.has("about")) {
+            entry.about = obj.isNull("about") ? null : obj.getString("about");
+        }
 
         return entry;
     }
@@ -165,6 +171,10 @@ public class UserEntry extends Model {
 
     public Date getBirthday() {
         return birthday;
+    }
+
+    public String getAbout() {
+        return about;
     }
 
     public static void deleteAll() {
