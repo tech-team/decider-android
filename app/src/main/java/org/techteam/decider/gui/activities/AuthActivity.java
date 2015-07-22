@@ -289,7 +289,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
             requestUsername(data.getExtras());
         } else if (requestCode == ActivityCodes.FINISH_REGISTRATION) {
-            Bundle registrationData = data.getBundleExtra(EditProfileActivity.REGISTRATION_DATA);
+            Bundle registrationData = data.getExtras();
             finishLogin(registrationData);
         }
     }

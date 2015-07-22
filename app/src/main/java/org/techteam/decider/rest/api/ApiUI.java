@@ -13,9 +13,10 @@ import android.os.Bundle;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.techteam.decider.auth.AccountGeneral;
-import org.techteam.decider.content.UserData;
-import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.ImageData;
+import org.techteam.decider.content.UserData;
+import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.content.question.CommentData;
 import org.techteam.decider.content.question.ImageQuestionData;
 import org.techteam.decider.net2.HttpDownloader;
 import org.techteam.decider.net2.HttpFile;
@@ -42,6 +43,7 @@ public class ApiUI {
     public static final Uri BASE_URI;
     private static final Uri API_URI;
     private static final Uri PUSH_URI;
+    private static final Uri SHARE_IMAGE_URI;
 
     private static final String REFRESH_TOKEN_PATH = "refresh_token";
 
@@ -49,6 +51,7 @@ public class ApiUI {
         BASE_URI = Uri.parse(BASE_URL);
         API_URI = BASE_URI.buildUpon().appendEncodedPath("api/v1/").build();
         PUSH_URI = BASE_URI.buildUpon().appendEncodedPath("push/").build();
+        SHARE_IMAGE_URI = BASE_URI.buildUpon().appendEncodedPath("question/").build();
     }
 
     private class PrefsKeys {
@@ -459,7 +462,10 @@ public class ApiUI {
         return uri.build().toString();
     }
 
-
+    public static String resolveShareImageUrl(QuestionEntry entry) {
+        String qid = String.valueOf(entry.getQId());
+        return SHARE_IMAGE_URI.buildUpon().appendEncodedPath(qid).build().toString();
+    }
 
 
 

@@ -1,15 +1,11 @@
 package org.techteam.decider.gui.views;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,11 +22,8 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.ProfileActivity;
-import org.techteam.decider.gui.fragments.ShareHelper;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
-
-import java.io.File;
 
 
 public class QuestionView extends PostView {
@@ -241,7 +234,12 @@ public class QuestionView extends PostView {
         shareButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ShareHelper.share(getContext(), entry);
+                Context context = getContext();
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, formatEntryForSharing(context));
+                sendIntent.setType("text/plain");
+                context.startActivity(sendIntent);
             }
         });
 
@@ -283,29 +281,21 @@ public class QuestionView extends PostView {
         });
     }
 
-    private Uri getImageContentUri(File imageFile) {
-        Context context = getContext();
+    private String formatEntryForSharing(Context context) {
+        StringBuilder sb = new StringBuilder();
 
-        String filePath = imageFile.getAbsolutePath();
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] { MediaStore.Images.Media._ID },
-                MediaStore.Images.Media.DATA + "=? ",
-                new String[] { filePath }, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int id = cursor.getInt(cursor
-                    .getColumnIndex(MediaStore.MediaColumns._ID));
-            Uri baseUri = Uri.parse("content://media/external/images/media");
-            return Uri.withAppendedPath(baseUri, "" + id);
-        } else {
-            if (imageFile.exists()) {
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.DATA, filePath);
-                return context.getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-            } else {
-                return null;
-            }
-        }
+        String endLine = "\n";
+        String hashTag = "#" + context.getString(R.string.app_name).toLowerCase();
+
+        sb.append(context.getString(R.string.shared_by));
+        sb.append(endLine);
+        sb.append(entry.getText());
+        sb.append(endLine);
+        sb.append(ApiUI.resolveShareImageUrl(entry));
+        sb.append(endLine);
+        sb.append(hashTag);
+
+        return sb.toString();
     }
+
 }

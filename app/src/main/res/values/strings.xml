@@ -113,5 +113,6 @@
     <string name="empty_credentials">Please fill login and password fields</string>
     <string name="editing_profile">Profile editing</string>
     <string name="exit_profile_editing">Do you really want to exit?\nData won\'t be saved.</string>
+    <string name="shared_by">Shared by Decider app</string>
 
 </resources>

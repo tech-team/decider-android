@@ -202,7 +202,14 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 waitDialog.dismiss();
                 //TODO: translate toasts
                 Toaster.toast(EditProfileActivity.this, "Profile saved");
-                setResult(RESULT_OK, getIntent());  // data loopback
+
+                // social auth
+                Intent intent = getIntent();
+                if (intent.getStringExtra(ServiceCallback.LoginRegisterExtras.LOGIN) == null) {
+                    intent.putExtra(ServiceCallback.LoginRegisterExtras.LOGIN, nickNameText.getText().toString());
+                }
+
+                setResult(RESULT_OK, intent);  // data loopback
                 finish();
             }
 
@@ -269,8 +276,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             if (registrationData != null) {
                 // we are at the last phase of registration
                 String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
-                //TODO: pass token explicitly
-                //serviceHelper.getUser(uid, token, callbacksKeeper.getCallback(OperationType.USER_GET));
+                // pass token explicitly
+                serviceHelper.getUser(uid, token, callbacksKeeper.getCallback(OperationType.USER_GET));
             } else {
                 serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
             }
@@ -289,8 +296,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         if (registrationData != null) {
             // we are at the last phase of registration
             String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
-            //TODO: pass token explicitly
-            //serviceHelper.editUser(userData, token, callbacksKeeper.getCallback(OperationType.USER_EDIT));
+            // pass token explicitly
+            serviceHelper.editUser(userData, token, callbacksKeeper.getCallback(OperationType.USER_EDIT));
         } else {
             serviceHelper.editUser(userData, callbacksKeeper.getCallback(OperationType.USER_EDIT));
         }
