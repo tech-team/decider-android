@@ -206,7 +206,9 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 String username = data.getString(EditUserExtras.USERNAME);
 
                 Intent intent = new Intent();
-                intent.putExtras(getIntent().getBundleExtra(REGISTRATION_DATA));
+                if (getIntent().hasExtra(REGISTRATION_DATA)) {
+                    intent.putExtras(getIntent().getBundleExtra(REGISTRATION_DATA));
+                }
                 intent.putExtra(LoginRegisterExtras.USERNAME, username);
 
                 setResult(RESULT_OK, intent);

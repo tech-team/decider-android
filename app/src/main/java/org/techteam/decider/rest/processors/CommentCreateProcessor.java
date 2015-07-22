@@ -51,6 +51,7 @@ public class CommentCreateProcessor extends RequestProcessor<CommentCreateReques
 
             QuestionEntry questionEntry = QuestionEntry.byQId(getRequest().getCommentData().getQuestionId());
             questionEntry.commentsCount += data.length();
+            questionEntry.save();
 
             ActiveAndroid.setTransactionSuccessful();
 

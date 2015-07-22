@@ -184,6 +184,8 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int questionId = data.getInt(CreateQuestionExtras.QID, -1);
                 int insertedCount = data.getInt(CreateQuestionExtras.COUNT, -1);
 
+                new QuestionUpdateTask().execute();
+
                 Bundle args = new Bundle();
                 args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
                 args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);

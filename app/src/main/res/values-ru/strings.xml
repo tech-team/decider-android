@@ -66,7 +66,6 @@
     <string name="about_placeholder">Меня зовут Вася и я Пупкин</string>
     <string name="profile_toolbar_title">Профиль</string>
     <string name="pictures_fil">Должны быть выбраны обе картинки</string>
-    <string name="gender_none">Не известен</string>
     <string name="server_problem">На сервере возникли некоторые проблемы. Попробуйте еще раз позже.</string>
     <string name="about_hint">Я есмь...</string>
     <string name="about_icon">Икокна информации о пользователе</string>
@@ -107,4 +106,5 @@
     <string name="exit_profile_editing">Действительно выйти?\nИзменения не будут сохранены.</string>
     <string name="editing_profile">Редактирование профиля</string>
     <string name="profile_saved">Профиль сохранён успешно</string>
+    <string name="gender_none"> </string>
 </resources>
