@@ -169,7 +169,8 @@ public class MainFragment
         if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
             int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
             Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
-            intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, qid);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, qid);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
             startActivity(intent);
         }
     }

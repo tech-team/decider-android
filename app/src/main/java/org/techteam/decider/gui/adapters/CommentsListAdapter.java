@@ -155,4 +155,8 @@ public class CommentsListAdapter
         else
             return VIEW_TYPE_COMMENT;
     }
+
+    public QuestionEntry getQuestionEntry() {
+        return questionEntry;
+    }
 }

@@ -61,7 +61,7 @@ public class CommentsGetProcessor extends RequestProcessor<CommentsGetRequest> {
                 }
                 ActiveAndroid.setTransactionSuccessful();
 
-                result.putInt(ServiceCallback.GetCommentsExtras.COUNT, data.length());
+                result.putInt(ServiceCallback.GetCommentsExtras.COUNT, comments.length());
                 result.putInt(ServiceCallback.GetCommentsExtras.REMAINING, remaining);
             } finally {
                 ActiveAndroid.endTransaction();

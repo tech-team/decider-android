@@ -30,6 +30,7 @@ import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
+import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.views.QuestionView;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -48,8 +49,10 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     private CommentsListAdapter adapter;
 
-    private static final int COMMENTS_LIMIT = 30;
+    private static final int COMMENTS_LIMIT = 5;
     private int commentsOffset = 0;
+    private boolean forceRefresh = false;
+    private int remaining = Integer.MAX_VALUE;
 
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
@@ -58,7 +61,13 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     public static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+        public static final String COMMENTS_OFFSET = "COMMENTS_OFFSET";
+        public static final String REMAINING = "REMAINING";
+    }
+
+    public static final class IntentExtras {
         public static final String Q_ID = "qid";
+        public static final String FORCE_REFRESH = "FORCE_REFRESH";
     }
 
     @Override
@@ -85,6 +94,9 @@ public class QuestionDetailsActivity extends ToolbarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        forceRefresh = getIntent().getBooleanExtra(IntentExtras.FORCE_REFRESH, false);
+        getIntent().putExtra(IntentExtras.FORCE_REFRESH, false);
+
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.fragment_question_details);
         
@@ -110,7 +122,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         commentsView.setLayoutManager(layoutManager);
 
         // comments stuff
-        int qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+        int qid = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
         Assert.assertNotSame("Q_ID is null", qid, -1);
 
         QuestionEntry entry = QuestionEntry.byQId(qid);
@@ -136,15 +148,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int questionId = data.getInt(GetCommentsExtras.QUESTION_ID, -1);
                 int insertedCount = data.getInt(GetCommentsExtras.COUNT, -1);
                 int loadIntention = data.getInt(GetCommentsExtras.LOAD_INTENTION, LoadIntention.REFRESH);
-                int remaining = data.getInt(GetCommentsExtras.REMAINING, 0);
-
-                commentsOffset += insertedCount;
+                remaining = data.getInt(GetCommentsExtras.REMAINING, 0);
 
                 adapter.setFeedFinished(remaining == 0);
                 if (!isFeedFinished) {
                     Bundle args = new Bundle();
                     args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
-                    args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                     args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                     getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
                 }
@@ -170,10 +179,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: ok");
 
-                int questionId = data.getInt(GetCommentsExtras.QUESTION_ID, -1);
+                int questionId = data.getInt(CreateQuestionExtras.QID, -1);
+                int insertedCount = data.getInt(CreateQuestionExtras.COUNT, -1);
 
                 Bundle args = new Bundle();
                 args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
+                args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                 getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
             }
 
@@ -246,25 +257,28 @@ public class QuestionDetailsActivity extends ToolbarActivity
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
+            commentsOffset = forceRefresh ? 0 : savedInstanceState.getInt(BundleKeys.COMMENTS_OFFSET, 0);
+            remaining = forceRefresh ? Integer.MAX_VALUE : savedInstanceState.getInt(BundleKeys.REMAINING, Integer.MAX_VALUE);
         }
 
+        adapter.setFeedFinished(remaining == 0);
         // set data
         retrieveEntryTask = new RetrieveEntryTask();
         retrieveEntryTask.execute();
 
-        LoaderManager lm = getLoaderManager();
-
         Bundle args = new Bundle();
-        args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, getIntent().getIntExtra(BundleKeys.Q_ID, -1));
+        args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, getIntent().getIntExtra(IntentExtras.Q_ID, -1));
         args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, 0);
         args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
-        lm.initLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
+        getLoaderManager().initLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
+        outState.putInt(BundleKeys.COMMENTS_OFFSET, commentsOffset);
+        outState.putInt(BundleKeys.REMAINING, remaining);
     }
 
     @Override
@@ -283,15 +297,17 @@ public class QuestionDetailsActivity extends ToolbarActivity
         String text = commentEdit.getText().toString();
         commentEdit.setText("");
 
-        int questionId = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+        int questionId = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
         int lastCommentId = CommentData.NO_LAST_COMMENT_ID;
 
         Cursor commentsCursor = adapter.getCursor();
-        int prevPosition = commentsCursor.getPosition();
-        if (commentsCursor.moveToLast()) {
-            CommentEntry commentEntry = CommentEntry.fromCursor(commentsCursor);
-            lastCommentId = commentEntry.getCid();
-            commentsCursor.moveToPosition(prevPosition);
+        if (commentsCursor != null) {
+            int prevPosition = commentsCursor.getPosition();
+            if (commentsCursor.moveToLast()) {
+                CommentEntry commentEntry = CommentEntry.fromCursor(commentsCursor);
+                lastCommentId = commentEntry.getCid();
+                commentsCursor.moveToPosition(prevPosition);
+            }
         }
 
         serviceHelper.createComment(new CommentData(text, questionId, lastCommentId, false),
@@ -306,6 +322,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
 //        } else {
 //            intention = LoadIntention.APPEND;
 //        }
+
+        serviceHelper.getComments(adapter.getQuestionEntry().getQId(),
+                COMMENTS_LIMIT,
+                commentsOffset,
+                LoadIntention.APPEND,
+                callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
 
         // TODO
     }
@@ -332,7 +354,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
         @Override
         protected QuestionEntry doInBackground(Void... params) {
-            int qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+            int qid = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
             Assert.assertNotSame("Q_ID is null", qid, -1);
 
             QuestionEntry entry = QuestionEntry.byQId(qid);
@@ -345,11 +367,13 @@ public class QuestionDetailsActivity extends ToolbarActivity
         protected void onPostExecute(QuestionEntry entry) {
             // QuestionView will be migrated into list element
             //questionView.reuse(entry, null);
-            serviceHelper.getComments(entry.getQId(),
-                    COMMENTS_LIMIT,
-                    commentsOffset,
-                    LoadIntention.REFRESH,
-                    callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
+            if (commentsOffset == 0) {
+                serviceHelper.getComments(entry.getQId(),
+                        COMMENTS_LIMIT,
+                        commentsOffset,
+                        LoadIntention.REFRESH,
+                        callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
+            }
         }
     }
 
@@ -357,7 +381,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
         @Override
         protected QuestionEntry doInBackground(Void... params) {
-            int qid = getIntent().getIntExtra(BundleKeys.Q_ID, -1);
+            int qid = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
             Assert.assertNotSame("Q_ID is null", qid, -1);
 
             QuestionEntry entry = QuestionEntry.byQId(qid);
@@ -408,13 +432,16 @@ public class QuestionDetailsActivity extends ToolbarActivity
             int loadIntention = questionsLoader.getLoadIntention();
 
             if (loadIntention == LoadIntention.REFRESH) {
+                commentsOffset = newCursor.getCount();
                 adapter.swapCursor(newCursor);
             } else {
                 if (entryPos != null) {
                     adapter.swapCursor(newCursor, entryPos);
                 } else if (count != null) {
+                    commentsOffset += count;
                     adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
                 } else {
+                    commentsOffset = newCursor.getCount();
                     adapter.swapCursor(newCursor);
                 }
             }

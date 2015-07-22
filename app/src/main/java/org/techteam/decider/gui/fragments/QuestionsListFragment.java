@@ -338,7 +338,8 @@ public class QuestionsListFragment
     @Override
     public void onCommentsClick(int entryPosition, QuestionEntry post) {
         Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
-        intent.putExtra(QuestionDetailsActivity.BundleKeys.Q_ID, post.getQId());
+        intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, post.getQId());
+        intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
         startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
     }
 
@@ -426,7 +427,7 @@ public class QuestionsListFragment
             boolean feedFinished = questionsLoader.isFeedFinished();
 
             if (loadIntention == LoadIntention.REFRESH) {
-                questionsOffset += newCursor.getCount();
+                questionsOffset = newCursor.getCount();
                 adapter.swapCursor(newCursor);
             } else {
                 if (entryPos != null) {
@@ -435,7 +436,7 @@ public class QuestionsListFragment
                     questionsOffset += count;
                     adapter.swapCursor(newCursor, newCursor.getCount() - count, count);
                 } else {
-                    questionsOffset += newCursor.getCount();
+                    questionsOffset = newCursor.getCount();
                     adapter.swapCursor(newCursor);
                 }
             }

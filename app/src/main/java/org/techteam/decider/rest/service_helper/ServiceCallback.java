@@ -57,6 +57,7 @@ public interface ServiceCallback {
 
     class CreateQuestionExtras {
         public static final String QID = "QID";
+        public static final String COUNT = "COUNT";
     }
 
     class LoginRegisterExtras {

@@ -49,6 +49,8 @@ public class CommentCreateProcessor extends RequestProcessor<CommentCreateReques
             }
             ActiveAndroid.setTransactionSuccessful();
 
+            result.putInt(ServiceCallback.CreateQuestionExtras.COUNT, data.length());
+
         } finally {
             ActiveAndroid.endTransaction();
         }
@@ -57,7 +59,7 @@ public class CommentCreateProcessor extends RequestProcessor<CommentCreateReques
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
-        data.putInt(ServiceCallback.GetCommentsExtras.QUESTION_ID, getRequest().getCommentData().getQuestionId());
+        data.putInt(ServiceCallback.CreateQuestionExtras.QID, getRequest().getCommentData().getQuestionId());
         return data;
     }
 }
