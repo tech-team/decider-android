@@ -215,7 +215,7 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                        intent.putExtra(EditProfileActivity.USER_ID, getIntent().getStringExtra(USER_ID));
+                        intent.putExtra(EditProfileActivity.IntentExtras.USER_ID, getIntent().getStringExtra(USER_ID));
                         startActivityForResult(intent, EDIT_PROFILE);
                     }
                 });

@@ -145,9 +145,9 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private void requestUsername(Bundle registrationData) {
         Intent finishRegistrationIntent = new Intent(AuthActivity.this, EditProfileActivity.class);
-        finishRegistrationIntent.putExtra(EditProfileActivity.REGISTRATION_DATA, registrationData);
+        finishRegistrationIntent.putExtra(EditProfileActivity.IntentExtras.REGISTRATION_DATA, registrationData);
         String uid = registrationData.getString(ServiceCallback.LoginRegisterExtras.USER_ID);
-        finishRegistrationIntent.putExtra(EditProfileActivity.USER_ID, uid);
+        finishRegistrationIntent.putExtra(EditProfileActivity.IntentExtras.USER_ID, uid);
         startActivityForResult(finishRegistrationIntent, ActivityCodes.FINISH_REGISTRATION);
     }
 

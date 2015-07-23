@@ -52,11 +52,6 @@ import static android.support.v7.app.AlertDialog.*;
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
 public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
-    public final static String USER_ID = "USER_ID";
-    public final static String REGISTRATION_DATA = "REGISTRATION_DATA";
-
-    private final String USER_DATA = "USER_DATA";
-
     private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
     private UserEntry entry;
@@ -88,6 +83,18 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     private Date birthday;
 
+    private boolean dataLooseWarnShowing = false;
+
+    public static final class BundleKeys {
+        public final static String USER_DATA = "USER_DATA";
+        public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
+    }
+
+    public static final class IntentExtras {
+        public final static String USER_ID = "USER_ID";
+        public final static String REGISTRATION_DATA = "REGISTRATION_DATA";
+    }
+
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
         return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
@@ -115,7 +122,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.fragment_profile_edit);
 
-        uid = getIntent().getStringExtra(USER_ID);
+        uid = getIntent().getStringExtra(IntentExtras.USER_ID);
         Assert.assertNotSame("UID is null", uid, null);
 
         // setup toolbar
@@ -207,8 +214,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 String username = data.getString(EditUserExtras.USERNAME);
 
                 Intent intent = new Intent();
-                if (getIntent().hasExtra(REGISTRATION_DATA)) {
-                    intent.putExtras(getIntent().getBundleExtra(REGISTRATION_DATA));
+                if (getIntent().hasExtra(IntentExtras.REGISTRATION_DATA)) {
+                    intent.putExtras(getIntent().getBundleExtra(IntentExtras.REGISTRATION_DATA));
                 }
                 intent.putExtra(LoginRegisterExtras.USERNAME, username);
 
@@ -275,7 +282,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                         }
                     });
 
-            Bundle registrationData = getIntent().getBundleExtra(REGISTRATION_DATA);
+            Bundle registrationData = getIntent().getBundleExtra(IntentExtras.REGISTRATION_DATA);
             if (registrationData != null) {
                 // we are at the last phase of registration
                 AlertDialog.Builder builder = new AlertDialog.Builder(EditProfileActivity.this);
@@ -299,17 +306,22 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
             }
         } else {
-            UserData userData = savedInstanceState.getParcelable(USER_DATA);
+            UserData userData = savedInstanceState.getParcelable(BundleKeys.USER_DATA);
             if (userData != null) {
                 deserialize(userData);
             }
+            dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
+        }
+
+        if (dataLooseWarnShowing) {
+            showDataLooseWarning();
         }
     }
 
     private void saveData() {
         UserData userData = serialize();
 
-        Bundle registrationData = getIntent().getBundleExtra(REGISTRATION_DATA);
+        Bundle registrationData = getIntent().getBundleExtra(IntentExtras.REGISTRATION_DATA);
         if (registrationData != null) {
             // we are at the last phase of registration
             String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
@@ -375,7 +387,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(USER_DATA, serialize());
+        outState.putParcelable(BundleKeys.USER_DATA, serialize());
+        outState.putBoolean(BundleKeys.DATA_LOOSE_WARN, dataLooseWarnShowing);
     }
 
     @Override
@@ -440,13 +453,19 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     @Override
     public void onBackPressed() {
+        showDataLooseWarning();
+    }
+
+    private void showDataLooseWarning() {
+        dataLooseWarnShowing = true;
         new Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(getString(R.string.editing_profile))
                 .setMessage(getString(R.string.exit_profile_editing))
-                .setPositiveButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.exit), new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dataLooseWarnShowing = false;
                         setResult(RESULT_CANCELED);
                         finish();
                     }

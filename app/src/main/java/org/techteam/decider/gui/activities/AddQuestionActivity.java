@@ -67,9 +67,12 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
     private ProgressDialog waitDialog;
 
+    private boolean dataLooseWarnShowing = false;
+
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String QUESTION_DATA = "QUESTION_DATA";
+        public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
     }
 
     @Override
@@ -178,10 +181,15 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
         if (savedInstanceState != null) {
             currentQuestionData = savedInstanceState.getParcelable(BundleKeys.QUESTION_DATA);
+            dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper);
             restoreQuestion();
+        }
+
+        if (dataLooseWarnShowing) {
+            showDataLooseWarning();
         }
     }
 
@@ -190,6 +198,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         super.onSaveInstanceState(outState);
         currentQuestionData = gatherQuestionData();
         outState.putParcelable(BundleKeys.QUESTION_DATA, currentQuestionData);
+        outState.putBoolean(BundleKeys.DATA_LOOSE_WARN, dataLooseWarnShowing);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
@@ -290,11 +299,17 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         if (postText.getText().toString().isEmpty()
                 && leftImageSelector.getImageData() == null
                 && rightImageSelector.getImageData() == null) {
+            dataLooseWarnShowing = false;
             super.onBackPressed();
             return;
         }
 
         // if no, ask user if he really wants to exit
+        showDataLooseWarning();
+    }
+
+    private void showDataLooseWarning() {
+        dataLooseWarnShowing = true;
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(getString(R.string.creating_post))
@@ -302,6 +317,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
                 .setPositiveButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dataLooseWarnShowing = false;
                         finish();
                     }
 
