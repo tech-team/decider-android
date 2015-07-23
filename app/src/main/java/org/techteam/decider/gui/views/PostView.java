@@ -10,11 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public abstract class PostView extends FrameLayout {
-    @SuppressLint("SimpleDateFormat")
-    private SimpleDateFormat uiDateFormat =
-            new SimpleDateFormat("d MMM, hh:mm");
-
-
     public PostView(Context context) {
         super(context);
     }
