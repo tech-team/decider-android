@@ -3,9 +3,9 @@ package org.techteam.decider.gui.activities;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
-import android.app.LoaderManager;
+import android.support.v4.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
+import android.support.v4.content.Loader;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -167,7 +167,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                     args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                     args.putBoolean(CommentsLoader.BundleKeys.PREPEND, true);
-                    getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
+                    getSupportLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
                 }
             }
 
@@ -200,7 +200,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, questionId);
                 args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
                 args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.APPEND);
-                getLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
+                getSupportLoaderManager().restartLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
             }
 
             @Override
@@ -285,7 +285,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         args.putInt(CommentsLoader.BundleKeys.QUESTION_ID, getIntent().getIntExtra(IntentExtras.Q_ID, -1));
         args.putInt(CommentsLoader.BundleKeys.INSERTED_COUNT, 0);
         args.putInt(CommentsLoader.BundleKeys.LOAD_INTENTION, LoadIntention.REFRESH);
-        getLoaderManager().initLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
+        getSupportLoaderManager().initLoader(LoaderIds.COMMENTS_LOADER, args, commentsLoaderCallbacks);
     }
 
     @Override
