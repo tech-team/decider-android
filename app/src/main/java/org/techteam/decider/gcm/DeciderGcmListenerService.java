@@ -40,8 +40,8 @@ public class DeciderGcmListenerService extends GcmListenerService {
     private void sendNotification(Push push) {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.logo))
-                .setSmallIcon(R.drawable.logo) // TODO: temporary
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(push.getTitle(this))
                 .setContentText(push.getMessage(this))
                 .setAutoCancel(true)

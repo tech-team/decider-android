@@ -18,6 +18,9 @@ import java.io.IOException;
 
 public abstract class RequestProcessor<T> extends Processor {
 
+    private static final int CODE_OK = 2000;
+    private static final int CODE_CREATED = 2001;
+
     private final T request;
 
     public RequestProcessor(Context context, T request) {
@@ -36,8 +39,8 @@ public abstract class RequestProcessor<T> extends Processor {
             return false;
         }
         String status = response.getString("status");
-        if (!status.equalsIgnoreCase("ok")) {
-            int code = response.getInt("code");
+        int code = response.getInt("code");
+        if (!status.equalsIgnoreCase("ok") || (code != CODE_OK && code != CODE_CREATED)) {
             postExecuteError(response, code, result);
             transactionError(operationType, requestId);
             cb.onError("status is not ok. resp = " + response.toString(), result);

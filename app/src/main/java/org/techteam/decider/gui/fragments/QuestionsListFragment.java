@@ -345,6 +345,7 @@ public class QuestionsListFragment
         Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
         intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, post.getQId());
         intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
+        intent.putExtra(QuestionDetailsActivity.IntentExtras.ENTRY_POSITION, entryPosition);
         startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
     }
 
@@ -390,6 +391,7 @@ public class QuestionsListFragment
 
     public void invalidate() {
         adapter.swapCursor(null);
+        refresh();
     }
 
     public void setCurrentSection(ContentSection currentSection) {
@@ -398,6 +400,20 @@ public class QuestionsListFragment
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ActivityHelper.QUESTION_DETAILS_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                int position = data.getIntExtra(QuestionDetailsActivity.IntentExtras.ENTRY_POSITION, -1);
+                if (position != -1) {
+                    adapter.notifyItemChanged(position);
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private class QuestionsLoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
