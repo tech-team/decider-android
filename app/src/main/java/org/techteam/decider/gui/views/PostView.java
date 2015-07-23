@@ -32,7 +32,7 @@ public abstract class PostView extends FrameLayout {
             return null;
         }
 
-        String dateString = DateFormat.getDateFormat(getContext()).format(date);
+        String dateString = DateFormat.getMediumDateFormat(getContext()).format(date);
         dateString += ", " + DateFormat.getTimeFormat(getContext()).format(date);
 
         return dateString;
