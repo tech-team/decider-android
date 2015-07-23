@@ -110,7 +110,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
+//        if (savedInstanceState == null) {
             getAuthToken(new AccountManagerCallback<Bundle>() {
                 @Override
                 public void run(AccountManagerFuture<Bundle> future) {
@@ -121,7 +121,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                     }
                 }
             });
-        }
+//        }
 
         serviceHelper = new ServiceHelper(this);
         callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
@@ -187,7 +187,6 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         setSupportActionBar(toolbar);
 
         categoriesListAdapter = new CategoriesListAdapter(null, this, this);
-
         createDrawer(toolbar, categoriesListAdapter);
     }
 
