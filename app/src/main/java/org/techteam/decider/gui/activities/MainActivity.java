@@ -4,12 +4,12 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.app.LoaderManager;
+import android.support.v4.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Loader;
+import android.support.v4.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -198,7 +198,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
     }
 
     private void finishAuthorization() {
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .add(R.id.content_frame, new MainFragment(), MainFragment.TAG).commit();
         getUserInfo();
     }
@@ -308,7 +308,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                 final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
                     @Override
                     public void run(AccountManagerFuture<Bundle> future) {
-                        MainFragment f = (MainFragment) getFragmentManager().findFragmentByTag(MainFragment.TAG);
+                        MainFragment f = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
                         if (f != null) {
                             f.invalidatePages();
                         }
@@ -348,7 +348,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
             @Override
             public void categorySelected(CategoryEntry category, boolean isChecked) {
-                MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag(MainFragment.TAG);
+                MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
                 QuestionsListFragment f = (QuestionsListFragment) mainFragment.getCurrentlyActiveFragment();
                 f.categorySelected(category, isChecked);
             }
@@ -364,7 +364,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
 
         @Override
         protected void onPostExecute(UserEntry entry) {
-            getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+            getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
             String username = entry.getUsername();
             if (username == null || username.isEmpty())
                 username = getString(R.string.no_nick);

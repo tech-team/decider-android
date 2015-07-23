@@ -2,15 +2,15 @@ package org.techteam.decider.gui.fragments;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.LoaderManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -69,6 +69,37 @@ public class MainFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        // sections
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) rootView.findViewById(R.id.sections_pager);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
+        // it's PagerAdapter set.
+        mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.sections_pager_tabs);
+        mSlidingTabLayout.setDistributeEvenly(true);
+        mSlidingTabLayout.setViewPager(mViewPager);
+
+        mSlidingTabLayout.setBackgroundColor(getResources().getColor(R.color.primary));
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(android.R.color.white);
+            }
+        });
+
+        // setup plus button
+        createPostButton = (FloatingActionButton) rootView.findViewById(R.id.create_post_button);
+        createPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AddQuestionActivity.class);
+                startActivityForResult(intent, ADD_QUESTION);
+            }
+        });
+
         return rootView;
     }
 
@@ -95,37 +126,6 @@ public class MainFragment
 //            actionBar.setHomeButtonEnabled(true);
 //        }
 
-
-        // sections
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) activity.findViewById(R.id.sections_pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
-        // it's PagerAdapter set.
-        mSlidingTabLayout = (SlidingTabLayout)activity.findViewById(R.id.sections_pager_tabs);
-        mSlidingTabLayout.setDistributeEvenly(true);
-        mSlidingTabLayout.setViewPager(mViewPager);
-
-        mSlidingTabLayout.setBackgroundColor(activity.getResources().getColor(R.color.primary));
-        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getResources().getColor(android.R.color.white);
-            }
-        });
-
-        // setup plus button
-        createPostButton = (FloatingActionButton) this.activity.findViewById(R.id.create_post_button);
-        createPostButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AddQuestionActivity.class);
-                startActivityForResult(intent, ADD_QUESTION);
-            }
-        });
     }
 
     @Override

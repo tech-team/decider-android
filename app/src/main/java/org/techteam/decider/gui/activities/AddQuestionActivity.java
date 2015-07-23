@@ -3,11 +3,11 @@ package org.techteam.decider.gui.activities;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
-import android.app.LoaderManager;
+import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
+import android.support.v4.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -136,7 +136,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
         // setup categories list
         serviceHelper = new ServiceHelper(this);
-        getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+        getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
 
         categoriesSpinnerAdapter = new SimpleCursorAdapter(
                 this,
