@@ -1,6 +1,5 @@
 package org.techteam.decider.gui.fragments;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
@@ -100,7 +99,6 @@ public class MainFragment
         serviceHelper = new ServiceHelper(activity);
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
