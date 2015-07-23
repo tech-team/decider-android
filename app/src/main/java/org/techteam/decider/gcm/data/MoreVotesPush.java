@@ -8,15 +8,15 @@ import android.os.Bundle;
 import org.techteam.decider.R;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 
-public class NewCommentPush extends Push {
+public class MoreVotesPush extends Push {
 
     private int questionId;
-    private int commentId;
+    private int count;
 
-    public NewCommentPush(Bundle data) {
-        super(PushCode.NEW_COMMENT);
+    public MoreVotesPush(Bundle data) {
+        super(PushCode.MORE_VOTES);
         questionId = Integer.parseInt(data.getString("question_id"));
-        commentId = Integer.parseInt(data.getString("comment_id"));
+        count = Integer.parseInt(data.getString("count"));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class NewCommentPush extends Push {
 
     @Override
     public String getMessage(Context context) {
-        return context.getString(R.string.push_new_comment);
+        return String.format(context.getString(R.string.push_more_votes), count);
     }
 
     @Override
@@ -34,7 +34,6 @@ public class NewCommentPush extends Push {
         Intent intent = new Intent(context, QuestionDetailsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, questionId);
-        intent.putExtra(QuestionDetailsActivity.IntentExtras.COMMENT_ID, commentId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
         return pendingIntent;
@@ -44,7 +43,7 @@ public class NewCommentPush extends Push {
         return questionId;
     }
 
-    public int getCommentId() {
-        return commentId;
+    public int getCount() {
+        return count;
     }
 }

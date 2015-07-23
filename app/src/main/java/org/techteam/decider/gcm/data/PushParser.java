@@ -17,6 +17,12 @@ public class PushParser {
             case NEW_VOTE:
                 push = new NewVotePush(data);
                 break;
+            case MORE_COMMENTS:
+                push = new MoreCommentsPush(data);
+                break;
+            case MORE_VOTES:
+                push = new MoreVotesPush(data);
+                break;
         }
 
         return push;

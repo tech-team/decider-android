@@ -113,4 +113,8 @@
     <string name="anon_badge">(Анонимно)</string>
     <string name="anon_explanation">Другие пользователи не видят автора.</string>
     <string name="invalid_email">Пожалуйста, введите настоящий почтовый адрес</string>
+    <string name="push_new_comment">New comment on your question!</string>
+    <string name="push_new_vote">New vote on your question!</string>
+    <string name="push_more_comments">More comments on your question! (%d)</string>
+    <string name="push_more_votes">More votes on your question! (%d)</string>
 </resources>

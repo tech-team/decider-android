@@ -121,5 +121,9 @@
     <string name="anon_badge">(Anonymous)</string>
     <string name="anon_explanation">Other users do not see the author.</string>
     <string name="invalid_email">Please enter real email address</string>
+    <string name="push_new_comment">New comment on your question!</string>
+    <string name="push_new_vote">New vote on your question!</string>
+    <string name="push_more_comments">More comments on your question! (%d)</string>
+    <string name="push_more_votes">More votes on your question! (%d)</string>
 
 </resources>
