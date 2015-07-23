@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 public class PushParser {
     public static Push parse(Bundle data) {
-        int code = data.getInt("code", -1);
+        int code = Integer.parseInt(data.getString("code"));
         PushCode pushCode = PushCode.fromCode(code);
 
         Push push = null;

@@ -13,7 +13,7 @@ public class NewVotePush extends Push {
 
     public NewVotePush(Bundle data) {
         super(PushCode.NEW_VOTE);
-        questionId = data.getInt("question_id", -1);
+        questionId = Integer.parseInt(data.getString("question_id"));
     }
 
     @Override

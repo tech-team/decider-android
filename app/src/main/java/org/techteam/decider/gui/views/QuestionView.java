@@ -130,6 +130,10 @@ public class QuestionView extends PostView {
         fillFields();
     }
 
+    public QuestionEntry getEntry() {
+        return entry;
+    }
+
     protected void fillFields() {
         final Context context = getContext();
 
@@ -252,6 +256,10 @@ public class QuestionView extends PostView {
                 menu.show();
             }
         });
+
+        if (entry.isAnonymous()) {
+
+        }
     }
 
     protected void attachCallbacks() {

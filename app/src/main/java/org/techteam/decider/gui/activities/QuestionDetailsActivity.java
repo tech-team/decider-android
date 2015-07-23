@@ -70,6 +70,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     public static final class IntentExtras {
         public static final String Q_ID = "qid";
+        public static final String COMMENT_ID = "COMMENT_ID";
         public static final String FORCE_REFRESH = "FORCE_REFRESH";
     }
 
@@ -460,7 +461,6 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 if (entryPos != null) {
                     adapter.swapCursor(newCursor, entryPos);
                 } else if (count != null) {
-                    count -= 1;
                     commentsOffset += count;
                     if (prepend) {
                         adapter.swapCursor(newCursor, 0, count);

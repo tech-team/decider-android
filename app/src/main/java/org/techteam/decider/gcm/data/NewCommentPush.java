@@ -15,8 +15,8 @@ public class NewCommentPush extends Push {
 
     public NewCommentPush(Bundle data) {
         super(PushCode.NEW_COMMENT);
-        questionId = data.getInt("question_id", -1);
-        commentId = data.getInt("comment_id", -1);
+        questionId = Integer.parseInt(data.getString("question_id"));
+        commentId = Integer.parseInt(data.getString("comment_id"));
     }
 
     @Override
@@ -33,6 +33,8 @@ public class NewCommentPush extends Push {
     public PendingIntent buildContentIntent(Context context) {
         Intent intent = new Intent(context, QuestionDetailsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, questionId);
+        intent.putExtra(QuestionDetailsActivity.IntentExtras.COMMENT_ID, commentId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
         return pendingIntent;
