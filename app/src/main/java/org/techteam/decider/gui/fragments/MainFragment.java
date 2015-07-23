@@ -43,6 +43,7 @@ public class MainFragment
 
     public static final String TAG = MainFragment.class.toString();
     private static final int ADD_QUESTION = 0;
+    private static final int QUESTION_DETAILS = 1;
     private MainActivity activity;
 
     private Toolbar toolbar;
@@ -171,31 +172,44 @@ public class MainFragment
             Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
             intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, qid);
             intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
-            startActivity(intent);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, true);
+            startActivityForResult(intent, QUESTION_DETAILS);
+        } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK) {
+            refreshPages();
         }
     }
 
     @Override
     public void categorySelected(CategoryEntry category, boolean isChecked) {
         Toaster.toast(getActivity(), "Selected");
-        category.setSelectedAsync(isChecked);
-        int currentFragment = mViewPager.getCurrentItem();
-        QuestionsListFragment f =(QuestionsListFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, currentFragment);
-        f.categorySelected(category, isChecked);
-//        if (onCategorySelectedListeners != null) {
-//            for (OnCategorySelectedListener listener : onCategorySelectedListeners) {
-//                if (listener != null) {
-//                    listener.categorySelected(category, isChecked);
-//                }
-//            }
-//        }
+        category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
+            @Override
+            public void categorySelected(CategoryEntry category, boolean isChecked) {
+                int currentFragment = mViewPager.getCurrentItem();
+                QuestionsListFragment f = (QuestionsListFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, currentFragment);
+                f.categorySelected(category, isChecked);
+            }
+        });
     }
 
     public void invalidatePages() {
-
+        for (Fragment f: mSectionsPagerAdapter.getFragments()) {
+            if (f != null) {
+                QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                questionsListFragment.invalidate();
+            }
+        }
     }
 
-    //TODO: refactor this out
+    public void refreshPages() {
+        for (Fragment f: mSectionsPagerAdapter.getFragments()) {
+            if (f != null) {
+                QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                questionsListFragment.refresh();
+            }
+        }
+    }
+
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
 
         private Fragment[] fragments;
@@ -229,6 +243,10 @@ public class MainFragment
         @Override
         public int getTextColor() {
             return android.R.color.white;
+        }
+
+        public Fragment[] getFragments() {
+            return fragments;
         }
     }
 

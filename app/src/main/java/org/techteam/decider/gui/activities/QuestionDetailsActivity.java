@@ -2,6 +2,7 @@ package org.techteam.decider.gui.activities;
 
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
@@ -72,6 +73,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         public static final String Q_ID = "qid";
         public static final String COMMENT_ID = "COMMENT_ID";
         public static final String FORCE_REFRESH = "FORCE_REFRESH";
+        public static final String AFTER_CREATE = "AFTER_CREATE";
     }
 
     @Override
@@ -302,6 +304,17 @@ public class QuestionDetailsActivity extends ToolbarActivity
     public void onPause() {
         super.onPause();
         serviceHelper.release();
+    }
+
+    @Override
+    public void onBackPressed() {
+        boolean afterCreate = getIntent().getBooleanExtra(IntentExtras.AFTER_CREATE, false);
+        if (afterCreate) {
+            setResult(Activity.RESULT_OK);
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void sendComment() {

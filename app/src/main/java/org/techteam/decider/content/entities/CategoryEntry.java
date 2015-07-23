@@ -12,12 +12,12 @@ import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
 
 import java.util.List;
 
 @Table(name = "Categories", id = BaseColumns._ID)
 public class CategoryEntry extends Model {
-
     public final static String LOCALIZED_LABEL_FIELD = "localized_label";
 
     @Column(name = "uid", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
@@ -56,8 +56,13 @@ public class CategoryEntry extends Model {
         return selected;
     }
 
-    public void setSelectedAsync(boolean selected) {
-        CategorySelectionSaver saver = new CategorySelectionSaver();
+    public void setSelectedAsync(final boolean selected, final OnCategorySelectedListener cb) {
+        CategorySelectionSaver saver = new CategorySelectionSaver() {
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                cb.categorySelected(CategoryEntry.this, selected);
+            }
+        };
         saver.execute(selected);
     }
 
@@ -97,10 +102,6 @@ public class CategoryEntry extends Model {
 
         protected void onProgressUpdate(Void... progress) {
 
-        }
-
-        protected void onPostExecute(Void result) {
-            System.out.println("Saved Category selection");
         }
     }
 

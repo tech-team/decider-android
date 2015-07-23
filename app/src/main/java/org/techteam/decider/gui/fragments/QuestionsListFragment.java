@@ -289,13 +289,18 @@ public class QuestionsListFragment
 
     @Override
     public void onRefresh() {
+        refresh();
+    }
+
+    public void refresh() {
         mSwipeRefreshLayout.setRefreshing(true);
 
 //        Toaster.toast(getActivity().getBaseContext(), R.string.loading);
 
+        questionsOffset = 0;
         serviceHelper.getQuestions(currentSection,
                 QUESTIONS_LIMIT,
-                questionsOffset = 0,
+                questionsOffset,
                 activity.getSelectedCategories(),
                 LoadIntention.REFRESH,
                 callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
@@ -345,7 +350,7 @@ public class QuestionsListFragment
 
     @Override
     public void categorySelected(CategoryEntry category, boolean isChecked) {
-         onRefresh();
+        refresh();
     }
 
     @Override
@@ -381,6 +386,10 @@ public class QuestionsListFragment
 
             getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
         }
+    }
+
+    public void invalidate() {
+        adapter.swapCursor(null);
     }
 
     public void setCurrentSection(ContentSection currentSection) {
