@@ -127,7 +127,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                 switch (serverErrorCode) {
                     case ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED:
                         requestUsername(data);
-                        break;
+                        return;
                     default:
                         break;
                 }
@@ -153,7 +153,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                 switch (serverErrorCode) {
                     case ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED:
                         requestUsername(data);
-                        break;
+                        return;
                     default:
                         break;
                 }

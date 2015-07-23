@@ -4,6 +4,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -53,7 +54,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     private CommentsListAdapter adapter;
 
-    private static final int COMMENTS_LIMIT = 5;
+    private static final int COMMENTS_LIMIT = 15;
     private int commentsOffset = 0;
     private boolean forceRefresh = false;
     private int remaining = Integer.MAX_VALUE;
@@ -74,6 +75,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         public static final String COMMENT_ID = "COMMENT_ID";
         public static final String FORCE_REFRESH = "FORCE_REFRESH";
         public static final String AFTER_CREATE = "AFTER_CREATE";
+        public static final String ENTRY_POSITION = "ENTRY_POSITION";
     }
 
     @Override
@@ -313,7 +315,11 @@ public class QuestionDetailsActivity extends ToolbarActivity
             setResult(Activity.RESULT_OK);
             finish();
         } else {
-            super.onBackPressed();
+            Intent data = new Intent();
+            int entryPosition = getIntent().getIntExtra(IntentExtras.ENTRY_POSITION, -1);
+            data.putExtra(IntentExtras.ENTRY_POSITION, entryPosition);
+            setResult(Activity.RESULT_OK, data);
+            finish();
         }
     }
 

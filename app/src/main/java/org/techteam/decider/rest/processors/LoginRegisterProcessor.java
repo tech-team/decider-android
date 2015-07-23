@@ -67,7 +67,9 @@ public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterReques
     @Override
     public void postExecuteError(JSONObject response, int errorCode, Bundle result) throws JSONException {
         super.postExecuteError(response, errorCode, result);
-        postExecute(response, result);
+        if (errorCode == ServiceCallback.ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED) {
+            postExecute(response, result);
+        }
     }
 
     @Override
