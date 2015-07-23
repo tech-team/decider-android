@@ -2,19 +2,14 @@ package org.techteam.decider.gui.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public abstract class PostView extends FrameLayout {
-    // date formatters
-    @SuppressLint("SimpleDateFormat")
-    private SimpleDateFormat sourceDateFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
     @SuppressLint("SimpleDateFormat")
     private SimpleDateFormat uiDateFormat =
             new SimpleDateFormat("d MMM, hh:mm");
@@ -36,6 +31,10 @@ public abstract class PostView extends FrameLayout {
         if (date == null) {
             return null;
         }
-        return uiDateFormat.format(date);
+
+        String dateString = DateFormat.getDateFormat(getContext()).format(date);
+        dateString += ", " + DateFormat.getTimeFormat(getContext()).format(date);
+
+        return dateString;
     }
 }
