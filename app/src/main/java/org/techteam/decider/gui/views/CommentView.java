@@ -1,9 +1,11 @@
 package org.techteam.decider.gui.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,6 +38,7 @@ public class CommentView extends PostView {
     private TextView authorText;
     private TextView dateText;
     private ImageView avatarImage;
+    private TextView anonBadge;
 
     // content
     private TextView postText;
@@ -65,6 +68,7 @@ public class CommentView extends PostView {
         authorText = (TextView) v.findViewById(R.id.author_text);
         dateText = (TextView) v.findViewById(R.id.date_text);
         avatarImage = (ImageView) v.findViewById(R.id.avatar_image);
+        anonBadge = (TextView) v.findViewById(R.id.anon_badge);
 
         // content
         postText = (TextView) v.findViewById(R.id.comment_text);
@@ -101,6 +105,8 @@ public class CommentView extends PostView {
             avatarImage.setImageDrawable(context.getResources().getDrawable(R.drawable.profile));
 
         authorText.setText(entry.getAuthor().getUsername());
+        anonBadge.setVisibility(entry.isAnonymous() ? VISIBLE : GONE);
+
         dateText.setText(getDateString(entry.getCreationDate()));
         postText.setText(entry.getText());
 
@@ -141,6 +147,28 @@ public class CommentView extends PostView {
     }
 
     protected void attachCallbacks() {
+        anonBadge.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (entry == null || !entry.isAnonymous())
+                    return;
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(R.string.anonymously)
+                        .setMessage(R.string.anon_explanation)
+                        .setIcon(R.drawable.logo)
+                        .setCancelable(false)
+                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
+            }
+        });
+
         avatarImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

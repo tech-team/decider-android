@@ -1,11 +1,13 @@
 package org.techteam.decider.gui.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +48,8 @@ public class QuestionView extends PostView {
     private ImageView avatarImage;
 
     private ImageButton overflowButton;
+    private TextView anonBadge;
+
     // content
     private EllipsizingTextView postText;
     private TextView ellipsizeHintText;
@@ -88,6 +92,7 @@ public class QuestionView extends PostView {
         dateText = (TextView) v.findViewById(R.id.date_text);
         avatarImage = (ImageView) v.findViewById(R.id.avatar_image);
         overflowButton = (ImageButton) v.findViewById(R.id.overflow_button);
+        anonBadge = (TextView) v.findViewById(R.id.anon_badge);
 
         // content
         postText = (EllipsizingTextView) v.findViewById(R.id.post_text);
@@ -144,6 +149,25 @@ public class QuestionView extends PostView {
         likeButton.getCompoundDrawables()[LEFT].setColorFilter(entry.isVoted() ? pressedStateFilter : null);
 
         commentsButton.setText(Integer.toString(entry.getCommentsCount()));
+        anonBadge.setVisibility(entry.isAnonymous() ? VISIBLE : GONE);
+        anonBadge.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(R.string.anonymously)
+                        .setMessage(R.string.anon_explanation)
+                        .setIcon(R.drawable.logo)
+                        .setCancelable(false)
+                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
+            }
+        });
 
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

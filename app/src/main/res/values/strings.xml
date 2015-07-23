@@ -40,7 +40,7 @@
     <string name="no">No</string>
     <string name="option1">First option:</string>
     <string name="option2">Second option:</string>
-    <string name="anonymously">Anonymously</string>
+    <string name="anonymously">Anonymous</string>
     <string name="popular_tab">Popular</string>
     <string name="new_tab">New</string>
     <string name="my_tab">My</string>
@@ -117,5 +117,8 @@
     <string name="profile_saved">Profile saved</string>
     <string name="end_registration_alert">Registration completion</string>
     <string name="end_registration_alert_message">To complete registration, please enter your nickname.</string>
+    <string name="send">Send</string>
+    <string name="anon_badge">(Anonymous)</string>
+    <string name="anon_explanation">Other users do not see the author.</string>
 
 </resources>

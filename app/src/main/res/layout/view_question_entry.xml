@@ -56,6 +56,19 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/open_context_menu" />
 
+    <TextView
+        android:id="@+id/anon_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/overflow_button"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/accent_material_dark"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:visibility="gone"
+        android:text="@string/anon_badge"/>
+
     <View
         android:id="@+id/header_hr"
         android:layout_width="fill_parent"

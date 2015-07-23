@@ -109,4 +109,7 @@
     <string name="gender_none"> </string>
     <string name="end_registration_alert">Завершение регистрации</string>
     <string name="end_registration_alert_message">Для завершения регистрации, пожалуйста, укажите ваш псевдоним.</string>
+    <string name="send">Send</string>
+    <string name="anon_badge">(Анонимно)</string>
+    <string name="anon_explanation">Другие пользователи не видят автора.</string>
 </resources>

@@ -13,8 +13,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 
 import junit.framework.Assert;
 
@@ -30,7 +31,6 @@ import org.techteam.decider.gui.fragments.OnQuestionEventCallback;
 import org.techteam.decider.gui.loaders.CommentsLoader;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
-import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.gui.views.QuestionView;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
@@ -46,6 +46,8 @@ public class QuestionDetailsActivity extends ToolbarActivity
     private QuestionView questionView;
     private RecyclerView commentsView;
     private EditText commentEdit;
+
+    private CheckBox anonymityCheckBox;
 
     private CommentsListAdapter adapter;
 
@@ -115,7 +117,9 @@ public class QuestionDetailsActivity extends ToolbarActivity
         commentsView = (RecyclerView) findViewById(R.id.comments_recycler);
 
         commentEdit = (EditText) findViewById(R.id.comment_edit);
-        ImageButton sendCommentButton = (ImageButton) findViewById(R.id.comment_send);
+        Button sendCommentButton = (Button) findViewById(R.id.comment_send);
+
+        anonymityCheckBox = (CheckBox) findViewById(R.id.anonymity_checkbox);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -315,7 +319,9 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         }
 
-        serviceHelper.createComment(new CommentData(text, questionId, lastCommentId, false),
+        boolean anon = anonymityCheckBox.isChecked();
+
+        serviceHelper.createComment(new CommentData(text, questionId, lastCommentId, anon),
                 callbacksKeeper.getCallback(OperationType.COMMENT_CREATE));
     }
 
