@@ -212,7 +212,14 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        Toaster.toast(this, email + " : " + password);
+        // nice article about email regexes:
+        // http://www.webmonkey.com/2008/08/four_regular_expressions_to_check_email_addresses/
+        // so let's just use dirty and simple one
+        if (!email.matches(".+\\@.+\\..+")) {
+            Toaster.toast(AuthActivity.this, getString(R.string.invalid_email));
+            return;
+        }
+
         serviceHelper.register(email, password, callbacksKeeper.getCallback(OperationType.REGISTER));
     }
 

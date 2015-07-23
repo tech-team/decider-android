@@ -112,4 +112,5 @@
     <string name="send">Send</string>
     <string name="anon_badge">(Анонимно)</string>
     <string name="anon_explanation">Другие пользователи не видят автора.</string>
+    <string name="invalid_email">Пожалуйста, введите настоящий почтовый адрес</string>
 </resources>

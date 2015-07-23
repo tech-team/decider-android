@@ -120,5 +120,6 @@
     <string name="send">Send</string>
     <string name="anon_badge">(Anonymous)</string>
     <string name="anon_explanation">Other users do not see the author.</string>
+    <string name="invalid_email">Please enter real email address</string>
 
 </resources>
