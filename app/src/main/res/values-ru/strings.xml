@@ -15,7 +15,7 @@
     <string name="ellipsize_hint">Нажмите, чтобы развернуть...</string>
     <string name="post_like">Мне нравится</string>
     <string name="post_comments">Комментарии</string>
-    <string name="report_abuse">Сообщить об оскорблении</string>
+    <string name="report_spam">Отметить как спам</string>
     <string name="loading">Загрузка...</string>
     <string name="pref_shorten_long_posts_title">Сокращать длинные посты</string>
     <string name="pref_shorten_long_posts_summ">Нажмите, чтобы развернуть вопрос</string>

@@ -30,6 +30,20 @@
         android:layout_marginTop="6dp"
         tools:text="Vasja Pupkin" />
 
+
+    <ImageView
+        android:id="@+id/anon_badge"
+        android:layout_width="32dp"
+        android:layout_height="16dp"
+        android:layout_toRightOf="@id/author_text"
+        android:layout_toEndOf="@id/author_text"
+        android:visibility="visible"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:layout_marginTop="6dp"
+        android:src="@drawable/anon_badge"
+        android:contentDescription="@string/anon_badge"/>
+
     <TextView
         android:id="@+id/date_text"
         android:layout_toRightOf="@id/avatar_image"
@@ -57,17 +71,16 @@
         android:contentDescription="@string/open_context_menu" />
 
     <TextView
-        android:id="@+id/anon_badge"
+        android:id="@+id/category_badge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/overflow_button"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@color/accent_material_dark"
+        android:background="#ffddeedd"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
-        android:visibility="gone"
-        android:text="@string/anon_badge"/>
+        tools:text="category" />
 
     <View
         android:id="@+id/header_hr"

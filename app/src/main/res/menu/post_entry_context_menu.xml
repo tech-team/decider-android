@@ -2,5 +2,5 @@
 
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/report_abuse" android:title="@string/report_abuse" />
+    <item android:id="@+id/report_spam" android:title="@string/report_spam" />
 </menu>
