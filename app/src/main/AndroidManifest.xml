@@ -46,7 +46,6 @@
             android:windowSoftInputMode="adjustResize|stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -80,7 +79,6 @@
             android:label="@string/preview_toolbar_title">
         </activity>
 
-        <activity android:name="com.vk.sdk.VKOpenAuthActivity" />
         <!-- Declare the bundled CropImage Activity -->
         <activity android:name="com.android.camera.CropImage" />
 
