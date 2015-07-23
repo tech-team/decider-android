@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import org.techteam.decider.R;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 
 public class NewVotePush extends Push {
@@ -23,7 +24,7 @@ public class NewVotePush extends Push {
 
     @Override
     public String getMessage(Context context) {
-        return "New votes on your question!";
+        return context.getString(R.string.push_new_vote);
     }
 
     @Override

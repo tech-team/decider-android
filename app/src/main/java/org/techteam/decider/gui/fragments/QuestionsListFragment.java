@@ -51,7 +51,7 @@ public class QuestionsListFragment
     public static final String TAG = QuestionsListFragment.class.toString();
 
 
-    private static final int QUESTIONS_LIMIT = 30;
+    private static final int QUESTIONS_LIMIT = 5;
     private int questionsOffset = 0;
     private ContentSection currentSection = null;
 
