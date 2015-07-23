@@ -7,8 +7,11 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -60,6 +63,32 @@ public class CommentView extends PostView {
 
     protected void init(Context context) {
         View v = View.inflate(context, R.layout.view_comment_entry, this);
+
+        v.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                final Context context = v.getContext();
+
+                PopupMenu menu = new PopupMenu(context, v);
+                menu.inflate(R.menu.post_entry_context_menu);
+
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                        switch (item.getItemId()) {
+                            case R.id.report_spam:
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+                menu.show();
+                return true;
+            }
+        });
 
         imageLoader = ImageLoaderInitializer.getImageLoader(context);
 
