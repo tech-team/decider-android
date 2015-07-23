@@ -140,10 +140,10 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
         categoriesSpinnerAdapter = new SimpleCursorAdapter(
                 this,
-                R.layout.categories_spinner_item,
+                android.R.layout.simple_list_item_1,
                 null,
                 new String[] {CategoryEntry.LOCALIZED_LABEL_FIELD},
-                new int[] {R.id.category_title},
+                new int[] {android.R.id.text1},
                 0);
 
         categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
