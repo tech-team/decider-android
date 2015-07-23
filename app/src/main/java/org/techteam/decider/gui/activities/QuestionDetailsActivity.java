@@ -134,10 +134,10 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
         // comments stuff
         int qid = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
-        Assert.assertNotSame("Q_ID is null", qid, -1);
+//        Assert.assertNotSame("Q_ID is null", qid, -1);
 
         QuestionEntry entry = QuestionEntry.byQId(qid);
-        Assert.assertNotSame("entry is null", entry, null);
+//        Assert.assertNotSame("entry is null", entry, null);
 
         adapter = new CommentsListAdapter(null, this, entry, this, this, this);
         commentsView.setAdapter(adapter);
@@ -153,8 +153,6 @@ public class QuestionDetailsActivity extends ToolbarActivity
         callbacksKeeper.addCallback(OperationType.COMMENTS_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(QuestionDetailsActivity.this, "GetComments: ok");
-
                 boolean isFeedFinished = data.getBoolean(GetCommentsExtras.FEED_FINISHED, false);
                 int questionId = data.getInt(GetCommentsExtras.QUESTION_ID, -1);
                 int insertedCount = data.getInt(GetCommentsExtras.COUNT, -1);
@@ -182,6 +180,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
                 Toaster.toast(QuestionDetailsActivity.this, "GetComments: failed. " + message);
             }
@@ -190,8 +194,6 @@ public class QuestionDetailsActivity extends ToolbarActivity
         callbacksKeeper.addCallback(OperationType.COMMENT_CREATE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(QuestionDetailsActivity.this, "CreateComment: ok");
-
                 int questionId = data.getInt(CreateQuestionExtras.QID, -1);
                 int insertedCount = data.getInt(CreateQuestionExtras.COUNT, -1);
 
@@ -214,6 +216,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
                 Toaster.toast(QuestionDetailsActivity.this, "CreateComment: failed. " + message);
             }
@@ -222,8 +230,6 @@ public class QuestionDetailsActivity extends ToolbarActivity
         callbacksKeeper.addCallback(OperationType.POLL_VOTE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toastLong(getApplicationContext(), "Successfully voted");
-
                 QuestionUpdateTask task = new QuestionUpdateTask();
                 task.execute();
             }
@@ -238,17 +244,29 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getApplicationContext(), msg);
+
+                int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
+                switch (serverErrorCode) {
+                    case PollVoteExtras.ErrorCodes.ALREADY_VOTED:
+                        Toaster.toast(getApplicationContext(), R.string.already_voted);
+                        return;
+                    default:
+                        break;
+                }
+                Toaster.toastLong(getApplicationContext(), "Error. " + message);
             }
         });
 
         callbacksKeeper.addCallback(OperationType.QUESTION_LIKE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toastLong(getApplicationContext(), "Like accepted");
-
                 QuestionUpdateTask task = new QuestionUpdateTask();
                 task.execute();
             }
@@ -263,9 +281,14 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getApplicationContext(), msg);
+                Toaster.toastLong(getApplicationContext(), "Error. " + message);
             }
         });
 
@@ -284,6 +307,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
                         return;
                 }
                 String msg = "Error. " + message;
@@ -307,9 +336,14 @@ public class QuestionDetailsActivity extends ToolbarActivity
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getApplicationContext(), msg);
+                Toaster.toastLong(getApplicationContext(), "Error. " + message);
             }
         });
 
@@ -393,31 +427,20 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     @Override
     public void moreCommentsRequested() {
-//        int intention;
-//        if (adapter.getCursor().getCount() == 0) {
-//            intention = LoadIntention.REFRESH;
-//        } else {
-//            intention = LoadIntention.APPEND;
-//        }
-
         serviceHelper.getComments(adapter.getQuestionEntry().getQId(),
                 COMMENTS_LIMIT,
                 commentsOffset,
                 LoadIntention.APPEND,
                 callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
-
-        // TODO
     }
 
     @Override
     public void onLikeClick(int entryPosition, QuestionEntry post) {
-        Toaster.toast(getApplicationContext(), "Like clicked");
         serviceHelper.likeQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_LIKE));
     }
 
     @Override
     public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
-        Toaster.toast(getApplicationContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
         serviceHelper.pollVote(entryPosition, post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
     }
 
@@ -442,10 +465,10 @@ public class QuestionDetailsActivity extends ToolbarActivity
         @Override
         protected QuestionEntry doInBackground(Void... params) {
             int qid = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
-            Assert.assertNotSame("Q_ID is null", qid, -1);
+//            Assert.assertNotSame("Q_ID is null", qid, -1);
 
             QuestionEntry entry = QuestionEntry.byQId(qid);
-            Assert.assertNotSame("entry is null", entry, null);
+//            Assert.assertNotSame("entry is null", entry, null);
 
             return entry;
         }
@@ -475,10 +498,10 @@ public class QuestionDetailsActivity extends ToolbarActivity
         @Override
         protected QuestionEntry doInBackground(Void... params) {
             int qid = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
-            Assert.assertNotSame("Q_ID is null", qid, -1);
+//            Assert.assertNotSame("Q_ID is null", qid, -1);
 
             QuestionEntry entry = QuestionEntry.byQId(qid);
-            Assert.assertNotSame("entry is null", entry, null);
+//            Assert.assertNotSame("entry is null", entry, null);
 
             return entry;
         }

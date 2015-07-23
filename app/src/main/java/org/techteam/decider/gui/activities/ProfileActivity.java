@@ -94,7 +94,7 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
         setContentView(R.layout.fragment_profile);
 
         uid = getIntent().getStringExtra(USER_ID);
-        Assert.assertNotSame("UID is null", uid, null);
+//        Assert.assertNotSame("UID is null", uid, null);
 
         // setup toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -124,7 +124,6 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
         callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(getApplicationContext(), "GetUser: ok");
                 retrieveEntryTask = new RetrieveEntryTask();
                 retrieveEntryTask.execute();
             }
@@ -139,6 +138,12 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
                         return;
                 }
                 Toaster.toastLong(getApplicationContext(), "GetUser: failed. " + message);

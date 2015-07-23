@@ -123,9 +123,17 @@
     <string name="invalid_email">Please enter real email address</string>
     <string name="push_new_comment">New comment on your question!</string>
     <string name="push_new_vote">New vote on your question!</string>
-    <string name="push_more_comments">More comments on your question! (%d)</string>
-    <string name="push_more_votes">More votes on your question! (%d)</string>
+    <string name="push_more_comments">More comments (%d) on your question!</string>
+    <string name="push_more_votes">More votes (%d) on your question!</string>
     <string name="question_marked_spam">Question marked as spam</string>
     <string name="comment_marked_spam">Comment marked as spam</string>
+    <string name="question_created">Question is created!</string>
+    <string name="username_taken">Username \'%s\' is already taken</string>
+    <string name="no_internet">There are problems with Internet connection</string>
+    <string name="internal_problems">Internal problems. Try again later.</string>
+    <string name="already_voted">You have already voted in this question</string>
+    <string name="invalid_credentials">Invalid credentials</string>
+    <string name="email_taken">This email is already taken</string>
+    <string name="username_required">Username is required to finish registration</string>
 
 </resources>

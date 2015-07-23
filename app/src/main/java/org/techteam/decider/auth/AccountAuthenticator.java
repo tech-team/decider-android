@@ -14,6 +14,7 @@ import android.util.Log;
 import org.json.JSONObject;
 import org.techteam.decider.gui.activities.AuthActivity;
 import org.techteam.decider.rest.api.ApiUI;
+import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
@@ -88,6 +89,8 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.EXPIRES, Long.toString(System.currentTimeMillis() + expires * 1000));
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
                     am.setUserData(account, ServiceCallback.LoginRegisterExtras.USER_ID, userId);
+                } catch (TokenRefreshFailException e) {
+                    throw new RuntimeException(e);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

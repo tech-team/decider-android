@@ -108,7 +108,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         callbacksKeeper.addCallback(OperationType.LOGIN, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(AuthActivity.this, "Login: ok");
                 String username = data.getString(LoginRegisterExtras.USERNAME);
                 String password = data.getString(LoginRegisterExtras.PASSWORD);
                 saveToken(data, username, password);
@@ -121,6 +120,12 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
 
                 int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
@@ -128,16 +133,19 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                     case ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED:
                         requestUsername(data);
                         return;
+                    case LoginRegisterExtras.ErrorCodes.INVALID_CREDENTIALS:
+                        Toaster.toast(getApplicationContext(), R.string.invalid_credentials);
+                        return;
                     default:
                         break;
                 }
-                Toaster.toast(AuthActivity.this, "Login: failed. " + message);
+                Toaster.toast(getApplicationContext(), "Login: failed. " + message);
             }
         });
         callbacksKeeper.addCallback(OperationType.REGISTER, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(AuthActivity.this, "Register: ok");
+
             }
 
             @Override
@@ -147,12 +155,21 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
 
                 int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
                 switch (serverErrorCode) {
                     case ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED:
                         requestUsername(data);
+                        return;
+                    case LoginRegisterExtras.ErrorCodes.INVALID_CREDENTIALS:
+                        Toaster.toast(getApplicationContext(), R.string.email_taken);
                         return;
                     default:
                         break;

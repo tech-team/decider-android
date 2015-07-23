@@ -15,6 +15,7 @@ import org.techteam.decider.rest.api.TokenRefreshFailException;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 public abstract class RequestProcessor<T> extends Processor {
 
@@ -49,7 +50,7 @@ public abstract class RequestProcessor<T> extends Processor {
         return true;
     }
 
-    public abstract JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException;
+    public abstract JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException;
     public abstract void postExecute(JSONObject response, Bundle result) throws JSONException;
     public void postExecuteError(JSONObject response, int errorCode, Bundle result) throws JSONException {
         String msg = response.getString("msg");
@@ -72,7 +73,17 @@ public abstract class RequestProcessor<T> extends Processor {
             postExecute(response, result);
             transactionFinished(operationType, requestId);
             cb.onSuccess(result);
-        } catch (IOException | JSONException | TokenRefreshFailException e) {
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            transactionError(operationType, requestId);
+            result.putInt(ServiceCallback.ErrorsExtras.GENERIC_ERROR_CODE, ServiceCallback.ErrorsExtras.GenericErrors.NO_INTERNET);
+            cb.onError(e.getMessage(), result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            transactionError(operationType, requestId);
+            result.putInt(ServiceCallback.ErrorsExtras.GENERIC_ERROR_CODE, ServiceCallback.ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS);
+            cb.onError(e.getMessage(), result);
+        } catch (IOException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);
             cb.onError(e.getMessage(), result);
@@ -81,10 +92,10 @@ public abstract class RequestProcessor<T> extends Processor {
             transactionError(operationType, requestId);
             result.putInt(ServiceCallback.ErrorsExtras.GENERIC_ERROR_CODE, ServiceCallback.ErrorsExtras.GenericErrors.INVALID_TOKEN);
             cb.onError(e.getMessage(), result);
-        } catch (AuthenticatorException e) {
+        } catch (AuthenticatorException | OperationCanceledException e) {
             e.printStackTrace();
-        } catch (OperationCanceledException e) {
-            e.printStackTrace();
+            transactionError(operationType, requestId);
+            cb.onError(e.getMessage(), result);
         } catch (ServerErrorException e) {
             e.printStackTrace();
             transactionError(operationType, requestId);

@@ -184,18 +184,20 @@ public class QuestionsListFragment
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getActivity().getApplicationContext(), msg);
-                System.out.println(msg);
+                Toaster.toastLong(getActivity().getApplicationContext(), message);
             }
         });
 
         callbacksKeeper.addCallback(OperationType.POLL_VOTE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toastLong(getActivity().getApplicationContext(), "Successfully voted");
-
                 int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
@@ -212,17 +214,29 @@ public class QuestionsListFragment
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getActivity().getApplicationContext(), msg);
+
+                int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
+                switch (serverErrorCode) {
+                    case PollVoteExtras.ErrorCodes.ALREADY_VOTED:
+                        Toaster.toast(getActivity().getApplicationContext(), R.string.already_voted);
+                        return;
+                    default:
+                        break;
+                }
+                Toaster.toastLong(getActivity().getApplicationContext(), message);
             }
         });
 
         callbacksKeeper.addCallback(OperationType.QUESTION_LIKE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toastLong(getActivity().getApplicationContext(), "Like accepted");
-
                 int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
@@ -239,9 +253,14 @@ public class QuestionsListFragment
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getActivity().getApplicationContext(), msg);
+                Toaster.toastLong(getActivity().getApplicationContext(), message);
             }
         });
 
@@ -261,9 +280,14 @@ public class QuestionsListFragment
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
-                String msg = "Error. " + message;
-                Toaster.toastLong(getActivity().getApplicationContext(), msg);
+                Toaster.toastLong(getActivity().getApplicationContext(), message);
             }
         });
     }
@@ -330,9 +354,6 @@ public class QuestionsListFragment
 
     @Override
     public void onScrolledDown() {
-        Toaster.toast(getActivity().getBaseContext(), "Bottom reached");
-
-        System.out.println("Load has begun");
         int intention;
         if (adapter.getCursor().getCount() == 0) {
             intention = LoadIntention.REFRESH;
@@ -346,19 +367,15 @@ public class QuestionsListFragment
                 activity.getSelectedCategories(),
                 intention,
                 callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
-
-//        serviceHelper.getQuestions(currentSection, QUESTIONS_LIMIT, questionsOffset, chosenCategories, intention, callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
     }
 
     @Override
     public void onLikeClick(int entryPosition, QuestionEntry post) {
-        Toaster.toast(getActivity(), "Like clicked");
         serviceHelper.likeQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_LIKE));
     }
 
     @Override
     public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
-        Toaster.toast(activity.getBaseContext(), "Vote pressed. QId = " + post.getQId() + ". voteId = " + voteId);
         serviceHelper.pollVote(entryPosition, post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
     }
 
@@ -417,8 +434,10 @@ public class QuestionsListFragment
     }
 
     public void invalidate() {
-        adapter.swapCursor(null);
-        refresh();
+        if (isAdded()) {
+            adapter.swapCursor(null);
+            refresh();
+        }
     }
 
     public void setCurrentSection(ContentSection currentSection) {

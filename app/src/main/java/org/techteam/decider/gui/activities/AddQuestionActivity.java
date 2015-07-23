@@ -152,7 +152,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
-                Toaster.toast(AddQuestionActivity.this, "Create question ok");
+                Toaster.toast(AddQuestionActivity.this, R.string.question_created);
 
                 Intent result = new Intent();
                 int qid = data.getInt(CreateQuestionExtras.QID, -1);
@@ -172,6 +172,12 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
                         return;
                 }
 

@@ -29,7 +29,7 @@ public class CommentReportSpamProcessor extends RequestProcessor<CommentReportSp
     }
 
     @Override
-    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, TokenRefreshFailException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
+    public JSONObject executeRequest() throws ServerErrorException, OperationCanceledException, IOException, JSONException, InvalidAccessTokenException, AuthenticatorException {
         return apiUI.reportSpam(getRequest());
     }
 

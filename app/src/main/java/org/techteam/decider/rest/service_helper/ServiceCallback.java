@@ -15,6 +15,8 @@ public interface ServiceCallback {
         public class GenericErrors {
             public static final int INVALID_TOKEN = 1;
             public static final int SERVER_ERROR = 2;
+            public static final int NO_INTERNET = 3;
+            public static final int INTERNAL_PROBLEMS = 4;
         }
 
         public class ErrorCodes {
@@ -43,6 +45,10 @@ public interface ServiceCallback {
         public static final String POLL_ITEM_ID = "POLL_ITEM_ID";
         public static final String VOTES_COUNT = "VOTES_COUNT";
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
+
+        public class ErrorCodes {
+            public static final int ALREADY_VOTED = 8200;
+        }
     }
 
     class EntityVoteExtras {
@@ -74,6 +80,10 @@ public interface ServiceCallback {
         public static final String USER_ID = "USER_ID";
         public static final String USERNAME = "USERNAME";
         public static final String REGISTRATION_UNFINISHED = "REGISTRATION_UNFINISHED";
+
+        public class ErrorCodes {
+            public static final int INVALID_CREDENTIALS = 7002;
+        }
     }
 
     class GetUserExtras {
@@ -86,6 +96,7 @@ public interface ServiceCallback {
 
         public class ErrorCodes {
             public static final int USERNAME_TAKEN = 7006;
+            public static final int USERNAME_REQUIRED = 7003;
         }
     }
 

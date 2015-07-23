@@ -24,8 +24,6 @@ import android.widget.Spinner;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import junit.framework.Assert;
-
 import org.techteam.decider.R;
 import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.UserData;
@@ -125,7 +123,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         setContentView(R.layout.fragment_profile_edit);
 
         uid = getIntent().getStringExtra(IntentExtras.USER_ID);
-        Assert.assertNotSame("UID is null", uid, null);
+//        Assert.assertNotSame("UID is null", uid, null);
 
         // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -236,13 +234,22 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
 
                 int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
                 switch (serverErrorCode) {
                     case EditUserExtras.ErrorCodes.USERNAME_TAKEN:
                         String username = data.getString(EditUserExtras.USERNAME);
-                        Toaster.toastLong(EditProfileActivity.this, "Username \'" + username + "\' is already taken" + message);
+                        Toaster.toastLong(getApplicationContext(), String.format(getString(R.string.username_taken), username));
+                        return;
+                    case EditUserExtras.ErrorCodes.USERNAME_REQUIRED:
+                        Toaster.toast(getApplicationContext(), getString(R.string.username_required));
                         return;
                     default:
                         break;
@@ -253,7 +260,6 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(getApplicationContext(), "GetUser: ok");
                 retrieveEntryTask = new RetrieveEntryTask();
                 retrieveEntryTask.execute();
             }
@@ -268,6 +274,12 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
                         return;
                 }
                 Toaster.toastLong(getApplicationContext(), "GetUser: failed. " + message);

@@ -110,24 +110,21 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
 
-//        if (savedInstanceState == null) {
-            getAuthToken(new AccountManagerCallback<Bundle>() {
-                @Override
-                public void run(AccountManagerFuture<Bundle> future) {
-                    if (future.isCancelled()) {
-                        finish();
-                    } else {
-                        finishAuthorization();
-                    }
+        getAuthToken(new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                if (future.isCancelled()) {
+                    finish();
+                } else {
+                    finishAuthorization();
                 }
-            });
-//        }
+            }
+        });
 
         serviceHelper = new ServiceHelper(this);
         callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                Toaster.toast(getApplicationContext(), "GetUser: ok");
                 serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.CATEGORIES_GET));
             }
 
@@ -140,6 +137,12 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
                         return;
                 }
                 Toaster.toastLong(getApplicationContext(), "GetUser: failed. " + message);
@@ -163,10 +166,15 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
                         return;
+                    case ErrorsExtras.GenericErrors.NO_INTERNET:
+                        Toaster.toastLong(getApplicationContext(), R.string.no_internet);
+                        return;
+                    case ErrorsExtras.GenericErrors.INTERNAL_PROBLEMS:
+                        Toaster.toastLong(getApplicationContext(), R.string.internal_problems);
+                        return;
                 }
                 String msg = "Categories error. " + message;
                 Toaster.toast(getApplicationContext(), msg);
-                System.out.println(msg);
             }
         });
 
@@ -176,9 +184,9 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                 boolean sentToken = sharedPreferences.getBoolean(GcmPreferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    Log.d(TAG, "send token successful");
+                    Log.d(TAG, "sent gcm token successfully");
                 } else {
-                    Log.d(TAG, "send token failed");
+                    Log.d(TAG, "send gcm token failed");
                 }
             }
         };
@@ -344,7 +352,6 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
 
     @Override
     public void categorySelected(CategoryEntry category, boolean isChecked) {
-        Toaster.toast(getApplicationContext(), "Selected");
         category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
             @Override
             public void categorySelected(CategoryEntry category, boolean isChecked) {
@@ -420,10 +427,6 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             if  (id == LoaderIds.CATEGORIES_LOADER) {
-
-                if (args != null) {
-                }
-
                 return new CategoriesLoader(MainActivity.this);
             }
             throw new IllegalArgumentException("Loader with given id is not found");

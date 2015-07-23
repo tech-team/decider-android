@@ -89,7 +89,7 @@ public class ApiUI {
         return am.getUserData(accounts[0], ServiceCallback.LoginRegisterExtras.USER_ID);
     }
 
-    public JSONObject getQuestions(QuestionsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject getQuestions(QuestionsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
@@ -105,7 +105,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getCategories(CategoriesGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject getCategories(CategoriesGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("locale", request.getLocale());
 
@@ -150,7 +150,7 @@ public class ApiUI {
         return obj;
     }
 
-    public JSONObject createQuestion(QuestionCreateRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject createQuestion(QuestionCreateRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         ImageQuestionData q = (ImageQuestionData) request.getQuestionData();
         ImageData[] images = { q.getPicture1(), q.getPicture2() };
         ImageParamFacade[] imageParamFacades = new ImageParamFacade[images.length];
@@ -187,7 +187,7 @@ public class ApiUI {
         }
     }
 
-    public JSONObject createComment(CommentCreateRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject createComment(CommentCreateRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         CommentData data = request.getCommentData();
         UrlParams params = new UrlParams();
         params.add("data", data.toJson().toString());
@@ -199,7 +199,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject uploadImage(ImageUploadRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject uploadImage(ImageUploadRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         ImageData image = request.getImage();
         ImageParamFacade imageParamFacade = new ImageParamFacade(image);
@@ -217,7 +217,7 @@ public class ApiUI {
         }
     }
 
-    public JSONObject pollVote(PollVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject pollVote(PollVoteRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("question_id", request.getQuestionId());
         params.add("poll_item_id", request.getPollItemId());
@@ -229,7 +229,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject entityVote(EntityVoteRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject entityVote(EntityVoteRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("entity", request.getEntityType());
         params.add("entity_id", request.getEntityId());
@@ -241,7 +241,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getComments(CommentsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject getComments(CommentsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("question_id", request.getQuestionId());
         params.add("limit", request.getLimit());
@@ -254,7 +254,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject getUser(UserGetRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject getUser(UserGetRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("user_id", request.getUserId());
 
@@ -269,7 +269,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject editUser(UserEditRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject editUser(UserEditRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UserData userData = request.getUserData();
         String accessToken = request.getAccessToken();
 
@@ -305,7 +305,7 @@ public class ApiUI {
         }
     }
 
-    public JSONObject authPush(PushAuthRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject authPush(PushAuthRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("instance_id", request.getInstanceId());
         params.add("reg_token", request.getRegToken());
@@ -317,7 +317,7 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
-    public JSONObject reportSpam(ReportSpamRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    public JSONObject reportSpam(ReportSpamRequest request) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
         params.add("entity", request.getEntityType());
         params.add("entity_id", request.getEntityId());
@@ -341,7 +341,7 @@ public class ApiUI {
         return httpRequest;
     }
 
-    private HttpResponse checkResponse(HttpResponse httpResponse, HttpRequest httpRequest) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    private HttpResponse checkResponse(HttpResponse httpResponse, HttpRequest httpRequest) throws JSONException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         if (httpResponse == null) {
             return null;
         }
@@ -377,7 +377,7 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    private HttpResponse makeProtectedGetCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         HttpRequest httpRequest = new HttpRequest(url);
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.GET);
@@ -387,7 +387,7 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    private HttpResponse makeProtectedPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         HttpRequest httpRequest = new HttpRequest(url);
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.POST);
@@ -397,7 +397,7 @@ public class ApiUI {
         return httpResponse;
     }
 
-    private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, TokenRefreshFailException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+    private HttpResponse makeProtectedMultipartPostCall(String url, UrlParams params) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         HttpRequest httpRequest = new HttpRequest(url);
         prepareHttpRequest(httpRequest, params);
         httpRequest.setRequestType(HttpRequest.Type.MULTIPART_POST);
