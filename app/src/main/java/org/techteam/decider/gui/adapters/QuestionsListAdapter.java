@@ -85,6 +85,11 @@ public class QuestionsListAdapter
             public void onCommentsClick(QuestionEntry post) {
                 onQuestionEventCallback.onCommentsClick(position, post);
             }
+
+            @Override
+            public void onReportSpamClick(QuestionEntry post) {
+                onQuestionEventCallback.onReportSpam(position, post);
+            }
         });
     }
 

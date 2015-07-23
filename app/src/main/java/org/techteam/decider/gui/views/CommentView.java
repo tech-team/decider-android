@@ -26,6 +26,7 @@ import org.techteam.decider.util.ImageLoaderInitializer;
 public class CommentView extends PostView {
 
     public interface EventListener {
+        void onReportSpamClick(CommentEntry entry);
     }
 
     // data
@@ -78,6 +79,7 @@ public class CommentView extends PostView {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                         switch (item.getItemId()) {
                             case R.id.report_spam:
+                                eventListener.onReportSpamClick(entry);
                                 return true;
                             default:
                                 return false;

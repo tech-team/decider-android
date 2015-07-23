@@ -317,6 +317,18 @@ public class ApiUI {
         return new JSONObject(response.getBody());
     }
 
+    public JSONObject reportSpam(ReportSpamRequest request) throws JSONException, TokenRefreshFailException, IOException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
+        UrlParams params = new UrlParams();
+        params.add("entity", request.getEntityType());
+        params.add("entity_id", request.getEntityId());
+
+        HttpResponse response = makeProtectedPostCall(resolveApiUrl(request.getPath()), params);
+        if (response == null || response.getBody() == null) {
+            return null;
+        }
+        return new JSONObject(response.getBody());
+    }
+
     private HttpRequest prepareHttpRequest(HttpRequest httpRequest, UrlParams params) throws InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, IOException {
         if (params.get("access_token") == null) {
             String accessToken = getAccessToken();

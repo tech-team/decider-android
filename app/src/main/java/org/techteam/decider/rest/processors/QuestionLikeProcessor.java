@@ -62,6 +62,7 @@ public class QuestionLikeProcessor extends RequestProcessor<QuestionLikeRequest>
     @Override
     protected Bundle getInitialBundle() {
         Bundle data = new Bundle();
+        data.putString(ServiceCallback.EntityVoteExtras.ENTITY_NAME, getRequest().getEntityType());
         data.putInt(ServiceCallback.EntityVoteExtras.ENTRY_POSITION, getRequest().getEntryPosition());
         return data;
     }

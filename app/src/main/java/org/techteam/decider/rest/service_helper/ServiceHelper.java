@@ -256,6 +256,38 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
+    public void reportSpamQuestion(int entryPosition, int questionId, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.QUESTION_REPORT_SPAM;
+
+        String requestId = createRequestId(op, questionId);
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.reportSpamQuestionIntent(context, op, requestId, entryPosition, questionId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
+    public void reportSpamComment(int entryPosition, int commentId, ServiceCallback cb) {
+        init();
+
+        OperationType op = OperationType.COMMENT_REPORT_SPAM;
+
+        String requestId = createRequestId(op, commentId);
+        CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
+
+        if (s == CallbackHelper.AddStatus.NEW_CB) {
+            Intent intent = ServiceIntentBuilder.reportSpamCommentIntent(context, op, requestId, entryPosition, commentId);
+            context.startService(intent);
+        }
+
+        pendingOperations.put(requestId, new PendingOperation(op, requestId));
+    }
+
 
 
 

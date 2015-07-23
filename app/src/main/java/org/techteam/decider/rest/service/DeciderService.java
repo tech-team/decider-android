@@ -7,12 +7,14 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.CommentCreateRequest;
+import org.techteam.decider.rest.api.CommentReportSpamRequest;
 import org.techteam.decider.rest.api.EntityVoteRequest;
 import org.techteam.decider.rest.api.PushAuthRequest;
 import org.techteam.decider.rest.api.QuestionCreateRequest;
 import org.techteam.decider.rest.api.CategoriesGetRequest;
 import org.techteam.decider.rest.api.CommentsGetRequest;
 import org.techteam.decider.rest.api.QuestionLikeRequest;
+import org.techteam.decider.rest.api.QuestionReportSpamRequest;
 import org.techteam.decider.rest.api.QuestionsGetRequest;
 import org.techteam.decider.rest.api.UserEditRequest;
 import org.techteam.decider.rest.api.UserGetRequest;
@@ -20,11 +22,13 @@ import org.techteam.decider.rest.api.LoginRegisterRequest;
 import org.techteam.decider.rest.api.PollVoteRequest;
 import org.techteam.decider.rest.api.ImageUploadRequest;
 import org.techteam.decider.rest.processors.CommentCreateProcessor;
+import org.techteam.decider.rest.processors.CommentReportSpamProcessor;
 import org.techteam.decider.rest.processors.PushAuthProcessor;
 import org.techteam.decider.rest.processors.QuestionCreateProcessor;
 import org.techteam.decider.rest.processors.CategoriesGetProcessor;
 import org.techteam.decider.rest.processors.CommentsGetProcessor;
 import org.techteam.decider.rest.processors.QuestionLikeProcessor;
+import org.techteam.decider.rest.processors.QuestionReportSpamProcessor;
 import org.techteam.decider.rest.processors.QuestionsGetProcessor;
 import org.techteam.decider.rest.processors.UserEditProcessor;
 import org.techteam.decider.rest.processors.UserGetProcessor;
@@ -143,6 +147,16 @@ public class DeciderService extends IntentService {
             case PUSH_AUTH: {
                 PushAuthRequest request = PushAuthRequest.fromBundle(extras);
                 processor = new PushAuthProcessor(getBaseContext(), request);
+                break;
+            }
+            case QUESTION_REPORT_SPAM: {
+                QuestionReportSpamRequest request = QuestionReportSpamRequest.fromBundle(extras);
+                processor = new QuestionReportSpamProcessor(getBaseContext(), request);
+                break;
+            }
+            case COMMENT_REPORT_SPAM: {
+                CommentReportSpamRequest request = CommentReportSpamRequest.fromBundle(extras);
+                processor = new CommentReportSpamProcessor(getBaseContext(), request);
                 break;
             }
 

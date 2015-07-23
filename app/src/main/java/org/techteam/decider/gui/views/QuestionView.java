@@ -35,6 +35,7 @@ public class QuestionView extends PostView {
         void onLikeClick(QuestionEntry post);
         void onVoteClick(QuestionEntry post, int voteId);
         void onCommentsClick(QuestionEntry post);
+        void onReportSpamClick(QuestionEntry post);
     }
 
     // data
@@ -255,6 +256,7 @@ public class QuestionView extends PostView {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                         switch (item.getItemId()) {
                             case R.id.report_spam:
+                                eventListener.onReportSpamClick(entry);
                                 return true;
                             default:
                                 return false;

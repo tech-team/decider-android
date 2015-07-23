@@ -64,6 +64,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     private LoaderManager.LoaderCallbacks<Cursor> commentsLoaderCallbacks = new CommentsLoaderCallbacksImpl();
 
+
     public static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String COMMENTS_OFFSET = "COMMENTS_OFFSET";
@@ -268,6 +269,50 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         });
 
+        callbacksKeeper.addCallback(OperationType.QUESTION_REPORT_SPAM, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toastLong(getApplicationContext(), R.string.question_marked_spam);
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
+                        getAuthTokenOrExit(null);
+                        return;
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                String msg = "Error. " + message;
+                Toaster.toastLong(getApplicationContext(), msg);
+            }
+        });
+
+        callbacksKeeper.addCallback(OperationType.COMMENT_REPORT_SPAM, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                Toaster.toastLong(getApplicationContext(), R.string.comment_marked_spam);
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
+                        getAuthTokenOrExit(null);
+                        return;
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                String msg = "Error. " + message;
+                Toaster.toastLong(getApplicationContext(), msg);
+            }
+        });
+
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
@@ -379,6 +424,16 @@ public class QuestionDetailsActivity extends ToolbarActivity
     @Override
     public void onCommentsClick(int entryPosition, QuestionEntry post) {
 
+    }
+
+    @Override
+    public void onReportSpam(int entryPosition, QuestionEntry post) {
+        serviceHelper.reportSpamQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_REPORT_SPAM));
+    }
+
+    @Override
+    public void onReportSpam(int entryPosition, CommentEntry entry) {
+        serviceHelper.reportSpamComment(entryPosition, entry.getCid(), callbacksKeeper.getCallback(OperationType.COMMENT_REPORT_SPAM));
     }
 
 

@@ -4,6 +4,7 @@ public enum OperationType {
     CATEGORIES_GET,
     COMMENT_CREATE,
     COMMENTS_GET(true),
+    COMMENT_REPORT_SPAM,
     IMAGE_UPLOAD,
     LOGIN,
     REGISTER,
@@ -11,6 +12,7 @@ public enum OperationType {
     QUESTION_CREATE,
     QUESTIONS_GET(true),
     QUESTION_LIKE,
+    QUESTION_REPORT_SPAM,
     USER_GET,
     USER_EDIT,
     PUSH_AUTH;

@@ -16,6 +16,7 @@ import org.techteam.decider.rest.api.QuestionCreateRequest;
 import org.techteam.decider.rest.api.CategoriesGetRequest;
 import org.techteam.decider.rest.api.CommentsGetRequest;
 import org.techteam.decider.rest.api.QuestionsGetRequest;
+import org.techteam.decider.rest.api.ReportSpamRequest;
 import org.techteam.decider.rest.api.UserEditRequest;
 import org.techteam.decider.rest.api.UserGetRequest;
 import org.techteam.decider.rest.api.LoginRegisterRequest;
@@ -132,6 +133,20 @@ public final class ServiceIntentBuilder {
         Intent intent = getBasicIntent(context, requestId, op);
         intent.putExtra(UserEditRequest.IntentExtras.USER_DATA, userData);
         intent.putExtra(UserEditRequest.IntentExtras.ACCESS_TOKEN, accessToken);
+        return intent;
+    }
+
+    public static Intent reportSpamQuestionIntent(Context context, OperationType op, String requestId, int entryPosition, int questionId) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(ReportSpamRequest.IntentExtras.ENTRY_POSITION, entryPosition);
+        intent.putExtra(ReportSpamRequest.IntentExtras.ENTITY_ID, questionId);
+        return intent;
+    }
+
+    public static Intent reportSpamCommentIntent(Context context, OperationType op, String requestId, int entryPosition, int commentId) {
+        Intent intent = getBasicIntent(context, requestId, op);
+        intent.putExtra(ReportSpamRequest.IntentExtras.ENTRY_POSITION, entryPosition);
+        intent.putExtra(ReportSpamRequest.IntentExtras.ENTITY_ID, commentId);
         return intent;
     }
 }

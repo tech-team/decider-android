@@ -46,6 +46,7 @@ public interface ServiceCallback {
     }
 
     class EntityVoteExtras {
+        public static final String ENTITY_NAME = "ENTITY_NAME";
         public static final String ENTITY_ID = "ENTITY_ID";
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
         public static final String VOTES_COUNT = "VOTES_COUNT";
@@ -86,5 +87,11 @@ public interface ServiceCallback {
         public class ErrorCodes {
             public static final int USERNAME_TAKEN = 7006;
         }
+    }
+
+    class ReportSpamExtras {
+        public static final String ENTITY_NAME = "ENTITY_NAME";
+        public static final String ENTITY_ID = "ENTITY_ID";
+        public static final String ENTRY_POSITION = "ENTRY_POSITION";
     }
 }

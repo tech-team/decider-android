@@ -90,6 +90,11 @@ public class CommentsListAdapter
                     public void onCommentsClick(QuestionEntry post) {
                         onQuestionEventCallback.onCommentsClick(-1, post);
                     }
+
+                    @Override
+                    public void onReportSpamClick(QuestionEntry post) {
+                        onQuestionEventCallback.onReportSpam(-1, post);
+                    }
                 });
                 break;
             case VIEW_TYPE_MORE_COMMENTS_BUTTON:
@@ -118,7 +123,12 @@ public class CommentsListAdapter
         if (getItemViewType(position) == VIEW_TYPE_COMMENT) {
             cursor.moveToPosition(position - 2);
             CommentEntry entry = CommentEntry.fromCursor(cursor);
-            holder.commentView.reuse(entry, new CommentView.EventListener() {});
+            holder.commentView.reuse(entry, new CommentView.EventListener() {
+                @Override
+                public void onReportSpamClick(CommentEntry entry) {
+                    onCommentEventCallback.onReportSpam(-1, entry);
+                }
+            });
         } else if (getItemViewType(position) == VIEW_TYPE_MORE_COMMENTS_BUTTON) {
             updateLoadingEntry();
         }

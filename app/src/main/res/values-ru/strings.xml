@@ -117,4 +117,6 @@
     <string name="push_new_vote">New vote on your question!</string>
     <string name="push_more_comments">More comments on your question! (%d)</string>
     <string name="push_more_votes">More votes on your question! (%d)</string>
+    <string name="question_marked_spam">Question marked as spam</string>
+    <string name="comment_marked_spam">Comment marked as spam</string>
 </resources>
