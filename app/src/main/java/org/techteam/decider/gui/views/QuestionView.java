@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.PollItemEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.activities.ProfileActivity;
@@ -48,7 +49,8 @@ public class QuestionView extends PostView {
     private ImageView avatarImage;
 
     private ImageButton overflowButton;
-    private TextView anonBadge;
+    private ImageView anonBadge;
+    private TextView categoryBadge;
 
     // content
     private EllipsizingTextView postText;
@@ -92,7 +94,8 @@ public class QuestionView extends PostView {
         dateText = (TextView) v.findViewById(R.id.date_text);
         avatarImage = (ImageView) v.findViewById(R.id.avatar_image);
         overflowButton = (ImageButton) v.findViewById(R.id.overflow_button);
-        anonBadge = (TextView) v.findViewById(R.id.anon_badge);
+        anonBadge = (ImageView) v.findViewById(R.id.anon_badge);
+        categoryBadge = (TextView) v.findViewById(R.id.category_badge);
 
         // content
         postText = (EllipsizingTextView) v.findViewById(R.id.post_text);
@@ -153,7 +156,9 @@ public class QuestionView extends PostView {
         likeButton.getCompoundDrawables()[LEFT].setColorFilter(entry.isVoted() ? pressedStateFilter : null);
 
         commentsButton.setText(Integer.toString(entry.getCommentsCount()));
-        anonBadge.setVisibility(entry.isAnonymous() ? VISIBLE : GONE);
+
+        String currentUserId = ApiUI.getCurrentUserId(getContext());
+        anonBadge.setVisibility(entry.isAnonymous() && entry.getAuthor().getUid().equals(currentUserId) ? VISIBLE : GONE);
         anonBadge.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,6 +177,9 @@ public class QuestionView extends PostView {
                         .show();
             }
         });
+        CategoryEntry categoryEntry = CategoryEntry.byUid(entry.getCategoryId());
+        if (categoryEntry != null)
+            categoryBadge.setText(categoryEntry.getLocalizedLabel());
 
         //configure according to SharedPreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -246,7 +254,8 @@ public class QuestionView extends PostView {
                     public boolean onMenuItemClick(MenuItem item) {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                         switch (item.getItemId()) {
-                            //TODO: context menu
+                            case R.id.report_spam:
+                                return true;
                             default:
                                 return false;
                         }

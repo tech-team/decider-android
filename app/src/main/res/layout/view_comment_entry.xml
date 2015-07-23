@@ -42,17 +42,17 @@
             android:layout_height="wrap_content"
             tools:text="Vasja Pupkin" />
 
-        <TextView
+        <ImageView
             android:id="@+id/anon_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="16dp"
             android:layout_toRightOf="@id/author_text"
             android:layout_toEndOf="@id/author_text"
-            android:background="@color/accent_material_dark"
-            android:visibility="gone"
+            android:visibility="visible"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:text="@string/anon_badge"/>
+            android:src="@drawable/anon_badge"
+            android:contentDescription="@string/anon_badge"/>
 
         <TextView
             android:id="@+id/date_text"

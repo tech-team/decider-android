@@ -18,7 +18,7 @@
     <string name="post_comments">Comments</string>
     <string name="pref_main" translatable="false">Main</string>
     <string name="pref_main_key" translatable="false">pref_main_key</string>
-    <string name="report_abuse">Report abuse</string>
+    <string name="report_spam">Mark as spam</string>
     <string name="loading">Loading...</string>
     <string name="pref_shorten_long_posts_key" translatable="false">pref_shorten_long_posts_key</string>
     <string name="pref_text_size_key" translatable="false">pref_text_size_key</string>

@@ -38,7 +38,7 @@ public class CommentView extends PostView {
     private TextView authorText;
     private TextView dateText;
     private ImageView avatarImage;
-    private TextView anonBadge;
+    private ImageView anonBadge;
 
     // content
     private TextView postText;
@@ -68,7 +68,7 @@ public class CommentView extends PostView {
         authorText = (TextView) v.findViewById(R.id.author_text);
         dateText = (TextView) v.findViewById(R.id.date_text);
         avatarImage = (ImageView) v.findViewById(R.id.avatar_image);
-        anonBadge = (TextView) v.findViewById(R.id.anon_badge);
+        anonBadge = (ImageView) v.findViewById(R.id.anon_badge);
 
         // content
         postText = (TextView) v.findViewById(R.id.comment_text);
@@ -105,7 +105,8 @@ public class CommentView extends PostView {
             avatarImage.setImageDrawable(context.getResources().getDrawable(R.drawable.profile));
 
         authorText.setText(entry.getAuthor().getUsername());
-        anonBadge.setVisibility(entry.isAnonymous() ? VISIBLE : GONE);
+        String currentUserId = ApiUI.getCurrentUserId(getContext());
+        anonBadge.setVisibility(entry.isAnonymous() && entry.getAuthor().getUid().equals(currentUserId) ? VISIBLE : GONE);
 
         dateText.setText(getDateString(entry.getCreationDate()));
         postText.setText(entry.getText());
