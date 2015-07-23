@@ -107,4 +107,6 @@
     <string name="editing_profile">Редактирование профиля</string>
     <string name="profile_saved">Профиль сохранён успешно</string>
     <string name="gender_none"> </string>
+    <string name="end_registration_alert">Завершение регистрации</string>
+    <string name="end_registration_alert_message">Для завершения регистрации, пожалуйста, укажите ваш псевдоним.</string>
 </resources>

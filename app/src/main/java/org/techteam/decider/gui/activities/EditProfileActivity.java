@@ -48,6 +48,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static android.support.v7.app.AlertDialog.*;
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
 public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
@@ -277,6 +278,20 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             Bundle registrationData = getIntent().getBundleExtra(REGISTRATION_DATA);
             if (registrationData != null) {
                 // we are at the last phase of registration
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditProfileActivity.this);
+                builder.setTitle(R.string.end_registration_alert)
+                        .setMessage(R.string.end_registration_alert_message)
+                        .setIcon(R.drawable.logo)
+                        .setCancelable(false)
+                        .setNegativeButton(android.R.string.ok, new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
+
                 String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
                 // pass token explicitly
                 serviceHelper.getUser(uid, token, callbacksKeeper.getCallback(OperationType.USER_GET));
@@ -425,7 +440,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
+        new Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(getString(R.string.editing_profile))
                 .setMessage(getString(R.string.exit_profile_editing))

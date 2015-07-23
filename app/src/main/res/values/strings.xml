@@ -115,5 +115,7 @@
     <string name="exit_profile_editing">Do you really want to exit?\nData won\'t be saved.</string>
     <string name="shared_by">Shared by Decider app</string>
     <string name="profile_saved">Profile saved</string>
+    <string name="end_registration_alert">Registration completion</string>
+    <string name="end_registration_alert_message">To complete registration, please enter your nickname.</string>
 
 </resources>
