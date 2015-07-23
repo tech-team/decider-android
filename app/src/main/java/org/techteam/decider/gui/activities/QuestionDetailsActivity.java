@@ -34,6 +34,7 @@ import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.views.QuestionView;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
+import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
@@ -384,6 +385,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
                         commentsOffset,
                         LoadIntention.REFRESH,
                         callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
+            }
+            String currentUserId = ApiUI.getCurrentUserId(QuestionDetailsActivity.this);
+            if (currentUserId != null) {
+                boolean anonymous = entry.isAnonymous() &&
+                        currentUserId.equals(entry.getAuthor().getUid());
+                anonymityCheckBox.setChecked(anonymous);
             }
         }
     }
