@@ -82,11 +82,13 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     private ImageLoader imageLoader;
 
     private Date birthday;
+    private String avatarUrl;
 
     private boolean dataLooseWarnShowing = false;
 
     public static final class BundleKeys {
         public final static String USER_DATA = "USER_DATA";
+        public final static String IMAGE_URI = "IMAGE_URI";
         public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
     }
 
@@ -309,6 +311,12 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             UserData userData = savedInstanceState.getParcelable(BundleKeys.USER_DATA);
             if (userData != null) {
                 deserialize(userData);
+                if (userData.getAvatar() == null) {
+                    avatarUrl = savedInstanceState.getString(BundleKeys.IMAGE_URI);
+                    if (avatarUrl != null) {
+                        imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
+                    }
+                }
             }
             dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
         }
@@ -388,6 +396,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(BundleKeys.USER_DATA, serialize());
+        outState.putString(BundleKeys.IMAGE_URI, avatarUrl);
         outState.putBoolean(BundleKeys.DATA_LOOSE_WARN, dataLooseWarnShowing);
     }
 
@@ -407,7 +416,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
         @Override
         protected void onPostExecute(UserEntry entry) {
-            String avatarUrl = entry.getAvatar();
+            avatarUrl = entry.getAvatar();
             if (avatarUrl != null) {
                 imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
             }
