@@ -61,12 +61,20 @@ public class SocialLoginActivity extends ToolbarActivity {
                     long expires = System.currentTimeMillis() + Long.parseLong(finalUri.getQueryParameter("expires")) * 1000;
                     String refreshToken = finalUri.getQueryParameter("refresh_token");
                     String userId = finalUri.getQueryParameter("user_id");
+                    String username = finalUri.getQueryParameter("username");
+                    boolean registrationFinished = true;
+                    String regFinishedQuery = finalUri.getQueryParameter("reg");
+                    if (regFinishedQuery != null) {
+                        registrationFinished = Integer.parseInt(regFinishedQuery) == 1;
+                    }
 
                     Intent data = new Intent();
                     data.putExtra(ServiceCallback.LoginRegisterExtras.TOKEN, accessToken);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.EXPIRES, expires);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.REFRESH_TOKEN, refreshToken);
                     data.putExtra(ServiceCallback.LoginRegisterExtras.USER_ID, userId);
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.USERNAME, username);
+                    data.putExtra(ServiceCallback.LoginRegisterExtras.REGISTRATION_UNFINISHED, !registrationFinished);
                     setResult(Activity.RESULT_OK, data);
                     finish();
                 }

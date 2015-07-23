@@ -65,6 +65,12 @@ public class LoginRegisterProcessor extends RequestProcessor<LoginRegisterReques
     }
 
     @Override
+    public void postExecuteError(JSONObject response, int errorCode, Bundle result) throws JSONException {
+        super.postExecuteError(response, errorCode, result);
+        postExecute(response, result);
+    }
+
+    @Override
     public void start(OperationType operationType, String requestId, ProcessorCallback cb) {
         transactionStarted(operationType, requestId);
 

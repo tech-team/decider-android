@@ -116,6 +116,21 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                int genericError = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
+                switch (genericError) {
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+
+                int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
+                switch (serverErrorCode) {
+                    case ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED:
+                        requestUsername(data);
+                        break;
+                    default:
+                        break;
+                }
                 Toaster.toast(AuthActivity.this, "Login: failed. " + message);
             }
         });
@@ -123,11 +138,25 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(AuthActivity.this, "Register: ok");
-                requestUsername(data);
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
+                int genericError = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
+                switch (genericError) {
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+
+                int serverErrorCode = data.getInt(ErrorsExtras.SERVER_ERROR_CODE, -1);
+                switch (serverErrorCode) {
+                    case ErrorsExtras.ErrorCodes.REGISTRATION_UNFINISHED:
+                        requestUsername(data);
+                        break;
+                    default:
+                        break;
+                }
                 Toaster.toast(AuthActivity.this, "Register: failed. " + message);
             }
         });
@@ -275,21 +304,29 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         this.finishAffinity();
     }
 
+    private void loginRegisterComplete(Intent data) {
+        Bundle registrationData = data.getExtras();
+        String username = registrationData.getString(ServiceCallback.LoginRegisterExtras.USERNAME);
+        String password = registrationData.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
+        if (password == null) {
+            password = "dummy";
+        }
+        saveToken(registrationData, username, password);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK)
             return;
 
         if (requestCode == ActivityCodes.SOCIAL_LOGIN) {
-            requestUsername(data.getExtras());
-        } else if (requestCode == ActivityCodes.FINISH_REGISTRATION) {
-            Bundle registrationData = data.getExtras();
-            String username = registrationData.getString(ServiceCallback.LoginRegisterExtras.USERNAME);
-            String password = registrationData.getString(ServiceCallback.LoginRegisterExtras.PASSWORD);
-            if (password == null) {
-                password = "dummy";
+            if (data.getBooleanExtra(ServiceCallback.LoginRegisterExtras.REGISTRATION_UNFINISHED, false)) {
+                requestUsername(data.getExtras());
+            } else {
+                loginRegisterComplete(data);
             }
-            saveToken(registrationData, username, password);
+        } else if (requestCode == ActivityCodes.FINISH_REGISTRATION) {
+            loginRegisterComplete(data);
         }
     }
 }

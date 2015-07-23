@@ -16,6 +16,10 @@ public interface ServiceCallback {
             public static final int INVALID_TOKEN = 1;
             public static final int SERVER_ERROR = 2;
         }
+
+        public class ErrorCodes {
+            public static final int REGISTRATION_UNFINISHED = 3000;
+        }
     }
 
     class GetQuestionsExtras {
@@ -68,6 +72,7 @@ public interface ServiceCallback {
         public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
         public static final String USER_ID = "USER_ID";
         public static final String USERNAME = "USERNAME";
+        public static final String REGISTRATION_UNFINISHED = "REGISTRATION_UNFINISHED";
     }
 
     class GetUserExtras {
