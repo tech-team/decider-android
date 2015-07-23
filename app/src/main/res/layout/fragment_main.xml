@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     style="AppTheme" >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/main_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:minHeight="?attr/actionBarSize"
-        style="@style/HeaderBar"
-        android:theme="@style/ActionBarThemeOverlay"
-        app:popupTheme="@style/ActionBarPopupThemeOverlay"
-        />
-
     <org.techteam.decider.gui.widget.SlidingTabLayout
         android:id="@+id/sections_pager_tabs"
         android:layout_width="match_parent"

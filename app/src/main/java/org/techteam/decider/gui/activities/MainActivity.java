@@ -4,11 +4,14 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -42,6 +45,10 @@ import org.techteam.decider.gcm.GcmPreferences;
 import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
+import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
+import org.techteam.decider.gui.fragments.QuestionsListFragment;
+import org.techteam.decider.gui.loaders.CategoriesLoader;
+import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -54,14 +61,14 @@ import org.techteam.decider.util.Toaster;
 import java.util.List;
 
 
-public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
+public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, OnCategorySelectedListener {
     private static final String TAG = MainActivity.class.getName();
 
     public static final int AUTH_REQUEST_CODE = 101;
     private static final int LOGOUT_ID = 1;
     public static String PACKAGE_NAME;
 
-
+    private Toolbar toolbar;
     // drawer related stuff
     private AccountHeader drawerHeader;
     private Drawer drawer;
@@ -71,6 +78,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
     private ServiceHelper serviceHelper;
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
+    private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
 
     private BroadcastReceiver gcmRegistrationBroadcastReceiver;
 
@@ -120,8 +128,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toast(getApplicationContext(), "GetUser: ok");
-                retrieveUserTask = new RetrieveUserTask();
-                retrieveUserTask.execute();
+                serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.CATEGORIES_GET));
             }
 
             @Override
@@ -139,6 +146,30 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
             }
         });
 
+        callbacksKeeper.addCallback(OperationType.CATEGORIES_GET, new ServiceCallback() {
+            @Override
+            public void onSuccess(String operationId, Bundle data) {
+                retrieveUserTask = new RetrieveUserTask();
+                retrieveUserTask.execute();
+            }
+
+            @Override
+            public void onError(String operationId, Bundle data, String message) {
+                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
+                switch (code) {
+                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
+                        getAuthTokenOrExit(null);
+                        return;
+                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
+                        Toaster.toastLong(getApplicationContext(), R.string.server_problem);
+                        return;
+                }
+                String msg = "Categories error. " + message;
+                Toaster.toast(getApplicationContext(), msg);
+                System.out.println(msg);
+            }
+        });
+
         gcmRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -152,7 +183,12 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
             }
         };
 
-        getUserInfo();
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+
+        categoriesListAdapter = new CategoriesListAdapter(null, this, this);
+
+        createDrawer(toolbar, categoriesListAdapter);
     }
 
     private void getUserInfo() {
@@ -165,6 +201,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
     private void finishAuthorization() {
         getFragmentManager().beginTransaction()
                 .add(R.id.content_frame, new MainFragment(), MainFragment.TAG).commit();
+        getUserInfo();
     }
 
     @Override
@@ -306,6 +343,19 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
         return CategoryEntry.getSelected();
     }
 
+    @Override
+    public void categorySelected(CategoryEntry category, boolean isChecked) {
+        Toaster.toast(getApplicationContext(), "Selected");
+        category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
+            @Override
+            public void categorySelected(CategoryEntry category, boolean isChecked) {
+                MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag(MainFragment.TAG);
+                QuestionsListFragment f = (QuestionsListFragment) mainFragment.getCurrentlyActiveFragment();
+                f.categorySelected(category, isChecked);
+            }
+        });
+    }
+
     class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {
 
         @Override
@@ -315,6 +365,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
         @Override
         protected void onPostExecute(UserEntry entry) {
+            getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
             String username = entry.getUsername();
             if (username == null || username.isEmpty())
                 username = getString(R.string.no_nick);
@@ -363,5 +414,31 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter {
 
         @Override
         abstract protected void onPostExecute(Void v);
+    }
+
+
+    private class LoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            if  (id == LoaderIds.CATEGORIES_LOADER) {
+
+                if (args != null) {
+                }
+
+                return new CategoriesLoader(MainActivity.this);
+            }
+            throw new IllegalArgumentException("Loader with given id is not found");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+            CategoriesLoader contentLoader = (CategoriesLoader) loader;
+            categoriesListAdapter.swapCursor(newCursor);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            categoriesListAdapter.swapCursor(null);
+        }
     }
 }

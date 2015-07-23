@@ -38,16 +38,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MainFragment
-        extends Fragment
-        implements OnCategorySelectedListener {
+        extends Fragment {
 
     public static final String TAG = MainFragment.class.toString();
     private static final int ADD_QUESTION = 0;
     private static final int QUESTION_DETAILS = 1;
     private MainActivity activity;
 
-    private Toolbar toolbar;
-    private CategoriesListAdapter categoriesListAdapter;
+//    private CategoriesListAdapter categoriesListAdapter;
     private List<OnCategorySelectedListener> onCategorySelectedListeners = new LinkedList<>();
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -59,7 +57,6 @@ public class MainFragment
     private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
-    private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
     //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
 
     private static final class BundleKeys {
@@ -79,31 +76,6 @@ public class MainFragment
 
         this.activity = (MainActivity) activity;
         serviceHelper = new ServiceHelper(activity);
-
-        callbacksKeeper.addCallback(OperationType.CATEGORIES_GET, new ServiceCallback() {
-            @Override
-            public void onSuccess(String operationId, Bundle data) {
-                getLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
-            }
-
-            @Override
-            public void onError(String operationId, Bundle data, String message) {
-                int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
-                switch (code) {
-                    case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        MainFragment.this.activity.getAuthTokenOrExit(null);
-                        return;
-                    case ErrorsExtras.GenericErrors.SERVER_ERROR:
-                        Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
-                        return;
-                }
-                String msg = "Categories error. " + message;
-                Toaster.toast(getActivity().getApplicationContext(), msg);
-                System.out.println(msg);
-            }
-        });
-
-        serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.CATEGORIES_GET));
     }
 
     @Override
@@ -114,18 +86,12 @@ public class MainFragment
             serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
         }
 
-        toolbar = (Toolbar) activity.findViewById(R.id.main_toolbar);
-        activity.setSupportActionBar(toolbar);
-
 //        ActionBar actionBar = this.activity.getSupportActionBar();
 //        if (actionBar != null) {
 //            actionBar.setDisplayHomeAsUpEnabled(true);
 //            actionBar.setHomeButtonEnabled(true);
 //        }
 
-        // setup drawer
-        categoriesListAdapter = new CategoriesListAdapter(null, activity, this);
-        activity.createDrawer(toolbar, categoriesListAdapter);
 
         // sections
         mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
@@ -179,17 +145,9 @@ public class MainFragment
         }
     }
 
-    @Override
-    public void categorySelected(CategoryEntry category, boolean isChecked) {
-        Toaster.toast(getActivity(), "Selected");
-        category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
-            @Override
-            public void categorySelected(CategoryEntry category, boolean isChecked) {
-                int currentFragment = mViewPager.getCurrentItem();
-                QuestionsListFragment f = (QuestionsListFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, currentFragment);
-                f.categorySelected(category, isChecked);
-            }
-        });
+    public Fragment getCurrentlyActiveFragment() {
+        int currentFragment = mViewPager.getCurrentItem();
+        return (Fragment) mSectionsPagerAdapter.instantiateItem(mViewPager, currentFragment);
     }
 
     public void invalidatePages() {
@@ -247,32 +205,6 @@ public class MainFragment
 
         public Fragment[] getFragments() {
             return fragments;
-        }
-    }
-
-
-    private class LoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            if  (id == LoaderIds.CATEGORIES_LOADER) {
-
-                if (args != null) {
-                }
-
-                return new CategoriesLoader(getActivity());
-            }
-            throw new IllegalArgumentException("Loader with given id is not found");
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
-            CategoriesLoader contentLoader = (CategoriesLoader) loader;
-            categoriesListAdapter.swapCursor(newCursor);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-            categoriesListAdapter.swapCursor(null);
         }
     }
 }
