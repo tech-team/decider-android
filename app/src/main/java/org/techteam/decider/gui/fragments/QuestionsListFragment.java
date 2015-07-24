@@ -132,7 +132,7 @@ public class QuestionsListFragment
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
-        serviceHelper = new ServiceHelper(activity);
+        serviceHelper = new ServiceHelper(activity.getApplicationContext());
         callbacksKeeper.addCallback(OperationType.QUESTIONS_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {

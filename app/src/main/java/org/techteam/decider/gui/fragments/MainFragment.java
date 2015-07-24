@@ -44,9 +44,6 @@ public class MainFragment
 
     private FloatingActionButton createPostButton;
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
-    private ServiceHelper serviceHelper;
-
     //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
 
     private static final class BundleKeys {
@@ -96,7 +93,6 @@ public class MainFragment
         super.onAttach(activity);
 
         this.activity = (MainActivity) activity;
-        serviceHelper = new ServiceHelper(activity);
     }
 
     @Override
@@ -104,7 +100,7 @@ public class MainFragment
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
-            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
+
         }
 
 //        ActionBar actionBar = this.activity.getSupportActionBar();
@@ -118,7 +114,6 @@ public class MainFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     @Override
