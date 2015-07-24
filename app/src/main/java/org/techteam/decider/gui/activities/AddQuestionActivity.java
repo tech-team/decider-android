@@ -25,7 +25,7 @@ import android.widget.Spinner;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.question.ImageQuestionData;
-import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.rest.CallbacksKeeper;
@@ -38,7 +38,7 @@ import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageHolder;
 import org.techteam.decider.util.image_selector.ImageSelector;
 
-public class AddQuestionActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
+public class AddQuestionActivity extends ToolbarActivity implements ActivityStarter, AuthTokenGetter {
     private static final String TAG = AddQuestionActivity.class.getName();
 
     public static final String QUESTION_ID = "QUESTION_ID";
@@ -77,7 +77,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
                 }
             }
         };
-        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

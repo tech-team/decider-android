@@ -19,13 +19,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import junit.framework.Assert;
-
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnMoreCommentsRequestedCallback;
@@ -42,7 +40,7 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends ToolbarActivity
-            implements OnMoreCommentsRequestedCallback, IAuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
+            implements OnMoreCommentsRequestedCallback, AuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
     private RetrieveEntryTask retrieveEntryTask;
 
     // children
@@ -81,7 +79,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -96,7 +94,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 }
             }
         };
-        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

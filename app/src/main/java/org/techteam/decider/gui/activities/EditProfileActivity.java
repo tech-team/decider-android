@@ -28,7 +28,7 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.UserData;
 import org.techteam.decider.content.entities.UserEntry;
-import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -49,7 +49,7 @@ import java.util.List;
 import static android.support.v7.app.AlertDialog.*;
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
-public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, IAuthTokenGetter {
+public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, AuthTokenGetter {
     private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
     private UserEntry entry;
@@ -97,7 +97,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 }
             }
         };
-        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

@@ -23,9 +23,11 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
+import org.techteam.decider.gui.CategoriesGetter;
 import org.techteam.decider.gui.activities.ActivityHelper;
 import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
 import org.techteam.decider.gui.loaders.LoadIntention;
 import org.techteam.decider.gui.loaders.LoaderIds;
@@ -68,8 +70,8 @@ public class QuestionsListFragment
     private ServiceHelper serviceHelper;
     public boolean refreshing = false;
 
-    private MainActivity activity;
-    private boolean initialized = false;
+    private CategoriesGetter categoriesGetter;
+    private AuthTokenGetter authTokenGetter;
 
     private LoaderManager.LoaderCallbacks<Cursor> questionsLoaderCallbacks = new QuestionsLoaderCallbacksImpl();
 
@@ -131,7 +133,8 @@ public class QuestionsListFragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        this.activity = (MainActivity) activity;
+        this.categoriesGetter = (CategoriesGetter) activity;
+        this.authTokenGetter = (AuthTokenGetter) activity;
         serviceHelper = new ServiceHelper(activity.getApplicationContext());
         callbacksKeeper.addCallback(OperationType.QUESTIONS_GET, new ServiceCallback() {
             @Override
@@ -181,7 +184,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -213,7 +216,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -254,7 +257,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -281,7 +284,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        QuestionsListFragment.this.activity.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -320,7 +323,6 @@ public class QuestionsListFragment
             currentSection = ContentSection.fromInt(savedInstanceState.getInt(BundleKeys.CURRENT_SECTION));
             questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET); // TODO: probably it's not valid
         }
-        initialized = true;
 
         adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this);
         recyclerView.setAdapter(adapter);
@@ -353,14 +355,14 @@ public class QuestionsListFragment
         serviceHelper.getQuestions(currentSection,
                 QUESTIONS_LIMIT,
                 questionsOffset,
-                activity.getSelectedCategories(),
+                categoriesGetter.getSelectedCategories(),
                 LoadIntention.REFRESH,
                 callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
     }
 
     @Override
     public void onScrolledDown() {
-        MainFragment mainFragment = activity.getMainFragment();
+        MainFragment mainFragment = (MainFragment) getParentFragment();
         if (mainFragment.getCurrentlyActiveFragment() == this) {
             int intention;
             if (adapter.getCursor().getCount() == 0) {
@@ -372,7 +374,7 @@ public class QuestionsListFragment
             serviceHelper.getQuestions(currentSection,
                     QUESTIONS_LIMIT,
                     questionsOffset,
-                    activity.getSelectedCategories(),
+                    categoriesGetter.getSelectedCategories(),
                     intention,
                     callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
         }
@@ -394,7 +396,7 @@ public class QuestionsListFragment
         intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, post.getQId());
         intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
         intent.putExtra(QuestionDetailsActivity.IntentExtras.ENTRY_POSITION, entryPosition);
-        startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
+        getParentFragment().startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
     }
 
     @Override
@@ -453,13 +455,6 @@ public class QuestionsListFragment
         this.currentSection = currentSection;
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    public QuestionsListAdapter getAdapter() {
-        return adapter;
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

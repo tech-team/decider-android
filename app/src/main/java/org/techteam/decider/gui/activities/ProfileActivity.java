@@ -20,11 +20,9 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import junit.framework.Assert;
-
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.UserEntry;
-import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -35,7 +33,7 @@ import org.techteam.decider.util.Toaster;
 
 import java.util.Date;
 
-public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter {
+public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter {
     public final static String USER_ID = "USER_ID";
 
     public final static int EDIT_PROFILE = 0;
@@ -68,7 +66,7 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -83,7 +81,7 @@ public class ProfileActivity extends ToolbarActivity implements IAuthTokenGetter
                 }
             }
         };
-        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

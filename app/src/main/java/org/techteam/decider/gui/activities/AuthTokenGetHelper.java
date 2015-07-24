@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 import org.techteam.decider.auth.AccountGeneral;
 
-public final class AuthTokenGetter {
+public final class AuthTokenGetHelper {
     public static AccountManagerFuture<Bundle> getAuthTokenByFeatures(Activity activity, AccountManagerCallback<Bundle> cb) {
         AccountManager am = AccountManager.get(activity);
         return am.getAuthTokenByFeatures(activity.getApplicationContext().getPackageName(),

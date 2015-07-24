@@ -43,7 +43,8 @@ import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.DbHelper;
 import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gcm.GcmPreferences;
-import org.techteam.decider.gui.activities.lib.IAuthTokenGetter;
+import org.techteam.decider.gui.CategoriesGetter;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
 import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
@@ -62,7 +63,10 @@ import org.techteam.decider.util.Toaster;
 import java.util.List;
 
 
-public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, OnCategorySelectedListener {
+public class MainActivity extends ToolbarActivity implements
+        AuthTokenGetter,
+        OnCategorySelectedListener,
+        CategoriesGetter {
     private static final String TAG = MainActivity.class.getName();
 
     public static final int AUTH_REQUEST_CODE = 101;
@@ -85,7 +89,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetter.getAuthTokenByFeatures(this, cb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
     }
 
     @Override
@@ -100,7 +104,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                 }
             }
         };
-        return AuthTokenGetter.getAuthTokenByFeatures(this, actualCb);
+        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override
@@ -356,6 +360,7 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         task.execute();
     }
 
+    @Override
     public List<CategoryEntry> getSelectedCategories() {
         if (categoriesListAdapter == null)
             return null;

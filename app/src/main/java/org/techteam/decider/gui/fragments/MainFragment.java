@@ -2,7 +2,6 @@ package org.techteam.decider.gui.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,13 +15,13 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.gui.CategoriesGetter;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
-import org.techteam.decider.gui.activities.MainActivity;
+import org.techteam.decider.gui.activities.AuthTokenGetHelper;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
+import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
-import org.techteam.decider.rest.CallbacksKeeper;
-import org.techteam.decider.rest.service_helper.ServiceHelper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +32,7 @@ public class MainFragment
     public static final String TAG = MainFragment.class.toString();
     private static final int ADD_QUESTION = 0;
     private static final int QUESTION_DETAILS = 1;
-    private MainActivity activity;
+
 
 //    private CategoriesListAdapter categoriesListAdapter;
     private List<OnCategorySelectedListener> onCategorySelectedListeners = new LinkedList<>();
@@ -91,8 +90,6 @@ public class MainFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        this.activity = (MainActivity) activity;
     }
 
     @Override
@@ -118,6 +115,7 @@ public class MainFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
             int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
             Intent intent = new Intent(getActivity(), QuestionDetailsActivity.class);
@@ -125,20 +123,15 @@ public class MainFragment
             intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
             intent.putExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, true);
             startActivityForResult(intent, QUESTION_DETAILS);
-        } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                if (data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
-                    refreshPages();
-                } else {
-                    int position = data.getIntExtra(QuestionDetailsActivity.IntentExtras.ENTRY_POSITION, -1);
-                    if (position != -1) {
-                        QuestionsListFragment f = (QuestionsListFragment) getCurrentlyActiveFragment();
-                        f.getAdapter().notifyItemChanged(position);
+        } else {
+            List<Fragment> fragments = getChildFragmentManager().getFragments();
+            if (fragments != null) {
+                for (Fragment fragment : fragments) {
+                    if (fragment != null) {
+                        fragment.onActivityResult(requestCode, resultCode, data);
                     }
                 }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
