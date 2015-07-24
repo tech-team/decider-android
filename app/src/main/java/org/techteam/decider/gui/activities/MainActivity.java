@@ -179,19 +179,6 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
             }
         });
 
-        gcmRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences.getBoolean(GcmPreferences.SENT_TOKEN_TO_SERVER, false);
-                if (sentToken) {
-                    Log.d(TAG, "sent gcm token successfully");
-                } else {
-                    Log.d(TAG, "send gcm token failed");
-                }
-            }
-        };
-
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
@@ -216,6 +203,18 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
     public void onResume() {
         super.onResume();
         serviceHelper.init();
+        gcmRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences.getBoolean(GcmPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.d(TAG, "sent gcm token successfully");
+                } else {
+                    Log.d(TAG, "send gcm token failed");
+                }
+            }
+        };
         LocalBroadcastManager.getInstance(this).registerReceiver(gcmRegistrationBroadcastReceiver,
                 new IntentFilter(GcmPreferences.REGISTRATION_COMPLETE));
     }
@@ -328,14 +327,25 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
 
                 if (accounts.length != 0) {
                     Account account = accounts[0];
-                    am.removeAccount(account, null, new AccountManagerCallback<Bundle>() {
-                        @Override
-                        public void run(AccountManagerFuture<Bundle> future) {
-                            // restart activity, it will request authorization and receive new user's data
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        am.removeAccount(account, null, new AccountManagerCallback<Bundle>() {
+                            @Override
+                            public void run(AccountManagerFuture<Bundle> future) {
+                                // restart activity, it will request authorization and receive new user's data
 //                            recreate();
-                            getAuthTokenOrExit(cb);
-                        }
-                    }, null);
+                                getAuthTokenOrExit(cb);
+                            }
+                        }, null);
+                    } else {
+                        am.removeAccount(account, new AccountManagerCallback<Boolean>() {
+                            @Override
+                            public void run(AccountManagerFuture<Boolean> future) {
+                                // restart activity, it will request authorization and receive new user's data
+//                            recreate();
+                                getAuthTokenOrExit(cb);
+                            }
+                        }, null);
+                    }
 
                 } else {
 //                    recreate();
