@@ -41,7 +41,11 @@ public class CommentsListAdapter
 
         public ViewHolder(View v) {
             super(v);
-            commentView = (CommentView) v.findViewById(R.id.comment_view);
+        }
+
+        public ViewHolder(CommentView v) {
+            super(v);
+            commentView = v;
         }
     }
 
@@ -110,9 +114,7 @@ public class CommentsListAdapter
 
                 break;
             case VIEW_TYPE_COMMENT:
-                v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.fragment_comment_card, parent, false);
-                break;
+                return new ViewHolder(new CommentView(context));
         }
 
         return new ViewHolder(v);
