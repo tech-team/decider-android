@@ -393,7 +393,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         if (afterCreate) {
             Intent data = new Intent();
             data.putExtra(IntentExtras.ENTRY_POSITION, afterCreate);
-            setResult(Activity.RESULT_OK);
+            setResult(Activity.RESULT_OK, data);
             finish();
         } else {
             Intent data = new Intent();
