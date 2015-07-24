@@ -361,7 +361,7 @@ public class QuestionsListFragment
     @Override
     public void onScrolledDown() {
         MainFragment mainFragment = activity.getMainFragment();
-        if (mainFragment.getCurrentlyActiveFragment() == this) {
+//        if (mainFragment.getCurrentlyActiveFragment() == this) {
             int intention;
             if (adapter.getCursor().getCount() == 0) {
                 intention = LoadIntention.REFRESH;
@@ -375,7 +375,7 @@ public class QuestionsListFragment
                     activity.getSelectedCategories(),
                     intention,
                     callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
-        }
+//        }
     }
 
     @Override

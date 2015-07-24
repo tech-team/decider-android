@@ -316,11 +316,12 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
                 final AccountManagerCallback<Bundle> cb = new AccountManagerCallback<Bundle>() {
                     @Override
                     public void run(AccountManagerFuture<Bundle> future) {
-                        MainFragment f = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
-                        if (f != null) {
-                            f.invalidatePages();
-                        }
-                        getUserInfo();
+//                        MainFragment f = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
+//                        if (f != null) {
+//                            f.invalidatePages();
+//                        }
+//                        getUserInfo();
+                        recreate();
                     }
                 };
 
