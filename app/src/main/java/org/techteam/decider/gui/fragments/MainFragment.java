@@ -131,7 +131,17 @@ public class MainFragment
             intent.putExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, true);
             startActivityForResult(intent, QUESTION_DETAILS);
         } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK) {
-            refreshPages();
+            if (data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
+                refreshPages();
+            } else {
+                int position = data.getIntExtra(QuestionDetailsActivity.IntentExtras.ENTRY_POSITION, -1);
+                if (position != -1) {
+                    QuestionsListFragment f = (QuestionsListFragment) getCurrentlyActiveFragment();
+                    f.getAdapter().notifyItemChanged(position);
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

@@ -391,6 +391,8 @@ public class QuestionDetailsActivity extends ToolbarActivity
     public void onBackPressed() {
         boolean afterCreate = getIntent().getBooleanExtra(IntentExtras.AFTER_CREATE, false);
         if (afterCreate) {
+            Intent data = new Intent();
+            data.putExtra(IntentExtras.ENTRY_POSITION, afterCreate);
             setResult(Activity.RESULT_OK);
             finish();
         } else {

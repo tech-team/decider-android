@@ -150,12 +150,14 @@ public class QuestionsListFragment
                     msg = "No more posts";
                 } else {
                     msg = "Successfully fetched posts";
-                    Bundle args = new Bundle();
-                    args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
-                    args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
-                    args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
-                    args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
-                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                    if (isAdded()) {
+                        Bundle args = new Bundle();
+                        args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
+                        args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
+                        args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
+                        args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
+                        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                    }
                 }
 
                 adapter.setFeedFinished(isFeedFinished);
@@ -201,7 +203,9 @@ public class QuestionsListFragment
                 int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
-                getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                if (isAdded()) {
+                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                }
             }
 
             @Override
@@ -240,7 +244,9 @@ public class QuestionsListFragment
                 int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
-                getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                if (isAdded()) {
+                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                }
             }
 
             @Override
@@ -449,6 +455,10 @@ public class QuestionsListFragment
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public QuestionsListAdapter getAdapter() {
+        return adapter;
     }
 
     @Override
