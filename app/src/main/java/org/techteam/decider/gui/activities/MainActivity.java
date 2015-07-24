@@ -355,11 +355,15 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
         category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
             @Override
             public void categorySelected(CategoryEntry category, boolean isChecked) {
-                MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
+                MainFragment mainFragment = getMainFragment();
                 QuestionsListFragment f = (QuestionsListFragment) mainFragment.getCurrentlyActiveFragment();
                 f.categorySelected(category, isChecked);
             }
         });
+    }
+
+    public MainFragment getMainFragment() {
+        return (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
     }
 
     class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {

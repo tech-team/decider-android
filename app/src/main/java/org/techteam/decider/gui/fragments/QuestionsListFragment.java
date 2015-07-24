@@ -354,19 +354,22 @@ public class QuestionsListFragment
 
     @Override
     public void onScrolledDown() {
-        int intention;
-        if (adapter.getCursor().getCount() == 0) {
-            intention = LoadIntention.REFRESH;
-        } else {
-            intention = LoadIntention.APPEND;
-        }
+        MainFragment mainFragment = activity.getMainFragment();
+        if (mainFragment.getCurrentlyActiveFragment() == this) {
+            int intention;
+            if (adapter.getCursor().getCount() == 0) {
+                intention = LoadIntention.REFRESH;
+            } else {
+                intention = LoadIntention.APPEND;
+            }
 
-        serviceHelper.getQuestions(currentSection,
-                QUESTIONS_LIMIT,
-                questionsOffset,
-                activity.getSelectedCategories(),
-                intention,
-                callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
+            serviceHelper.getQuestions(currentSection,
+                    QUESTIONS_LIMIT,
+                    questionsOffset,
+                    activity.getSelectedCategories(),
+                    intention,
+                    callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
+        }
     }
 
     @Override
