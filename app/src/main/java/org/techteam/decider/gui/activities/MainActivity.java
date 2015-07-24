@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.os.Build;
 import android.support.v4.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -327,14 +328,15 @@ public class MainActivity extends ToolbarActivity implements IAuthTokenGetter, O
 
                 if (accounts.length != 0) {
                     Account account = accounts[0];
-                    am.removeAccount(account, new AccountManagerCallback<Boolean>() {
+                    am.removeAccount(account, null, new AccountManagerCallback<Bundle>() {
                         @Override
-                        public void run(AccountManagerFuture<Boolean> future) {
+                        public void run(AccountManagerFuture<Bundle> future) {
                             // restart activity, it will request authorization and receive new user's data
 //                            recreate();
                             getAuthTokenOrExit(cb);
                         }
                     }, null);
+
                 } else {
 //                    recreate();
                     getAuthTokenOrExit(cb);
