@@ -240,6 +240,7 @@ public class MainActivity extends ToolbarActivity implements
         categoriesListAdapter = new CategoriesListAdapter(null, this, this);
         createDrawer(toolbar, categoriesListAdapter);
 
+        new RetrieveUserTask().execute();
         getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
 
         eventBus.register(this);
@@ -543,6 +544,9 @@ public class MainActivity extends ToolbarActivity implements
 
         @Override
         protected void onPostExecute(UserEntry entry) {
+            if (entry == null) {
+                return;
+            }
             getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
             String username = entry.getUsername();
             if (username == null || username.isEmpty())
