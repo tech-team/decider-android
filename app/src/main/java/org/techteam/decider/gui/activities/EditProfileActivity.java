@@ -55,7 +55,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     private UserEntry entry;
     private String uid;
 
-    private RetrieveEntryTask retrieveEntryTask;
+    private RetrieveUserTask retrieveUserTask;
 
     // children
     private ImageView profileImage;
@@ -251,13 +251,12 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         callbacksKeeper.addCallback(TAG, OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                retrieveEntryTask = new RetrieveEntryTask();
-                retrieveEntryTask.execute();
+                retrieveUserTask = new RetrieveUserTask();
+                retrieveUserTask.execute();
             }
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                waitDialog.dismiss();
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
@@ -324,6 +323,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             }
             dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
         }
+
+        new RetrieveUserTask().execute();
 
         if (dataLooseWarnShowing) {
             showDataLooseWarning();
@@ -426,7 +427,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         imageSelector.onActivityResult(requestCode, resultCode, data);
     }
 
-    class RetrieveEntryTask extends AsyncTask<Void, Void, UserEntry> {
+    class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {
 
         @Override
         protected UserEntry doInBackground(Void... params) {

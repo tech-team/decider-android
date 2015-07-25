@@ -1,7 +1,5 @@
 package org.techteam.decider.gui.activities;
 
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -22,7 +20,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.UserEntry;
-import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -44,7 +41,7 @@ public class ProfileActivity extends ToolbarActivity {
     private UserEntry entry;
     private String uid;
 
-    private RetrieveEntryTask retrieveEntryTask;
+    private RetrieveUserTask retrieveUserTask;
 
     // children
     private Toolbar toolbar;
@@ -107,8 +104,8 @@ public class ProfileActivity extends ToolbarActivity {
         callbacksKeeper.addCallback(TAG, OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                retrieveEntryTask = new RetrieveEntryTask();
-                retrieveEntryTask.execute();
+                retrieveUserTask = new RetrieveUserTask();
+                retrieveUserTask.execute();
             }
 
             @Override
@@ -144,6 +141,7 @@ public class ProfileActivity extends ToolbarActivity {
                 ProfileActivity.this.finish();
             }
         });
+        new RetrieveUserTask().execute();
         serviceHelper.getUser(TAG, uid, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
     }
 
@@ -151,8 +149,8 @@ public class ProfileActivity extends ToolbarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_PROFILE && resultCode == Activity.RESULT_OK) {
             // update data
-            retrieveEntryTask = new RetrieveEntryTask();
-            retrieveEntryTask.execute();
+            retrieveUserTask = new RetrieveUserTask();
+            retrieveUserTask.execute();
         }
     }
 
@@ -174,7 +172,7 @@ public class ProfileActivity extends ToolbarActivity {
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
-    class RetrieveEntryTask extends AsyncTask<Void, Void, UserEntry> {
+    class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {
 
         @Override
         protected UserEntry doInBackground(Void... params) {

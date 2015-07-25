@@ -348,6 +348,8 @@ public class MainActivity extends ToolbarActivity implements
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(new ProfileDrawerItem())
+                .withSelectionListEnabled(false)
+                .withSelectionListEnabledForSingleProfile(false)
                 .build();
 
         //Now create your drawer and pass the AccountHeader.Result
