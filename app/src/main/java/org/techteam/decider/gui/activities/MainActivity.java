@@ -405,8 +405,17 @@ public class MainActivity extends ToolbarActivity implements
 
                 if (accounts.length != 0) {
                     Account account = accounts[0];
-                    am.removeAccountExplicitly(account);
-                    getAuthTokenOrExit(cb);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        am.removeAccountExplicitly(accounts[0]);
+                        getAuthTokenOrExit(cb);
+                    } else {
+                        am.removeAccount(account, new AccountManagerCallback<Boolean>() {
+                            @Override
+                            public void run(AccountManagerFuture<Boolean> future) {
+                                getAuthTokenOrExit(cb);
+                            }
+                        }, null);
+                    }
                 } else {
 //                    recreate();
                     getAuthTokenOrExit(cb);

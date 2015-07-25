@@ -8,6 +8,7 @@ import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import org.json.JSONException;
@@ -360,7 +361,12 @@ public class ApiUI {
             if (newAccessToken == null) {
                 Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
                 if (accounts.length != 0) {
-                    am.removeAccountExplicitly(accounts[0]);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        am.removeAccountExplicitly(accounts[0]);
+                    } else {
+                        AccountManagerFuture<Boolean> f = am.removeAccount(accounts[0], null, null);
+                        f.getResult();
+                    }
                 }
                 throw new InvalidAccessTokenException();
             }
