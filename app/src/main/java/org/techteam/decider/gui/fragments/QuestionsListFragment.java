@@ -151,6 +151,32 @@ public class QuestionsListFragment
         this.categoriesGetter = (CategoriesGetter) activity;
         this.authTokenGetter = (AuthTokenGetter) activity;
         this.serviceHelperGetter = (ServiceHelperGetter) activity;
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+
+        if (savedInstanceState != null) {
+//            boolean isRefreshing = serviceHelperGetter.restoreOperationsState(savedInstanceState,
+//                    BundleKeys.PENDING_OPERATIONS,
+//                    callbacksKeeper);
+//
+//            if (isRefreshing) {
+//                // TODO: it is not working
+//                mSwipeRefreshLayout.setRefreshing(true);
+//            } else {
+//                mSwipeRefreshLayout.setRefreshing(false);
+//            }
+
+            currentSection = ContentSection.fromInt(savedInstanceState.getInt(BundleKeys.CURRENT_SECTION));
+            questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET); // TODO: probably it's not valid
+        }
+
         String tag = getServiceTag();
         CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
         callbacksKeeper.addCallback(tag, OperationType.QUESTIONS_GET, new ServiceCallback() {
@@ -169,7 +195,7 @@ public class QuestionsListFragment
                 if (isFeedFinished) {
                     msg = "No more posts";
                 } else {
-                    msg = "Successfully fetched posts";
+                    msg = "Successfully fetched posts. " + currentSection.toString();
                     if (isAdded()) {
                         Bundle args = new Bundle();
                         args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
@@ -316,30 +342,6 @@ public class QuestionsListFragment
                 Toaster.toastLong(getActivity().getApplicationContext(), message);
             }
         });
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-        sharedPref.registerOnSharedPreferenceChangeListener(this);
-
-        if (savedInstanceState != null) {
-//            boolean isRefreshing = serviceHelperGetter.restoreOperationsState(savedInstanceState,
-//                    BundleKeys.PENDING_OPERATIONS,
-//                    callbacksKeeper);
-//
-//            if (isRefreshing) {
-//                // TODO: it is not working
-//                mSwipeRefreshLayout.setRefreshing(true);
-//            } else {
-//                mSwipeRefreshLayout.setRefreshing(false);
-//            }
-
-            currentSection = ContentSection.fromInt(savedInstanceState.getInt(BundleKeys.CURRENT_SECTION));
-            questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET); // TODO: probably it's not valid
-        }
 
         adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this);
         recyclerView.setAdapter(adapter);
