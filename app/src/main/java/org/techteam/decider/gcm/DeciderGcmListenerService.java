@@ -33,8 +33,12 @@ public class DeciderGcmListenerService extends GcmListenerService {
          *     - Update UI.
          */
 
-        Push push = PushParser.parse(data);
-        sendNotification(push);
+        try {
+            Push push = PushParser.parse(data);
+            sendNotification(push);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendNotification(Push push) {

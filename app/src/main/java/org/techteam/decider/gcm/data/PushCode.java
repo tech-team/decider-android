@@ -1,6 +1,7 @@
 package org.techteam.decider.gcm.data;
 
 public enum PushCode {
+    DEBUG(0),
     NEW_COMMENT(1000),
     NEW_COMMENT_LIKE(1001),
     NEW_VOTE(1002),

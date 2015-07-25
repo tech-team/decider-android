@@ -101,6 +101,12 @@
             android:exported="false" >
         </service>
 
+        <receiver android:name=".misc.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".gcm.GcmRegistrationIntentService"
             android:exported="false" >
