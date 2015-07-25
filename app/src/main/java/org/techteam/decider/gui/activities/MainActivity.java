@@ -84,7 +84,8 @@ public class MainActivity extends ToolbarActivity implements
     public static String PACKAGE_NAME;
 
     public static final int AUTH_REQUEST_CODE = 101;
-    private static final int LOGOUT_ID = 1;
+    private static final int PREFERENCES_ID = 1;
+    private static final int LOGOUT_ID = 2;
 
     private static final int ADD_QUESTION = 0;
     private static final int QUESTION_DETAILS = 1;
@@ -361,22 +362,36 @@ public class MainActivity extends ToolbarActivity implements
                         new CategoriesDrawerItem(categoriesListAdapter),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem()
+                                .withName(R.string.preferences)
+                                .withIdentifier(PREFERENCES_ID),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem()
                                 .withName(R.string.drawer_item_logout)
                                 .withIdentifier(LOGOUT_ID)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
-                        if (iDrawerItem.getIdentifier() == LOGOUT_ID) {
-                            logout();
-                            return true;
-                        } else {
-                            return true;
+                        switch (iDrawerItem.getIdentifier()) {
+                            case PREFERENCES_ID:
+                                showPreferences();
+                                return true;
+                            case LOGOUT_ID:
+                                logout();
+                                return true;
+                            default:
+                                return true;
                         }
                     }
                 })
                 .build();
     }
+
+    private void showPreferences() {
+        Intent intent = new Intent(this, PreferencesActivity.class);
+        startActivity(intent);
+    }
+
 
     private void logout() {
         drawer.closeDrawer();
