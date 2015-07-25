@@ -62,7 +62,6 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
     private ImageSelector rightImageSelector;
 
     private ImageQuestionData currentQuestionData;
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
     private ProgressDialog waitDialog;
@@ -148,7 +147,8 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
         categoriesSpinner.setAdapter(categoriesSpinnerAdapter);
 
-        callbacksKeeper.addCallback(OperationType.QUESTION_CREATE, new ServiceCallback() {
+        CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(TAG, OperationType.QUESTION_CREATE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
@@ -190,7 +190,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
             dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
-                    callbacksKeeper);
+                    callbacksKeeper, TAG);
             restoreQuestion();
         }
 
@@ -294,7 +294,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
                         dialog.dismiss();
                     }
                 });
-        serviceHelper.createQuestion(currentQuestionData, callbacksKeeper.getCallback(OperationType.QUESTION_CREATE));
+        serviceHelper.createQuestion(TAG, currentQuestionData, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.QUESTION_CREATE));
 
         return true;
     }

@@ -46,14 +46,9 @@ public class MainFragment
 
     private FloatingActionButton createPostButton;
 
-    private ServiceHelper serviceHelper;
-    private CallbacksKeeper callbacksKeeper;
 
-    public static MainFragment create(ServiceHelper serviceHelper, CallbacksKeeper callbacksKeeper) {
-        MainFragment f = new MainFragment();
-        f.serviceHelper = serviceHelper;
-        f.callbacksKeeper = callbacksKeeper;
-        return f;
+    public static MainFragment create() {
+        return new MainFragment();
     }
 
     //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();

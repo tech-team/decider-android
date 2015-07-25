@@ -55,7 +55,6 @@ public class AuthActivity extends AccountAuthenticatorActivity {
 
     private BroadcastReceiver gcmRegistrationBroadcastReceiver;
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
     private static final class BundleKeys {
@@ -105,7 +104,8 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         });
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.LOGIN, new ServiceCallback() {
+        CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(TAG, OperationType.LOGIN, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 String username = data.getString(LoginRegisterExtras.USERNAME);
@@ -142,7 +142,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
                 Toaster.toast(getApplicationContext(), "Login: failed. " + message);
             }
         });
-        callbacksKeeper.addCallback(OperationType.REGISTER, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.REGISTER, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
 
@@ -185,7 +185,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
-                    callbacksKeeper);
+                    callbacksKeeper, TAG);
         }
     }
 
@@ -214,7 +214,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        serviceHelper.login(email, password, callbacksKeeper.getCallback(OperationType.LOGIN));
+        serviceHelper.login(TAG, email, password, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.LOGIN));
     }
 
     private void register() {
@@ -237,7 +237,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
             return;
         }
 
-        serviceHelper.register(email, password, callbacksKeeper.getCallback(OperationType.REGISTER));
+        serviceHelper.register(TAG, email, password, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.REGISTER));
     }
 
     private void socialLogin(SocialProviders.Provider provider) {

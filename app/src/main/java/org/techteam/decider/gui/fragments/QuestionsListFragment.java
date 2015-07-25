@@ -24,8 +24,8 @@ import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.CategoriesGetter;
+import org.techteam.decider.gui.ServiceHelperGetter;
 import org.techteam.decider.gui.activities.ActivityHelper;
-import org.techteam.decider.gui.activities.MainActivity;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.QuestionsListAdapter;
@@ -50,8 +50,7 @@ public class QuestionsListFragment
         SharedPreferences.OnSharedPreferenceChangeListener,
         OnCategorySelectedListener {
 
-    public static final String TAG = QuestionsListFragment.class.toString();
-
+    public static final String TAG = QuestionsListFragment.class.getName();
 
     private static final int QUESTIONS_LIMIT = 30;
     private int questionsOffset = 0;
@@ -66,14 +65,25 @@ public class QuestionsListFragment
     private TextView emptyListView;
     private QuestionsListAdapter adapter;
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
-    private ServiceHelper serviceHelper;
+    private ServiceHelperGetter serviceHelperGetter;
     public boolean refreshing = false;
 
     private CategoriesGetter categoriesGetter;
     private AuthTokenGetter authTokenGetter;
 
     private LoaderManager.LoaderCallbacks<Cursor> questionsLoaderCallbacks = new QuestionsLoaderCallbacksImpl();
+
+    private String serviceTag = null;
+    private String getServiceTag() {
+        if (serviceTag == null) {
+            if (currentSection != null) {
+                serviceTag = TAG + currentSection.toString();
+            } else {
+                serviceTag = TAG;
+            }
+        }
+        return serviceTag;
+    }
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -135,8 +145,10 @@ public class QuestionsListFragment
 
         this.categoriesGetter = (CategoriesGetter) activity;
         this.authTokenGetter = (AuthTokenGetter) activity;
-        serviceHelper = new ServiceHelper(activity.getApplicationContext());
-        callbacksKeeper.addCallback(OperationType.QUESTIONS_GET, new ServiceCallback() {
+        this.serviceHelperGetter = (ServiceHelperGetter) activity;
+        String tag = getServiceTag();
+        CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(tag, OperationType.QUESTIONS_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 mSwipeRefreshLayout.setRefreshing(false);
@@ -200,7 +212,7 @@ public class QuestionsListFragment
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.POLL_VOTE, new ServiceCallback() {
+        callbacksKeeper.addCallback(tag, OperationType.POLL_VOTE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
@@ -241,7 +253,7 @@ public class QuestionsListFragment
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.QUESTION_LIKE, new ServiceCallback() {
+        callbacksKeeper.addCallback(tag, OperationType.QUESTION_LIKE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 int entryPosition = data.getInt(PollVoteExtras.ENTRY_POSITION);
@@ -273,7 +285,7 @@ public class QuestionsListFragment
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.QUESTION_REPORT_SPAM, new ServiceCallback() {
+        callbacksKeeper.addCallback(tag, OperationType.QUESTION_REPORT_SPAM, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toastLong(getActivity().getApplicationContext(), R.string.question_marked_spam);
@@ -309,16 +321,16 @@ public class QuestionsListFragment
         sharedPref.registerOnSharedPreferenceChangeListener(this);
 
         if (savedInstanceState != null) {
-            boolean isRefreshing = serviceHelper.restoreOperationsState(savedInstanceState,
-                    BundleKeys.PENDING_OPERATIONS,
-                    callbacksKeeper);
-
-            if (isRefreshing) {
-                // TODO: it is not working
-                mSwipeRefreshLayout.setRefreshing(true);
-            } else {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
+//            boolean isRefreshing = serviceHelperGetter.restoreOperationsState(savedInstanceState,
+//                    BundleKeys.PENDING_OPERATIONS,
+//                    callbacksKeeper);
+//
+//            if (isRefreshing) {
+//                // TODO: it is not working
+//                mSwipeRefreshLayout.setRefreshing(true);
+//            } else {
+//                mSwipeRefreshLayout.setRefreshing(false);
+//            }
 
             currentSection = ContentSection.fromInt(savedInstanceState.getInt(BundleKeys.CURRENT_SECTION));
             questionsOffset = savedInstanceState.getInt(BundleKeys.QUESTIONS_OFFSET); // TODO: probably it's not valid
@@ -336,7 +348,6 @@ public class QuestionsListFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
         outState.putInt(BundleKeys.QUESTIONS_OFFSET, questionsOffset);
         outState.putInt(BundleKeys.CURRENT_SECTION, currentSection.toInt());
     }
@@ -352,12 +363,13 @@ public class QuestionsListFragment
 //        Toaster.toast(getActivity().getBaseContext(), R.string.loading);
 
         questionsOffset = 0;
-        serviceHelper.getQuestions(currentSection,
+        serviceHelperGetter.getServiceHelper().getQuestions(getServiceTag(),
+                currentSection,
                 QUESTIONS_LIMIT,
                 questionsOffset,
                 categoriesGetter.getSelectedCategories(),
                 LoadIntention.REFRESH,
-                callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
+                CallbacksKeeper.getInstance().getCallback(getServiceTag(), OperationType.QUESTIONS_GET));
     }
 
     @Override
@@ -371,23 +383,31 @@ public class QuestionsListFragment
                 intention = LoadIntention.APPEND;
             }
 
-            serviceHelper.getQuestions(currentSection,
+            serviceHelperGetter.getServiceHelper().getQuestions(getServiceTag(),
+                    currentSection,
                     QUESTIONS_LIMIT,
                     questionsOffset,
                     categoriesGetter.getSelectedCategories(),
                     intention,
-                    callbacksKeeper.getCallback(OperationType.QUESTIONS_GET));
+                    CallbacksKeeper.getInstance().getCallback(getServiceTag(), OperationType.QUESTIONS_GET));
 //        }
     }
 
     @Override
     public void onLikeClick(int entryPosition, QuestionEntry post) {
-        serviceHelper.likeQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_LIKE));
+        serviceHelperGetter.getServiceHelper().likeQuestion(getServiceTag(),
+                entryPosition,
+                post.getQId(),
+                CallbacksKeeper.getInstance().getCallback(getServiceTag(), OperationType.QUESTION_LIKE));
     }
 
     @Override
     public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
-        serviceHelper.pollVote(entryPosition, post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
+        serviceHelperGetter.getServiceHelper().pollVote(getServiceTag(),
+                entryPosition,
+                post.getQId(),
+                voteId,
+                CallbacksKeeper.getInstance().getCallback(getServiceTag(), OperationType.POLL_VOTE));
     }
 
     @Override
@@ -401,7 +421,10 @@ public class QuestionsListFragment
 
     @Override
     public void onReportSpam(int entryPosition, QuestionEntry post) {
-        serviceHelper.reportSpamQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_REPORT_SPAM));
+        serviceHelperGetter.getServiceHelper().reportSpamQuestion(getServiceTag(),
+                entryPosition,
+                post.getQId(),
+                CallbacksKeeper.getInstance().getCallback(getServiceTag(), OperationType.QUESTION_REPORT_SPAM));
     }
 
     @Override
@@ -412,13 +435,11 @@ public class QuestionsListFragment
     @Override
     public void onResume() {
         super.onResume();
-        serviceHelper.init();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        serviceHelper.release();
     }
 
     @Override

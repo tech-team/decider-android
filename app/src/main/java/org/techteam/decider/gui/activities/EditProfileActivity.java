@@ -50,6 +50,7 @@ import static android.support.v7.app.AlertDialog.*;
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
 public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, AuthTokenGetter {
+    public static final String TAG = EditProfileActivity.class.getName();
     private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
     private UserEntry entry;
@@ -73,7 +74,6 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     private Button saveButton;
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
     private ProgressDialog waitDialog;
 
@@ -88,6 +88,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         public final static String USER_DATA = "USER_DATA";
         public final static String IMAGE_URI = "IMAGE_URI";
         public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
     }
 
     public static final class IntentExtras {
@@ -204,7 +205,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         });
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.USER_EDIT, new ServiceCallback() {
+        CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(TAG, OperationType.USER_EDIT, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 waitDialog.dismiss();
@@ -257,7 +259,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 Toaster.toastLong(EditProfileActivity.this, "Profile not saved: " + message);
             }
         });
-        callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 retrieveEntryTask = new RetrieveEntryTask();
@@ -315,11 +317,12 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
                 String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
                 // pass token explicitly
-                serviceHelper.getUser(uid, token, callbacksKeeper.getCallback(OperationType.USER_GET));
+                serviceHelper.getUser(TAG, uid, token, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
             } else {
-                serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
+                serviceHelper.getUser(TAG, uid, callbacksKeeper.getCallback(TAG, OperationType.USER_GET));
             }
         } else {
+            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, CallbacksKeeper.getInstance(), TAG);
             UserData userData = savedInstanceState.getParcelable(BundleKeys.USER_DATA);
             if (userData != null) {
                 deserialize(userData);
@@ -346,9 +349,9 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             // we are at the last phase of registration
             String token = registrationData.getString(ServiceCallback.LoginRegisterExtras.TOKEN);
             // pass token explicitly
-            serviceHelper.editUser(userData, token, callbacksKeeper.getCallback(OperationType.USER_EDIT));
+            serviceHelper.editUser(TAG, userData, token, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_EDIT));
         } else {
-            serviceHelper.editUser(userData, callbacksKeeper.getCallback(OperationType.USER_EDIT));
+            serviceHelper.editUser(TAG, userData, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_EDIT));
         }
     }
 
@@ -407,6 +410,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
         outState.putParcelable(BundleKeys.USER_DATA, serialize());
         outState.putString(BundleKeys.IMAGE_URI, avatarUrl);
         outState.putBoolean(BundleKeys.DATA_LOOSE_WARN, dataLooseWarnShowing);

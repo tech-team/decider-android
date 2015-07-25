@@ -41,6 +41,7 @@ import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends ToolbarActivity
             implements OnMoreCommentsRequestedCallback, AuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
+    private static final String TAG = QuestionDetailsActivity.class.getName();
     private RetrieveEntryTask retrieveEntryTask;
 
     // children
@@ -57,7 +58,6 @@ public class QuestionDetailsActivity extends ToolbarActivity
     private boolean forceRefresh = false;
     private int remaining = Integer.MAX_VALUE;
 
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ServiceHelper serviceHelper;
 
     private LoaderManager.LoaderCallbacks<Cursor> commentsLoaderCallbacks = new CommentsLoaderCallbacksImpl();
@@ -148,7 +148,8 @@ public class QuestionDetailsActivity extends ToolbarActivity
         });
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.COMMENTS_GET, new ServiceCallback() {
+        CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(TAG, OperationType.COMMENTS_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 boolean isFeedFinished = data.getBoolean(GetCommentsExtras.FEED_FINISHED, false);
@@ -189,7 +190,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.COMMENT_CREATE, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.COMMENT_CREATE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 int questionId = data.getInt(CreateQuestionExtras.QID, -1);
@@ -225,7 +226,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.POLL_VOTE, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.POLL_VOTE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 QuestionUpdateTask task = new QuestionUpdateTask();
@@ -262,7 +263,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.QUESTION_LIKE, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.QUESTION_LIKE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 QuestionUpdateTask task = new QuestionUpdateTask();
@@ -290,7 +291,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.QUESTION_REPORT_SPAM, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.QUESTION_REPORT_SPAM, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toastLong(getApplicationContext(), R.string.question_marked_spam);
@@ -318,7 +319,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.COMMENT_REPORT_SPAM, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.COMMENT_REPORT_SPAM, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 Toaster.toastLong(getApplicationContext(), R.string.comment_marked_spam);
@@ -348,7 +349,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         if (savedInstanceState != null) {
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
-                    callbacksKeeper);
+                    callbacksKeeper, TAG);
             commentsOffset = forceRefresh ? 0 : savedInstanceState.getInt(BundleKeys.COMMENTS_OFFSET, 0);
             remaining = forceRefresh ? Integer.MAX_VALUE : savedInstanceState.getInt(BundleKeys.REMAINING, Integer.MAX_VALUE);
         }
@@ -421,27 +422,28 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
         boolean anon = anonymityCheckBox.isChecked();
 
-        serviceHelper.createComment(new CommentData(text, questionId, lastCommentId, anon),
-                callbacksKeeper.getCallback(OperationType.COMMENT_CREATE));
+        serviceHelper.createComment(TAG, new CommentData(text, questionId, lastCommentId, anon),
+                CallbacksKeeper.getInstance().getCallback(TAG, OperationType.COMMENT_CREATE));
     }
 
     @Override
     public void moreCommentsRequested() {
-        serviceHelper.getComments(adapter.getQuestionEntry().getQId(),
+        serviceHelper.getComments(TAG,
+                adapter.getQuestionEntry().getQId(),
                 COMMENTS_LIMIT,
                 commentsOffset,
                 LoadIntention.APPEND,
-                callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
+                CallbacksKeeper.getInstance().getCallback(TAG, OperationType.COMMENTS_GET));
     }
 
     @Override
     public void onLikeClick(int entryPosition, QuestionEntry post) {
-        serviceHelper.likeQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_LIKE));
+        serviceHelper.likeQuestion(TAG, entryPosition, post.getQId(), CallbacksKeeper.getInstance().getCallback(TAG, OperationType.QUESTION_LIKE));
     }
 
     @Override
     public void onVoteClick(int entryPosition, QuestionEntry post, int voteId) {
-        serviceHelper.pollVote(entryPosition, post.getQId(), voteId, callbacksKeeper.getCallback(OperationType.POLL_VOTE));
+        serviceHelper.pollVote(TAG, entryPosition, post.getQId(), voteId, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.POLL_VOTE));
     }
 
     @Override
@@ -451,12 +453,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     @Override
     public void onReportSpam(int entryPosition, QuestionEntry post) {
-        serviceHelper.reportSpamQuestion(entryPosition, post.getQId(), callbacksKeeper.getCallback(OperationType.QUESTION_REPORT_SPAM));
+        serviceHelper.reportSpamQuestion(TAG, entryPosition, post.getQId(), CallbacksKeeper.getInstance().getCallback(TAG, OperationType.QUESTION_REPORT_SPAM));
     }
 
     @Override
     public void onReportSpam(int entryPosition, CommentEntry entry) {
-        serviceHelper.reportSpamComment(entryPosition, entry.getCid(), callbacksKeeper.getCallback(OperationType.COMMENT_REPORT_SPAM));
+        serviceHelper.reportSpamComment(TAG, entryPosition, entry.getCid(), CallbacksKeeper.getInstance().getCallback(TAG, OperationType.COMMENT_REPORT_SPAM));
     }
 
 
@@ -478,11 +480,12 @@ public class QuestionDetailsActivity extends ToolbarActivity
             // QuestionView will be migrated into list element
             //questionView.reuse(entry, null);
             if (commentsOffset == 0) {
-                serviceHelper.getComments(entry.getQId(),
+                serviceHelper.getComments(TAG,
+                        entry.getQId(),
                         COMMENTS_LIMIT,
                         commentsOffset,
                         LoadIntention.REFRESH,
-                        callbacksKeeper.getCallback(OperationType.COMMENTS_GET));
+                        CallbacksKeeper.getInstance().getCallback(TAG, OperationType.COMMENTS_GET));
             }
             String currentUserId = ApiUI.getCurrentUserId(QuestionDetailsActivity.this);
             if (currentUserId != null) {

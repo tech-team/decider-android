@@ -44,6 +44,7 @@ import org.techteam.decider.content.entities.DbHelper;
 import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gcm.GcmPreferences;
 import org.techteam.decider.gui.CategoriesGetter;
+import org.techteam.decider.gui.ServiceHelperGetter;
 import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.fragments.MainFragment;
@@ -66,7 +67,8 @@ import java.util.List;
 public class MainActivity extends ToolbarActivity implements
         AuthTokenGetter,
         OnCategorySelectedListener,
-        CategoriesGetter {
+        CategoriesGetter,
+        ServiceHelperGetter {
     private static final String TAG = MainActivity.class.getName();
 
     public static final int AUTH_REQUEST_CODE = 101;
@@ -82,10 +84,14 @@ public class MainActivity extends ToolbarActivity implements
     private CategoriesListAdapter categoriesListAdapter;
 
     private ServiceHelper serviceHelper;
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
 
     private BroadcastReceiver gcmRegistrationBroadcastReceiver;
+
+    @Override
+    public ServiceHelper getServiceHelper() {
+        return serviceHelper;
+    }
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -131,10 +137,11 @@ public class MainActivity extends ToolbarActivity implements
         });
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
+        final CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(TAG, OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                serviceHelper.getCategories(getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(OperationType.CATEGORIES_GET));
+                serviceHelper.getCategories(TAG, getResources().getConfiguration().locale.toString(), callbacksKeeper.getCallback(TAG, OperationType.CATEGORIES_GET));
             }
 
             @Override
@@ -158,7 +165,7 @@ public class MainActivity extends ToolbarActivity implements
             }
         });
 
-        callbacksKeeper.addCallback(OperationType.CATEGORIES_GET, new ServiceCallback() {
+        callbacksKeeper.addCallback(TAG, OperationType.CATEGORIES_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 retrieveUserTask = new RetrieveUserTask();
@@ -188,7 +195,7 @@ public class MainActivity extends ToolbarActivity implements
         });
 
         if (savedInstanceState != null) {
-            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
+            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper, TAG);
         }
 
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -201,12 +208,12 @@ public class MainActivity extends ToolbarActivity implements
     private void getUserInfo() {
         String currentUserId = ApiUI.getCurrentUserId(MainActivity.this);
         if (currentUserId != null) {
-            serviceHelper.getUser(currentUserId, callbacksKeeper.getCallback(OperationType.USER_GET));
+            serviceHelper.getUser(TAG, currentUserId, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
         }
     }
 
     private void finishAuthorization() {
-        MainFragment f = MainFragment.create(serviceHelper, callbacksKeeper);
+        MainFragment f = MainFragment.create();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.content_frame, f, MainFragment.TAG).commit();
         getUserInfo();

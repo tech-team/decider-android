@@ -34,10 +34,11 @@ import org.techteam.decider.util.Toaster;
 import java.util.Date;
 
 public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter {
+    private static final String TAG = ProfileActivity.class.getName();
+
     public final static String USER_ID = "USER_ID";
 
     public final static int EDIT_PROFILE = 0;
-
     private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
     private UserEntry entry;
@@ -61,8 +62,11 @@ public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter 
     private ImageLoader imageLoader;
 
     private ServiceHelper serviceHelper;
-    private CallbacksKeeper callbacksKeeper = new CallbacksKeeper();
     private ProgressDialog waitDialog;
+
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
 
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
@@ -119,7 +123,8 @@ public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter 
         editButton = (Button) findViewById(R.id.edit_button);
 
         serviceHelper = new ServiceHelper(this);
-        callbacksKeeper.addCallback(OperationType.USER_GET, new ServiceCallback() {
+        CallbacksKeeper callbacksKeeper = CallbacksKeeper.getInstance();
+        callbacksKeeper.addCallback(TAG, OperationType.USER_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
                 retrieveEntryTask = new RetrieveEntryTask();
@@ -148,6 +153,10 @@ public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter 
             }
         });
 
+        if (savedInstanceState != null) {
+            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, CallbacksKeeper.getInstance(), TAG);
+        }
+
         waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait),
                 true, true, new DialogInterface.OnCancelListener() {
             @Override
@@ -155,7 +164,7 @@ public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter 
                 ProfileActivity.this.finish();
             }
         });
-        serviceHelper.getUser(uid, callbacksKeeper.getCallback(OperationType.USER_GET));
+        serviceHelper.getUser(TAG, uid, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
     }
 
     @Override
@@ -177,6 +186,12 @@ public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter 
     protected void onPause() {
         super.onResume();
         serviceHelper.release();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     class RetrieveEntryTask extends AsyncTask<Void, Void, UserEntry> {

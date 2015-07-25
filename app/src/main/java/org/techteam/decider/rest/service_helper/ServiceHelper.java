@@ -39,12 +39,12 @@ public class ServiceHelper {
         this.context = context;
     }
 
-    public void getQuestions(ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
+    public void getQuestions(String tag, ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.QUESTIONS_GET;
 
-        String requestId = createRequestId(op, contentSection, limit, offset);
+        String requestId = createRequestId(tag, op, contentSection, limit, offset);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -55,12 +55,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void getCategories(String locale, ServiceCallback cb) {
+    public void getCategories(String tag, String locale, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.CATEGORIES_GET;
 
-        String requestId = createRequestId(op, locale);
+        String requestId = createRequestId(tag, op, locale);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -71,11 +71,11 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    private void loginRegister(String email, String password, OperationType op, ServiceCallback cb) {
+    private void loginRegister(String tag, String email, String password, OperationType op, ServiceCallback cb) {
         init();
         email = email.trim();
 
-        String requestId = createRequestId(op, email);
+        String requestId = createRequestId(tag, op, email);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -86,22 +86,22 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void login(String email, String password, ServiceCallback cb) {
+    public void login(String tag, String email, String password, ServiceCallback cb) {
         OperationType op = OperationType.LOGIN;
-        loginRegister(email, password, op, cb);
+        loginRegister(tag, email, password, op, cb);
     }
 
-    public void register(String email, String password, ServiceCallback cb) {
+    public void register(String tag, String email, String password, ServiceCallback cb) {
         OperationType op = OperationType.REGISTER;
-        loginRegister(email, password, op, cb);
+        loginRegister(tag, email, password, op, cb);
     }
 
-    public void uploadImage(ImageData image, int imageOrdinalId, ServiceCallback cb) {
+    public void uploadImage(String tag, ImageData image, int imageOrdinalId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.IMAGE_UPLOAD;
 
-        String requestId = createRequestId(op, imageOrdinalId, image.getOriginalFilename());
+        String requestId = createRequestId(tag, op, imageOrdinalId, image.getOriginalFilename());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -112,12 +112,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void createQuestion(QuestionData questionData, ServiceCallback cb) {
+    public void createQuestion(String tag, QuestionData questionData, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.QUESTION_CREATE;
 
-        String requestId = createRequestId(op, questionData.createFingerprint());
+        String requestId = createRequestId(tag, op, questionData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -128,12 +128,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void pollVote(int entryPosition, int questionId, int pollItemId, ServiceCallback cb) {
+    public void pollVote(String tag, int entryPosition, int questionId, int pollItemId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.POLL_VOTE;
 
-        String requestId = createRequestId(op, questionId, pollItemId);
+        String requestId = createRequestId(tag, op, questionId, pollItemId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -144,12 +144,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void likeQuestion(int entryPosition, int questionId, ServiceCallback cb) {
+    public void likeQuestion(String tag, int entryPosition, int questionId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.QUESTION_LIKE;
 
-        String requestId = createRequestId(op, questionId);
+        String requestId = createRequestId(tag, op, questionId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -160,12 +160,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void getComments(int questionId, int limit, int offset, int loadIntention, ServiceCallback cb) {
+    public void getComments(String tag, int questionId, int limit, int offset, int loadIntention, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.COMMENTS_GET;
 
-        String requestId = createRequestId(op, questionId, limit, offset);
+        String requestId = createRequestId(tag, op, questionId, limit, offset);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -176,12 +176,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void createComment(CommentData commentData, ServiceCallback cb) {
+    public void createComment(String tag, CommentData commentData, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.COMMENT_CREATE;
 
-        String requestId = createRequestId(op, commentData.createFingerprint());
+        String requestId = createRequestId(tag, op, commentData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -192,12 +192,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void getUser(String userId, ServiceCallback cb) {
+    public void getUser(String tag, String userId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.USER_GET;
 
-        String requestId = createRequestId(op, userId);
+        String requestId = createRequestId(tag, op, userId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -208,12 +208,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void getUser(String userId, String accessToken, ServiceCallback cb) {
+    public void getUser(String tag, String userId, String accessToken, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.USER_GET;
 
-        String requestId = createRequestId(op, userId);
+        String requestId = createRequestId(tag, op, userId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -224,12 +224,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void editUser(UserData userData, ServiceCallback cb) {
+    public void editUser(String tag, UserData userData, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.USER_EDIT;
 
-        String requestId = createRequestId(op, userData.createFingerprint());
+        String requestId = createRequestId(tag, op, userData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -240,12 +240,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void editUser(UserData userData, String accessToken, ServiceCallback cb) {
+    public void editUser(String tag, UserData userData, String accessToken, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.USER_EDIT;
 
-        String requestId = createRequestId(op, userData.createFingerprint());
+        String requestId = createRequestId(tag, op, userData.createFingerprint());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -256,12 +256,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void reportSpamQuestion(int entryPosition, int questionId, ServiceCallback cb) {
+    public void reportSpamQuestion(String tag, int entryPosition, int questionId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.QUESTION_REPORT_SPAM;
 
-        String requestId = createRequestId(op, questionId);
+        String requestId = createRequestId(tag, op, questionId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -272,12 +272,12 @@ public class ServiceHelper {
         pendingOperations.put(requestId, new PendingOperation(op, requestId));
     }
 
-    public void reportSpamComment(int entryPosition, int commentId, ServiceCallback cb) {
+    public void reportSpamComment(String tag, int entryPosition, int commentId, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.COMMENT_REPORT_SPAM;
 
-        String requestId = createRequestId(op, commentId);
+        String requestId = createRequestId(tag, op, commentId);
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
@@ -298,7 +298,7 @@ public class ServiceHelper {
     /**
      * @return true if app should be refreshing right now, false otherwise
      **/
-    public boolean restoreOperationsState(Bundle savedInstanceState, String key, CallbacksKeeper callbacksKeeper) {
+    public boolean restoreOperationsState(Bundle savedInstanceState, String key, CallbacksKeeper callbacksKeeper, String tag) {
         ArrayList<PendingOperation> operations = savedInstanceState.getParcelableArrayList(key);
         if (operations == null) {
             Log.wtf(TAG, "Operations are null!");
@@ -318,7 +318,7 @@ public class ServiceHelper {
                 isRefreshing = op.getOperationType().canRefresh();
             }
 
-            addCallback(op.getOperationId(), callbacksKeeper.getCallback(op.getOperationType()));
+            addCallback(op.getOperationId(), callbacksKeeper.getCallback(tag, op.getOperationType()));
         }
         return isRefreshing;
     }
@@ -345,8 +345,10 @@ public class ServiceHelper {
         callbackHelper.addCallback(operationId, cb);
     }
 
-    private static String createRequestId(OperationType op, Object... args) {
+    private static String createRequestId(String tag, OperationType op, Object... args) {
         StringBuilder sb = new StringBuilder();
+        sb.append(tag);
+        sb.append("__");
         sb.append(op.toString());
         for (Object arg : args) {
             sb.append("__");
