@@ -26,6 +26,9 @@ import org.techteam.decider.gui.widget.SlidingTabLayout;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.service_helper.ServiceHelper;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,10 +39,6 @@ public class MainFragment
     private static final int ADD_QUESTION = 0;
     private static final int QUESTION_DETAILS = 1;
 
-
-//    private CategoriesListAdapter categoriesListAdapter;
-    private List<OnCategorySelectedListener> onCategorySelectedListeners = new LinkedList<>();
-
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
@@ -49,12 +48,6 @@ public class MainFragment
 
     public static MainFragment create() {
         return new MainFragment();
-    }
-
-    //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
-
-    private static final class BundleKeys {
-
     }
 
     @Override
@@ -104,16 +97,6 @@ public class MainFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState != null) {
-
-        }
-
-//        ActionBar actionBar = this.activity.getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//            actionBar.setHomeButtonEnabled(true);
-//        }
-
     }
 
     @Override
@@ -134,11 +117,11 @@ public class MainFragment
         } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK && data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
             refreshPages();
         } else {
-            List<Fragment> fragments = getChildFragmentManager().getFragments();
-            if (fragments != null) {
-                for (Fragment fragment : fragments) {
-                    if (fragment != null) {
-                        fragment.onActivityResult(requestCode, resultCode, data);
+            for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+                if (weak != null) {
+                    Fragment f = weak.get();
+                    if (f != null) {
+                        f.onActivityResult(requestCode, resultCode, data);
                     }
                 }
             }
@@ -151,33 +134,41 @@ public class MainFragment
     }
 
     public void invalidatePages() {
-        for (Fragment f: getChildFragmentManager().getFragments()) {
-            if (f != null && f.isAdded()) {
-                QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
-                questionsListFragment.invalidate();
+        for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+            if (weak != null) {
+                Fragment f = weak.get();
+                if (f != null) {
+                    QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                    questionsListFragment.invalidate();
+                }
             }
         }
     }
 
     public void refreshPages() {
-        for (Fragment f: getChildFragmentManager().getFragments()) {
-            if (f != null && f.isAdded()) {
-                QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
-                questionsListFragment.refresh();
+        for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+            if (weak != null) {
+                Fragment f = weak.get();
+                if (f != null) {
+                    QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                    questionsListFragment.refresh();
+                }
             }
         }
     }
 
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
+        private HashMap<Integer, WeakReference<Fragment>> fragments;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            fragments = new HashMap<>(getCount());
         }
 
         @Override
         public Fragment getItem(int position) {
             QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
-            onCategorySelectedListeners.add(f);
+            fragments.put(position, new WeakReference<Fragment>(f));
             return f;
         }
 
@@ -195,6 +186,10 @@ public class MainFragment
         @Override
         public int getTextColor() {
             return android.R.color.white;
+        }
+
+        public HashMap<Integer, WeakReference<Fragment>> getFragments() {
+            return fragments;
         }
     }
 }

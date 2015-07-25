@@ -140,6 +140,11 @@ public class QuestionsListFragment
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
@@ -342,7 +347,7 @@ public class QuestionsListFragment
         Log.d(TAG, "restarting loader...");
         Bundle args = new Bundle();
         args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
-        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+        getLoaderManager().initLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -470,10 +475,6 @@ public class QuestionsListFragment
             adapter.swapCursor(null);
             refresh();
         }
-    }
-
-    public void setCurrentSection(ContentSection currentSection) {
-        this.currentSection = currentSection;
     }
 
 

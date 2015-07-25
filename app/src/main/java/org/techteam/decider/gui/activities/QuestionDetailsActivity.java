@@ -391,7 +391,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         boolean afterCreate = getIntent().getBooleanExtra(IntentExtras.AFTER_CREATE, false);
         if (afterCreate) {
             Intent data = new Intent();
-            data.putExtra(IntentExtras.ENTRY_POSITION, afterCreate);
+            data.putExtra(IntentExtras.AFTER_CREATE, afterCreate);
             setResult(Activity.RESULT_OK, data);
             finish();
         } else {
