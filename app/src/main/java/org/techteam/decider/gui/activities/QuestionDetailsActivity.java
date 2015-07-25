@@ -1,7 +1,5 @@
 package org.techteam.decider.gui.activities;
 
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.support.v4.app.LoaderManager;
 import android.content.Intent;
@@ -23,7 +21,6 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CommentEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.content.question.CommentData;
-import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.CommentsListAdapter;
 import org.techteam.decider.gui.fragments.OnCommentEventCallback;
 import org.techteam.decider.gui.fragments.OnMoreCommentsRequestedCallback;
@@ -154,7 +151,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -190,7 +187,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -218,7 +215,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -255,7 +252,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -282,7 +279,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -310,7 +307,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);

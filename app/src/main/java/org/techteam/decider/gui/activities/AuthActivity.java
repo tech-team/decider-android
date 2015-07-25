@@ -324,6 +324,12 @@ public class AuthActivity extends AccountAuthenticatorActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ToolbarActivity.setAuthInProgress(false);
+    }
+
+    @Override
     public void onBackPressed() {
         this.finishAffinity();
     }

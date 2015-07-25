@@ -45,8 +45,6 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
-import org.techteam.decider.auth.AccountAuthenticator;
-import org.techteam.decider.auth.CanceledAccountManagerFuture;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.DbHelper;
@@ -54,7 +52,6 @@ import org.techteam.decider.content.entities.UserEntry;
 import org.techteam.decider.gcm.GcmPreferences;
 import org.techteam.decider.gui.CategoriesGetter;
 import org.techteam.decider.gui.ServiceHelperGetter;
-import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
@@ -187,7 +184,7 @@ public class MainActivity extends ToolbarActivity implements
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -215,7 +212,7 @@ public class MainActivity extends ToolbarActivity implements
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -407,18 +404,18 @@ public class MainActivity extends ToolbarActivity implements
                     Account account = accounts[0];
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                         am.removeAccountExplicitly(accounts[0]);
-                        getAuthTokenOrExit(cb);
+                        getAuthTokenAndCheck(cb);
                     } else {
                         am.removeAccount(account, new AccountManagerCallback<Boolean>() {
                             @Override
                             public void run(AccountManagerFuture<Boolean> future) {
-                                getAuthTokenOrExit(cb);
+                                getAuthTokenAndCheck(cb);
                             }
                         }, null);
                     }
                 } else {
 //                    recreate();
-                    getAuthTokenOrExit(cb);
+                    getAuthTokenAndCheck(cb);
                 }
             }
         };

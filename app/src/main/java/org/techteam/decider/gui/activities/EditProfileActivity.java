@@ -28,7 +28,6 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ImageData;
 import org.techteam.decider.content.UserData;
 import org.techteam.decider.content.entities.UserEntry;
-import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -97,8 +96,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     }
 
     @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
-        return super.getAuthTokenOrExit(new AccountManagerCallback<Bundle>() {
+    public AccountManagerFuture<Bundle> getAuthTokenAndCheck(AccountManagerCallback<Bundle> cb) {
+        return super.getAuthTokenAndCheck(new AccountManagerCallback<Bundle>() {
             @Override
             public void run(AccountManagerFuture<Bundle> future) {
                 getUserInfoWithWaitDialog();
@@ -221,7 +220,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 int genericError = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (genericError) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -262,7 +261,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthTokenOrExit(null);
+                        getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);

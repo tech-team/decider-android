@@ -226,7 +226,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        authTokenGetter.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -258,7 +258,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        authTokenGetter.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -299,7 +299,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        authTokenGetter.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);
@@ -326,7 +326,7 @@ public class QuestionsListFragment
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        authTokenGetter.getAuthTokenOrExit(null);
+                        authTokenGetter.getAuthTokenAndCheck(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getActivity().getApplicationContext(), R.string.server_problem);

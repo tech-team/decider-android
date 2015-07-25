@@ -6,5 +6,5 @@ import android.os.Bundle;
 
 public interface AuthTokenGetter {
     AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb);
-    AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb);
+    AccountManagerFuture<Bundle> getAuthTokenAndCheck(AccountManagerCallback<Bundle> cb);
 }
