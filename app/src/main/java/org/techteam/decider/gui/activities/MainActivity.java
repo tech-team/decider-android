@@ -129,6 +129,8 @@ public class MainActivity extends ToolbarActivity implements
                     finish();
                 } else {
                     getUserInfo();
+                    reloadPages();
+                    ((QuestionsListFragment) getCurrentlyActiveFragment()).reload();
                 }
             }
         });
@@ -457,6 +459,18 @@ public class MainActivity extends ToolbarActivity implements
                 if (f != null) {
                     QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
                     questionsListFragment.refresh();
+                }
+            }
+        }
+    }
+
+    public void reloadPages() {
+        for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+            if (weak != null) {
+                Fragment f = weak.get();
+                if (f != null) {
+                    QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                    questionsListFragment.reload();
                 }
             }
         }

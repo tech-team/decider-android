@@ -45,6 +45,10 @@ public class QuestionsLoader extends CursorLoader {
         return getContext().getContentResolver().query(uri, null, null, null, "_id ASC");
     }
 
+    public ContentSection getContentSection() {
+        return contentSection;
+    }
+
     public Integer getEntryPosition() {
         return entryPosition;
     }

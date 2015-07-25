@@ -201,7 +201,7 @@ public class QuestionsListFragment
                         args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                         args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
                         args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
-                        getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                     }
                 }
 
@@ -249,7 +249,7 @@ public class QuestionsListFragment
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
                 if (isAdded()) {
-                    getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
             }
 
@@ -290,7 +290,7 @@ public class QuestionsListFragment
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
                 if (isAdded()) {
-                    getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
             }
 
@@ -345,10 +345,10 @@ public class QuestionsListFragment
         adapter = new QuestionsListAdapter(null, getActivity(), currentSection, QuestionsListFragment.this, QuestionsListFragment.this);
         recyclerView.setAdapter(adapter);
 
-        Log.d(TAG, "restarting loader...");
+        Log.d(TAG, String.format("onActivityCreated: restarting loader in %s...", currentSection.toString()));
         Bundle args = new Bundle();
         args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
-        getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -378,10 +378,16 @@ public class QuestionsListFragment
                 CallbacksKeeper.getInstance().getCallback(getServiceTag(), OperationType.QUESTIONS_GET));
     }
 
+    public void reload() {
+        Log.d(TAG, String.format("reload: restarting loader in %s...", currentSection.toString()));
+        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
+    }
+
     @Override
     public void onScrolledDown() {
 //        MainFragment mainFragment = (MainFragment) getParentFragment();
 //        if (mainFragment.getCurrentlyActiveFragment() == this) {
+//            Toaster.toast(getActivity().getApplicationContext(), "onScrolledDown");
             int intention;
             if (adapter.getCursor().getCount() == 0) {
                 intention = LoadIntention.REFRESH;
@@ -460,7 +466,7 @@ public class QuestionsListFragment
                 default:
                     break;
             }
-            getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
+            getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
         }
     }
 
@@ -523,6 +529,7 @@ public class QuestionsListFragment
             Integer count = questionsLoader.getInsertedCount();
             int loadIntention = questionsLoader.getLoadIntention();
             boolean feedFinished = questionsLoader.isFeedFinished();
+            ContentSection loadedSection = questionsLoader.getContentSection();
 
             if (loadIntention == LoadIntention.REFRESH) {
                 questionsOffset = newCursor.getCount();
@@ -536,6 +543,9 @@ public class QuestionsListFragment
                 } else {
                     questionsOffset = newCursor.getCount();
                     adapter.swapCursor(newCursor);
+                    if (newCursor.getCount() == 0) {
+//                        refresh();
+                    }
                 }
             }
         }
