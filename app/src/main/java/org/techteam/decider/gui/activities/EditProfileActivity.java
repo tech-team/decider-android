@@ -49,7 +49,7 @@ import java.util.List;
 import static android.support.v7.app.AlertDialog.*;
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
-public class EditProfileActivity extends ToolbarActivity implements ActivityStarter, AuthTokenGetter {
+public class EditProfileActivity extends ToolbarActivity implements ActivityStarter {
     public static final String TAG = EditProfileActivity.class.getName();
     private static final long WAIT_DIALOG_DISMISS_DELAY = 600;
 
@@ -97,23 +97,13 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     }
 
     @Override
-    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(final AccountManagerCallback<Bundle> cb) {
-        AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
+    public AccountManagerFuture<Bundle> getAuthTokenOrExit(AccountManagerCallback<Bundle> cb) {
+        return super.getAuthTokenOrExit(new AccountManagerCallback<Bundle>() {
             @Override
             public void run(AccountManagerFuture<Bundle> future) {
-                if (!future.isCancelled()) {
-                    if (cb != null) {
-                        cb.run(future);
-                    }
-                }
+                getUserInfoWithWaitDialog();
             }
-        };
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
+        });
     }
 
     @Override
@@ -231,7 +221,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 int genericError = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (genericError) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -272,7 +262,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
-                        getAuthToken(null);
+                        getAuthTokenOrExit(null);
                         return;
                     case ErrorsExtras.GenericErrors.SERVER_ERROR:
                         Toaster.toastLong(getApplicationContext(), R.string.server_problem);
@@ -319,7 +309,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 // pass token explicitly
                 serviceHelper.getUser(TAG, uid, token, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
             } else {
-                serviceHelper.getUser(TAG, uid, callbacksKeeper.getCallback(TAG, OperationType.USER_GET));
+                getUserInfo();
             }
         } else {
             serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, CallbacksKeeper.getInstance(), TAG);
@@ -339,6 +329,22 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         if (dataLooseWarnShowing) {
             showDataLooseWarning();
         }
+    }
+
+    private void getUserInfo() {
+        serviceHelper.getUser(TAG, uid, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
+    }
+
+    private void getUserInfoWithWaitDialog() {
+        waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait),
+                true, true, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }
+                });
+        getUserInfo();
     }
 
     private void saveData() {

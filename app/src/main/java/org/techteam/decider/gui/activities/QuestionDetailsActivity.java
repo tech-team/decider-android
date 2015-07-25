@@ -40,7 +40,7 @@ import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 public class QuestionDetailsActivity extends ToolbarActivity
-            implements OnMoreCommentsRequestedCallback, AuthTokenGetter, OnQuestionEventCallback, OnCommentEventCallback {
+            implements OnMoreCommentsRequestedCallback, OnQuestionEventCallback, OnCommentEventCallback {
     private static final String TAG = QuestionDetailsActivity.class.getName();
     private RetrieveEntryTask retrieveEntryTask;
 
@@ -75,26 +75,6 @@ public class QuestionDetailsActivity extends ToolbarActivity
         public static final String FORCE_REFRESH = "FORCE_REFRESH";
         public static final String AFTER_CREATE = "AFTER_CREATE";
         public static final String ENTRY_POSITION = "ENTRY_POSITION";
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(final AccountManagerCallback<Bundle> cb) {
-        AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
-            @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                if (!future.isCancelled()) {
-                    if (cb != null) {
-                        cb.run(future);
-                    }
-                }
-            }
-        };
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

@@ -24,8 +24,12 @@ import static org.techteam.decider.auth.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY;
 import static org.techteam.decider.auth.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
 
 public class AccountAuthenticator extends AbstractAccountAuthenticator {
-    private final String TAG = AccountAuthenticator.class.getName();
+    private static final String TAG = AccountAuthenticator.class.getName();
     private final Context mContext;
+
+
+    public static final String AUTH_PREFS = "AUTH_PREFS";
+    public static final String AUTH_IN_PROGRESS_KEY = "AUTH_IN_PROGRESS";
 
     private ApiUI apiUI;
 
@@ -36,6 +40,8 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         // I hate you! Google - set mContext as protected!
         this.mContext = context;
     }
+
+
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {

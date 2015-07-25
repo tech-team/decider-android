@@ -45,6 +45,8 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
+import org.techteam.decider.auth.AccountAuthenticator;
+import org.techteam.decider.auth.CanceledAccountManagerFuture;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.DbHelper;
@@ -75,7 +77,6 @@ import java.util.List;
 
 
 public class MainActivity extends ToolbarActivity implements
-        AuthTokenGetter,
         OnCategorySelectedListener,
         CategoriesGetter,
         ServiceHelperGetter {
@@ -112,34 +113,25 @@ public class MainActivity extends ToolbarActivity implements
     }
 
     @Override
-    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
-    }
-
-    @Override
     public ServiceHelper getServiceHelper() {
         return serviceHelper;
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(final AccountManagerCallback<Bundle> cb) {
-        AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
-            @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                if (!future.isCancelled()) {
-                    if (cb != null) {
-                        cb.run(future);
-                    }
-                }
-            }
-        };
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PACKAGE_NAME = getApplicationContext().getPackageName();
+
+        getAuthToken(new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                if (future.isCancelled()) {
+                    finish();
+                } else {
+                    getUserInfo();
+                }
+            }
+        });
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
@@ -244,17 +236,6 @@ public class MainActivity extends ToolbarActivity implements
 
         categoriesListAdapter = new CategoriesListAdapter(null, this, this);
         createDrawer(toolbar, categoriesListAdapter);
-
-        getAuthToken(new AccountManagerCallback<Bundle>() {
-            @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                if (future.isCancelled()) {
-                    finish();
-                } else {
-                    finishAuthorization();
-                }
-            }
-        });
     }
 
     private void getUserInfo() {
@@ -262,10 +243,6 @@ public class MainActivity extends ToolbarActivity implements
         if (currentUserId != null) {
             serviceHelper.getUser(TAG, currentUserId, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.USER_GET));
         }
-    }
-
-    private void finishAuthorization() {
-        getUserInfo();
     }
 
     @Override
@@ -426,26 +403,8 @@ public class MainActivity extends ToolbarActivity implements
 
                 if (accounts.length != 0) {
                     Account account = accounts[0];
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                        am.removeAccount(account, null, new AccountManagerCallback<Bundle>() {
-                            @Override
-                            public void run(AccountManagerFuture<Bundle> future) {
-                                // restart activity, it will request authorization and receive new user's data
-//                            recreate();
-                                getAuthTokenOrExit(cb);
-                            }
-                        }, null);
-                    } else {
-                        am.removeAccount(account, new AccountManagerCallback<Boolean>() {
-                            @Override
-                            public void run(AccountManagerFuture<Boolean> future) {
-                                // restart activity, it will request authorization and receive new user's data
-//                            recreate();
-                                getAuthTokenOrExit(cb);
-                            }
-                        }, null);
-                    }
-
+                    am.removeAccountExplicitly(account);
+                    getAuthTokenOrExit(cb);
                 } else {
 //                    recreate();
                     getAuthTokenOrExit(cb);

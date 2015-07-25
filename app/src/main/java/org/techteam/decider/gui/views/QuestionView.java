@@ -9,6 +9,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +31,8 @@ import org.techteam.decider.util.ImageLoaderInitializer;
 
 
 public class QuestionView extends PostView {
+
+    private static final String TAG = QuestionView.class.getName();
 
     public interface EventListener {
         void onLikeClick(QuestionEntry post);
@@ -140,6 +143,11 @@ public class QuestionView extends PostView {
 
     protected void fillFields() {
         final Context context = getContext();
+
+        if (entry == null) {
+            Log.w(TAG, "QuestionEntry is null");
+            return;
+        }
 
         String avatar = entry.getAuthor().getAvatar();
         imageLoader.cancelDisplayTask(avatarImage);

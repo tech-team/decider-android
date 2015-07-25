@@ -35,7 +35,6 @@ import org.techteam.decider.gui.loaders.QuestionsLoader;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
-import org.techteam.decider.rest.service_helper.ServiceHelper;
 import org.techteam.decider.util.Toaster;
 
 import java.util.LinkedList;
@@ -202,7 +201,7 @@ public class QuestionsListFragment
                         args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
                         args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
                         args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
-                        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                        getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                     }
                 }
 
@@ -250,7 +249,7 @@ public class QuestionsListFragment
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
                 if (isAdded()) {
-                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                    getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
             }
 
@@ -291,7 +290,7 @@ public class QuestionsListFragment
                 Bundle args = new Bundle();
                 args.putInt(QuestionsLoader.BundleKeys.ENTRY_POSITION, entryPosition);
                 if (isAdded()) {
-                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+                    getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
             }
 
@@ -349,7 +348,7 @@ public class QuestionsListFragment
         Log.d(TAG, "restarting loader...");
         Bundle args = new Bundle();
         args.putInt(QuestionsLoader.BundleKeys.SECTION, currentSection.toInt());
-        getLoaderManager().initLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
+        getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
     }
 
     @Override
@@ -461,7 +460,7 @@ public class QuestionsListFragment
                 default:
                     break;
             }
-            getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
+            getActivity().getSupportLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
         }
     }
 

@@ -118,4 +118,9 @@ public class CategoryEntry extends Model {
     public static void deleteAll() {
         new Delete().from(CategoryEntry.class).execute();
     }
+
+    @Override
+    public String toString() {
+        return localizedLabel;
+    }
 }

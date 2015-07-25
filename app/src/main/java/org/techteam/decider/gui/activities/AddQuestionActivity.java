@@ -38,7 +38,7 @@ import org.techteam.decider.util.image_selector.ActivityStarter;
 import org.techteam.decider.util.image_selector.ImageHolder;
 import org.techteam.decider.util.image_selector.ImageSelector;
 
-public class AddQuestionActivity extends ToolbarActivity implements ActivityStarter, AuthTokenGetter {
+public class AddQuestionActivity extends ToolbarActivity implements ActivityStarter {
     private static final String TAG = AddQuestionActivity.class.getName();
 
     public static final String QUESTION_ID = "QUESTION_ID";
@@ -72,26 +72,6 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String QUESTION_DATA = "QUESTION_DATA";
         public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
-    }
-
-    @Override
-    public AccountManagerFuture<Bundle> getAuthTokenOrExit(final AccountManagerCallback<Bundle> cb) {
-        AccountManagerCallback<Bundle> actualCb = new AccountManagerCallback<Bundle>() {
-            @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                if (!future.isCancelled()) {
-                    if (cb != null) {
-                        cb.run(future);
-                    }
-                }
-            }
-        };
-        return AuthTokenGetHelper.getAuthTokenByFeatures(this, actualCb);
     }
 
     @Override

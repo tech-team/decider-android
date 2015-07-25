@@ -68,7 +68,6 @@
             android:name=".gui.activities.ProfileActivity"
             android:label="@string/profile_toolbar_title"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
         <activity

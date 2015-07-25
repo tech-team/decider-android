@@ -44,7 +44,15 @@ public class ServiceHelper {
 
         OperationType op = OperationType.QUESTIONS_GET;
 
-        String requestId = createRequestId(tag, op, contentSection, limit, offset);
+        StringBuilder categoriesSb = new StringBuilder();
+        categoriesSb.append("[");
+        for (CategoryEntry entry : categories) {
+            categoriesSb.append(entry.toString());
+            categoriesSb.append(",");
+        }
+        categoriesSb.append("]");
+
+        String requestId = createRequestId(tag, op, contentSection, limit, offset, categoriesSb.toString());
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {

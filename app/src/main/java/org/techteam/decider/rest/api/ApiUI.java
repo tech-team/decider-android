@@ -360,8 +360,7 @@ public class ApiUI {
             if (newAccessToken == null) {
                 Account[] accounts = am.getAccountsByType(context.getApplicationContext().getPackageName());
                 if (accounts.length != 0) {
-                    AccountManagerFuture<Boolean> f = am.removeAccount(accounts[0], null, null);
-                    f.getResult();
+                    am.removeAccountExplicitly(accounts[0]);
                 }
                 throw new InvalidAccessTokenException();
             }
