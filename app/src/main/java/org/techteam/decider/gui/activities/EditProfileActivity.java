@@ -75,6 +75,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     private ServiceHelper serviceHelper;
     private ProgressDialog waitDialog;
+    private ProgressDialog savingDialog;
+    private AlertDialog dataLooseWarn;
 
     private ImageLoader imageLoader;
 
@@ -82,12 +84,16 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     private String avatarUrl;
 
     private boolean dataLooseWarnShowing = false;
+    private boolean loadingDialogShowing = false;
+    private boolean savingDialogShowing = false;
 
     public static final class BundleKeys {
         public final static String USER_DATA = "USER_DATA";
         public final static String IMAGE_URI = "IMAGE_URI";
         public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+        public static final String LOADING_DIALOG = "LOADING_DIALOG";
+        public static final String SAVING_DIALOG = "LOADING_DIALOG";
     }
 
     public static final class IntentExtras {
@@ -158,14 +164,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             @Override
             public void onClick(View v) {
                 Keyboard.hideSoftKeyboard(EditProfileActivity.this, getWindow().getDecorView());
-                waitDialog = ProgressDialog.show(EditProfileActivity.this, getString(R.string.saving_profile), getString(R.string.please_wait),
-                        true, true, new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialog) {
-                                // just close dialog, request is already sent anyway
-                                dialog.dismiss();
-                            }
-                        });
+                showSavingDialog();
                 saveData();
             }
         });
@@ -198,7 +197,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         callbacksKeeper.addCallback(TAG, OperationType.USER_EDIT, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                waitDialog.dismiss();
+                hideSavingDialog();
 
                 Toaster.toast(EditProfileActivity.this, R.string.profile_saved);
 
@@ -216,7 +215,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                waitDialog.dismiss();
+                hideSavingDialog();
                 int genericError = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (genericError) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
@@ -277,14 +276,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         });
 
         if (savedInstanceState == null) {
-            waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait),
-                    true, true, new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            setResult(RESULT_CANCELED);
-                            finish();
-                        }
-                    });
+            showLoadingDialog();
 
             Bundle registrationData = getIntent().getBundleExtra(IntentExtras.REGISTRATION_DATA);
             if (registrationData != null) {
@@ -322,12 +314,22 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                 }
             }
             dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
+            loadingDialogShowing = savedInstanceState.getBoolean(BundleKeys.LOADING_DIALOG);
+            savingDialogShowing = savedInstanceState.getBoolean(BundleKeys.SAVING_DIALOG);
         }
 
         new RetrieveUserTask().execute();
 
         if (dataLooseWarnShowing) {
             showDataLooseWarning();
+        }
+
+        if (loadingDialogShowing && !waitDialog.isShowing()) {
+            showLoadingDialog();
+        }
+
+        if (savingDialogShowing && !savingDialog.isShowing()) {
+            showSavingDialog();
         }
     }
 
@@ -336,15 +338,66 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
     }
 
     private void getUserInfoWithWaitDialog() {
+        showLoadingDialog();
+        getUserInfo();
+    }
+
+    private void showLoadingDialog() {
         waitDialog = ProgressDialog.show(this, getString(R.string.loading_profile), getString(R.string.please_wait),
-                true, true, new DialogInterface.OnCancelListener() {
+                true, true, new OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
+                        loadingDialogShowing = false;
+                        dialog.dismiss();
                         setResult(RESULT_CANCELED);
                         finish();
                     }
                 });
-        getUserInfo();
+        loadingDialogShowing = true;
+    }
+
+    private void hideLoadingDialog() {
+        if (waitDialog != null && waitDialog.isShowing()) {
+            waitDialog.dismiss();
+        }
+        loadingDialogShowing = false;
+    }
+
+    private void showSavingDialog() {
+        savingDialog = ProgressDialog.show(EditProfileActivity.this, getString(R.string.saving_profile), getString(R.string.please_wait),
+                true, true, new OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        // just close dialog, request is already sent anyway
+                        hideSavingDialog();
+                    }
+                });
+        savingDialogShowing = true;
+    }
+
+    private void hideSavingDialog() {
+        if (savingDialog != null && savingDialog.isShowing()) {
+            savingDialog.dismiss();
+        }
+        savingDialogShowing = false;
+    }
+
+    private void showDataLooseWarning() {
+        dataLooseWarnShowing = true;
+        dataLooseWarn = new Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getString(R.string.editing_profile))
+                .setMessage(getString(R.string.exit_profile_editing))
+                .setPositiveButton(getString(R.string.exit), new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dataLooseWarnShowing = false;
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
     }
 
     private void saveData() {
@@ -420,6 +473,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         outState.putParcelable(BundleKeys.USER_DATA, serialize());
         outState.putString(BundleKeys.IMAGE_URI, avatarUrl);
         outState.putBoolean(BundleKeys.DATA_LOOSE_WARN, dataLooseWarnShowing);
+        outState.putBoolean(BundleKeys.LOADING_DIALOG, loadingDialogShowing);
+        outState.putBoolean(BundleKeys.SAVING_DIALOG, savingDialogShowing);
     }
 
     @Override
@@ -466,7 +521,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    waitDialog.dismiss();
+                    hideLoadingDialog();
                 }
             }, WAIT_DIALOG_DISMISS_DELAY);
         }
@@ -488,21 +543,23 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         showDataLooseWarning();
     }
 
-    private void showDataLooseWarning() {
-        dataLooseWarnShowing = true;
-        new Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(getString(R.string.editing_profile))
-                .setMessage(getString(R.string.exit_profile_editing))
-                .setPositiveButton(getString(R.string.exit), new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dataLooseWarnShowing = false;
-                        setResult(RESULT_CANCELED);
-                        finish();
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (waitDialog != null && waitDialog.isShowing()) {
+            waitDialog.dismiss();
+        }
+        waitDialog = null;
+
+        if (savingDialog != null && savingDialog.isShowing()) {
+            savingDialog.dismiss();
+        }
+        savingDialog = null;
+
+        if (dataLooseWarn != null && dataLooseWarn.isShowing()) {
+            dataLooseWarn.dismiss();
+        }
+        dataLooseWarn = null;
     }
 }
