@@ -87,6 +87,10 @@ public class MainActivity extends ToolbarActivity implements
 
     private BroadcastReceiver gcmRegistrationBroadcastReceiver;
 
+    private static final class BundleKeys {
+        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+    }
+
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
         return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
@@ -183,6 +187,10 @@ public class MainActivity extends ToolbarActivity implements
             }
         });
 
+        if (savedInstanceState != null) {
+            serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper);
+        }
+
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
@@ -198,9 +206,16 @@ public class MainActivity extends ToolbarActivity implements
     }
 
     private void finishAuthorization() {
+        MainFragment f = MainFragment.create(serviceHelper, callbacksKeeper);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.content_frame, new MainFragment(), MainFragment.TAG).commit();
+                .add(R.id.content_frame, f, MainFragment.TAG).commit();
         getUserInfo();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
     @Override

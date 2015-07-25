@@ -16,12 +16,15 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.gui.CategoriesGetter;
+import org.techteam.decider.gui.activities.ActivityHelper;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
 import org.techteam.decider.gui.activities.AuthTokenGetHelper;
 import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
+import org.techteam.decider.rest.CallbacksKeeper;
+import org.techteam.decider.rest.service_helper.ServiceHelper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,10 +46,20 @@ public class MainFragment
 
     private FloatingActionButton createPostButton;
 
+    private ServiceHelper serviceHelper;
+    private CallbacksKeeper callbacksKeeper;
+
+    public static MainFragment create(ServiceHelper serviceHelper, CallbacksKeeper callbacksKeeper) {
+        MainFragment f = new MainFragment();
+        f.serviceHelper = serviceHelper;
+        f.callbacksKeeper = callbacksKeeper;
+        return f;
+    }
+
     //private Map<Integer, CategoryEntry> selectedCategories = new HashMap<>();
 
     private static final class BundleKeys {
-        public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
+
     }
 
     @Override
@@ -123,6 +136,8 @@ public class MainFragment
             intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
             intent.putExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, true);
             startActivityForResult(intent, QUESTION_DETAILS);
+        } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK && data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
+            refreshPages();
         } else {
             List<Fragment> fragments = getChildFragmentManager().getFragments();
             if (fragments != null) {
@@ -141,8 +156,8 @@ public class MainFragment
     }
 
     public void invalidatePages() {
-        for (Fragment f: mSectionsPagerAdapter.getFragments()) {
-            if (f != null) {
+        for (Fragment f: getChildFragmentManager().getFragments()) {
+            if (f != null && f.isAdded()) {
                 QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
                 questionsListFragment.invalidate();
             }
@@ -150,8 +165,8 @@ public class MainFragment
     }
 
     public void refreshPages() {
-        for (Fragment f: mSectionsPagerAdapter.getFragments()) {
-            if (f != null) {
+        for (Fragment f: getChildFragmentManager().getFragments()) {
+            if (f != null && f.isAdded()) {
                 QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
                 questionsListFragment.refresh();
             }
@@ -160,21 +175,15 @@ public class MainFragment
 
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
 
-        private Fragment[] fragments;
-
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            fragments = new Fragment[getCount()];
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (fragments[position] == null) {
-                QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
-                onCategorySelectedListeners.add(f);
-                fragments[position] = f;
-            }
-            return fragments[position];
+            QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
+            onCategorySelectedListeners.add(f);
+            return f;
         }
 
         @Override
@@ -191,10 +200,6 @@ public class MainFragment
         @Override
         public int getTextColor() {
             return android.R.color.white;
-        }
-
-        public Fragment[] getFragments() {
-            return fragments;
         }
     }
 }
