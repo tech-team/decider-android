@@ -121,7 +121,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
         super.onCreate(savedInstanceState);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.fragment_profile_edit);
+        setContentView(R.layout.activity_profile_edit);
 
         uid = getIntent().getStringExtra(IntentExtras.USER_ID);
 //        Assert.assertNotSame("UID is null", uid, null);

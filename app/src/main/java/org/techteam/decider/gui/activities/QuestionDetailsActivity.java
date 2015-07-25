@@ -105,7 +105,7 @@ public class QuestionDetailsActivity extends ToolbarActivity
         getIntent().putExtra(IntentExtras.FORCE_REFRESH, false);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.fragment_question_details);
+        setContentView(R.layout.activity_question_details);
         
         // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.post_details_toolbar);

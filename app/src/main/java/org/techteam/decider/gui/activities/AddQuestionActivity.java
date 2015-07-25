@@ -99,7 +99,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         super.onCreate(savedInstanceState);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.fragment_add_question);
+        setContentView(R.layout.activity_add_question);
 
         // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.post_add_toolbar);

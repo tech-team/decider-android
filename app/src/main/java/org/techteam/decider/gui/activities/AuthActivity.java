@@ -71,7 +71,7 @@ public class AuthActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.fragment_auth);
+        setContentView(R.layout.activity_auth);
 
         mAccountManager = AccountManager.get(getBaseContext());
 

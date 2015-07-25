@@ -93,7 +93,7 @@ public class ProfileActivity extends ToolbarActivity implements AuthTokenGetter 
         super.onCreate(savedInstanceState);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.fragment_profile);
+        setContentView(R.layout.activity_profile);
 
         uid = getIntent().getStringExtra(USER_ID);
 //        Assert.assertNotSame("UID is null", uid, null);

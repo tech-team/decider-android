@@ -4,7 +4,11 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.Activity;
 import android.os.Build;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,6 +23,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,6 +31,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
@@ -39,6 +45,7 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.techteam.decider.R;
+import org.techteam.decider.content.ContentSection;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.DbHelper;
 import org.techteam.decider.content.entities.UserEntry;
@@ -47,11 +54,12 @@ import org.techteam.decider.gui.CategoriesGetter;
 import org.techteam.decider.gui.ServiceHelperGetter;
 import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.adapters.CategoriesListAdapter;
-import org.techteam.decider.gui.fragments.MainFragment;
+import org.techteam.decider.gui.adapters.ColoredAdapter;
 import org.techteam.decider.gui.fragments.OnCategorySelectedListener;
 import org.techteam.decider.gui.fragments.QuestionsListFragment;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
+import org.techteam.decider.gui.widget.SlidingTabLayout;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -61,6 +69,8 @@ import org.techteam.decider.util.CacheHelper;
 import org.techteam.decider.util.ImageLoaderInitializer;
 import org.techteam.decider.util.Toaster;
 
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -70,10 +80,19 @@ public class MainActivity extends ToolbarActivity implements
         CategoriesGetter,
         ServiceHelperGetter {
     private static final String TAG = MainActivity.class.getName();
+    public static String PACKAGE_NAME;
 
     public static final int AUTH_REQUEST_CODE = 101;
     private static final int LOGOUT_ID = 1;
-    public static String PACKAGE_NAME;
+
+    private static final int ADD_QUESTION = 0;
+    private static final int QUESTION_DETAILS = 1;
+
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
+    private SlidingTabLayout mSlidingTabLayout;
+
+    private FloatingActionButton createPostButton;
 
     private Toolbar toolbar;
     // drawer related stuff
@@ -88,11 +107,6 @@ public class MainActivity extends ToolbarActivity implements
 
     private BroadcastReceiver gcmRegistrationBroadcastReceiver;
 
-    @Override
-    public ServiceHelper getServiceHelper() {
-        return serviceHelper;
-    }
-
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
     }
@@ -100,6 +114,11 @@ public class MainActivity extends ToolbarActivity implements
     @Override
     public AccountManagerFuture<Bundle> getAuthToken(AccountManagerCallback<Bundle> cb) {
         return AuthTokenGetHelper.getAuthTokenByFeatures(this, cb);
+    }
+
+    @Override
+    public ServiceHelper getServiceHelper() {
+        return serviceHelper;
     }
 
     @Override
@@ -125,14 +144,38 @@ public class MainActivity extends ToolbarActivity implements
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
 
-        getAuthToken(new AccountManagerCallback<Bundle>() {
+        // toolbar
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+
+        // sections
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.sections_pager);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
+        // it's PagerAdapter set.
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sections_pager_tabs);
+        mSlidingTabLayout.setDistributeEvenly(true);
+        mSlidingTabLayout.setViewPager(mViewPager);
+
+        mSlidingTabLayout.setBackgroundColor(getResources().getColor(R.color.primary));
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                if (future.isCancelled()) {
-                    finish();
-                } else {
-                    finishAuthorization();
-                }
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(android.R.color.white);
+            }
+        });
+
+        // setup plus button
+        createPostButton = (FloatingActionButton) findViewById(R.id.create_post_button);
+        createPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AddQuestionActivity.class);
+                startActivityForResult(intent, ADD_QUESTION);
             }
         });
 
@@ -198,11 +241,19 @@ public class MainActivity extends ToolbarActivity implements
             serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, callbacksKeeper, TAG);
         }
 
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
-
         categoriesListAdapter = new CategoriesListAdapter(null, this, this);
         createDrawer(toolbar, categoriesListAdapter);
+
+        getAuthToken(new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                if (future.isCancelled()) {
+                    finish();
+                } else {
+                    finishAuthorization();
+                }
+            }
+        });
     }
 
     private void getUserInfo() {
@@ -213,10 +264,31 @@ public class MainActivity extends ToolbarActivity implements
     }
 
     private void finishAuthorization() {
-        MainFragment f = MainFragment.create();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.content_frame, f, MainFragment.TAG).commit();
         getUserInfo();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_QUESTION && resultCode == Activity.RESULT_OK) {
+            int qid = data.getIntExtra(AddQuestionActivity.QUESTION_ID, -1);
+            Intent intent = new Intent(this, QuestionDetailsActivity.class);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, qid);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, true);
+            startActivityForResult(intent, QUESTION_DETAILS);
+        } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK && data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
+            refreshPages();
+        } else {
+            for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+                if (weak != null) {
+                    Fragment f = weak.get();
+                    if (f != null) {
+                        f.onActivityResult(requestCode, resultCode, data);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -395,15 +467,75 @@ public class MainActivity extends ToolbarActivity implements
         category.setSelectedAsync(isChecked, new OnCategorySelectedListener() {
             @Override
             public void categorySelected(CategoryEntry category, boolean isChecked) {
-                MainFragment mainFragment = getMainFragment();
-                QuestionsListFragment f = (QuestionsListFragment) mainFragment.getCurrentlyActiveFragment();
+                QuestionsListFragment f = (QuestionsListFragment) getCurrentlyActiveFragment();
                 f.categorySelected(category, isChecked);
             }
         });
     }
 
-    public MainFragment getMainFragment() {
-        return (MainFragment) getSupportFragmentManager().findFragmentByTag(MainFragment.TAG);
+    public Fragment getCurrentlyActiveFragment() {
+        int currentFragment = mViewPager.getCurrentItem();
+        return (Fragment) mSectionsPagerAdapter.instantiateItem(mViewPager, currentFragment);
+    }
+
+    public void invalidatePages() {
+        for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+            if (weak != null) {
+                Fragment f = weak.get();
+                if (f != null) {
+                    QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                    questionsListFragment.invalidate();
+                }
+            }
+        }
+    }
+
+    public void refreshPages() {
+        for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+            if (weak != null) {
+                Fragment f = weak.get();
+                if (f != null) {
+                    QuestionsListFragment questionsListFragment = (QuestionsListFragment) f;
+                    questionsListFragment.refresh();
+                }
+            }
+        }
+    }
+
+    private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
+        private HashMap<Integer, WeakReference<Fragment>> fragments;
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+            fragments = new HashMap<>(getCount());
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            QuestionsListFragment f = QuestionsListFragment.create(ContentSection.fromInt(position));
+            fragments.put(position, new WeakReference<Fragment>(f));
+            return f;
+        }
+
+        @Override
+        public int getCount() {
+            return ContentSection.values().length;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            int resId = ContentSection.fromInt(position).getResId();
+            return getString(resId);
+        }
+
+        @Override
+        public int getTextColor() {
+            return android.R.color.white;
+        }
+
+        public HashMap<Integer, WeakReference<Fragment>> getFragments() {
+            return fragments;
+        }
     }
 
     class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {

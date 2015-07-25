@@ -379,7 +379,7 @@ public class QuestionsListFragment
 
     @Override
     public void onScrolledDown() {
-        MainFragment mainFragment = (MainFragment) getParentFragment();
+//        MainFragment mainFragment = (MainFragment) getParentFragment();
 //        if (mainFragment.getCurrentlyActiveFragment() == this) {
             int intention;
             if (adapter.getCursor().getCount() == 0) {
@@ -454,18 +454,11 @@ public class QuestionsListFragment
 
             int resId = res.getIdentifier(key, "string", getActivity().getPackageName());
 
-            //TODO: move defaults somewhere
             switch (resId) {
                 //TODO: case R.string.pref_justify_by_width_key and so one
-
                 default:
-//                    Toaster.toast(getActivity().getBaseContext(),
-//                            "Some settings changed programmatically");
                     break;
             }
-
-            //cause posts to re-render
-
             getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, null, questionsLoaderCallbacks);
         }
     }
