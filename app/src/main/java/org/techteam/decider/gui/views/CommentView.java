@@ -166,16 +166,6 @@ public class CommentView extends PostView {
         }
 
         postText.setTextColor(context.getResources().getColor(android.R.color.black));
-
-
-        //TODO: text justification, see:
-        //http://stackoverflow.com/questions/1292575/android-textview-justify-text
-
-        // TODO: mark liked and so on
-
-//        toolbarView.setRating(entry.getRating());
-//        toolbarView._setBayaned(entry.getIsBayan());
-//        toolbarView._setFaved(entry.isFavorite());
     }
 
     protected void attachCallbacks() {
@@ -204,8 +194,22 @@ public class CommentView extends PostView {
         avatarImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                final Context context = getContext();
                 String uid = entry.getAuthor().getUid();
+                String currentUid = ApiUI.getCurrentUserId(context);
+
+                if (entry.isAnonymous() && !uid.equals(currentUid)) {
+                    new AlertDialog.Builder(context)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle(context.getString(R.string.anon_profile))
+                            .setMessage(context.getString(R.string.anon_profile_entry))
+                            .setNegativeButton(context.getString(R.string.ok), null)
+                            .show();
+
+                    return;
+                }
+
+                Intent intent = new Intent(context, ProfileActivity.class);
                 intent.putExtra(ProfileActivity.USER_ID, uid);
                 getContext().startActivity(intent);
             }

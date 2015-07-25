@@ -131,4 +131,6 @@
     <string name="loading_image">Загрузка картинки...</string>
     <string name="loading_image_failed">Не удалось загрузкить картинку.\nПлохое интернет-соединение, либо не зватает ОЗУ.</string>
     <string name="ok">OK</string>
+    <string name="anon_profile">Анонимный профиль</string>
+    <string name="anon_profile_entry">Автор данного сообщения пожелал остаться инкогнито.</string>
 </resources>
