@@ -48,6 +48,7 @@ public class CategoriesGetProcessor extends RequestProcessor<CategoriesGetReques
                 CategoryEntry entry = CategoryEntry.fromJson(q);
                 CategoryEntry dbEntry = CategoryEntry.byUid(entry.getUid());
                 if (dbEntry == null || !dbEntry.contentEquals(entry)) {
+                    entry.setSelected(true);
                     entry.save();
                 }
             }

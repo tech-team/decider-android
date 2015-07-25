@@ -59,6 +59,7 @@ import org.techteam.decider.gui.fragments.QuestionsListFragment;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.gui.widget.SlidingTabLayout;
+import org.techteam.decider.misc.NetworkStateReceiver;
 import org.techteam.decider.rest.CallbacksKeeper;
 import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.api.ApiUI;
@@ -71,6 +72,8 @@ import org.techteam.decider.util.Toaster;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 
 public class MainActivity extends ToolbarActivity implements
@@ -104,7 +107,7 @@ public class MainActivity extends ToolbarActivity implements
     private ServiceHelper serviceHelper;
     private LoaderManager.LoaderCallbacks<Cursor> categoriesLoaderCallbacks = new LoaderCallbacksImpl();
 
-    private BroadcastReceiver gcmRegistrationBroadcastReceiver;
+    private EventBus eventBus = EventBus.getDefault();
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
@@ -201,6 +204,7 @@ public class MainActivity extends ToolbarActivity implements
             }
         });
 
+
         callbacksKeeper.addCallback(TAG, OperationType.CATEGORIES_GET, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
@@ -236,6 +240,11 @@ public class MainActivity extends ToolbarActivity implements
 
         categoriesListAdapter = new CategoriesListAdapter(null, this, this);
         createDrawer(toolbar, categoriesListAdapter);
+
+        new RetrieveUserTask().execute();
+        getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+
+        eventBus.register(this);
     }
 
     private void getUserInfo() {
@@ -279,32 +288,27 @@ public class MainActivity extends ToolbarActivity implements
     public void onResume() {
         super.onResume();
         serviceHelper.init();
-        gcmRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences.getBoolean(GcmPreferences.SENT_TOKEN_TO_SERVER, false);
-                if (sentToken) {
-                    Log.d(TAG, "sent gcm token successfully");
-                } else {
-                    Log.d(TAG, "send gcm token failed");
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(gcmRegistrationBroadcastReceiver,
-                new IntentFilter(GcmPreferences.REGISTRATION_COMPLETE));
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
+        lbm.registerReceiver(gcmRegistrationBroadcastReceiver, new IntentFilter(GcmPreferences.REGISTRATION_COMPLETE));
     }
 
     @Override
     public void onPause() {
         super.onPause();
         serviceHelper.release();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(gcmRegistrationBroadcastReceiver);
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
+        lbm.unregisterReceiver(gcmRegistrationBroadcastReceiver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        eventBus.unregister(this);
+    }
+
+    public void onEvent(NetworkStateReceiver.NetworkIsUpEvent event) {
+        Log.d(TAG, "Got NetworkIsUp event. Updating information...");
+        getUserInfo();
     }
 
     @Override
@@ -345,6 +349,8 @@ public class MainActivity extends ToolbarActivity implements
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(new ProfileDrawerItem())
+                .withSelectionListEnabled(false)
+                .withSelectionListEnabledForSingleProfile(false)
                 .build();
 
         //Now create your drawer and pass the AccountHeader.Result
@@ -497,6 +503,19 @@ public class MainActivity extends ToolbarActivity implements
         }
     }
 
+    private BroadcastReceiver gcmRegistrationBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean sentToken = sharedPreferences.getBoolean(GcmPreferences.SENT_TOKEN_TO_SERVER, false);
+            if (sentToken) {
+                Log.d(TAG, "sent gcm token successfully");
+            } else {
+                Log.d(TAG, "send gcm token failed");
+            }
+        }
+    };
+
     private class SectionsPagerAdapter extends FragmentStatePagerAdapter implements ColoredAdapter {
         private HashMap<Integer, WeakReference<Fragment>> fragments;
 
@@ -542,6 +561,9 @@ public class MainActivity extends ToolbarActivity implements
 
         @Override
         protected void onPostExecute(UserEntry entry) {
+            if (entry == null) {
+                return;
+            }
             getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
             String username = entry.getUsername();
             if (username == null || username.isEmpty())

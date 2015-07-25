@@ -9,6 +9,9 @@ public class PushParser {
 
         Push push = null;
         switch (pushCode) {
+            case DEBUG:
+                push = new DebugPush(data);
+                break;
             case NEW_COMMENT:
                 push = new NewCommentPush(data);
                 break;
