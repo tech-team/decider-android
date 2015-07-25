@@ -176,7 +176,7 @@ public class QuestionView extends PostView {
                         .setMessage(R.string.anon_explanation)
                         .setIcon(R.drawable.logo)
                         .setCancelable(false)
-                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -275,10 +275,6 @@ public class QuestionView extends PostView {
                 menu.show();
             }
         });
-
-        if (entry.isAnonymous()) {
-
-        }
     }
 
     protected void attachCallbacks() {
@@ -324,8 +320,22 @@ public class QuestionView extends PostView {
         avatarImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                final Context context = getContext();
                 String uid = entry.getAuthor().getUid();
+                String currentUid = ApiUI.getCurrentUserId(context);
+
+                if (entry.isAnonymous() && !uid.equals(currentUid)) {
+                    new AlertDialog.Builder(context)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle(context.getString(R.string.anon_profile))
+                            .setMessage(context.getString(R.string.anon_profile_entry))
+                            .setNegativeButton(context.getString(R.string.ok), null)
+                            .show();
+
+                    return;
+                }
+
+                Intent intent = new Intent(context, ProfileActivity.class);
                 intent.putExtra(ProfileActivity.USER_ID, uid);
                 getContext().startActivity(intent);
             }
