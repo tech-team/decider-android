@@ -541,7 +541,11 @@ public class MainActivity extends ToolbarActivity implements
 
         @Override
         protected UserEntry doInBackground(Void... params) {
-            return UserEntry.byUId(ApiUI.getCurrentUserId(MainActivity.this));
+            String userId = ApiUI.getCurrentUserId(MainActivity.this);
+            if (userId != null) {
+                return UserEntry.byUId(userId);
+            }
+            return null;
         }
 
         @Override

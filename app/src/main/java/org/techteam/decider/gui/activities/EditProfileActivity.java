@@ -438,6 +438,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
         @Override
         protected void onPostExecute(UserEntry entry) {
+            if (entry == null) return;
             avatarUrl = entry.getAvatar();
             if (avatarUrl != null) {
                 imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
