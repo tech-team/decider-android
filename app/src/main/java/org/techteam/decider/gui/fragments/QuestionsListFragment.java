@@ -421,7 +421,7 @@ public class QuestionsListFragment
         intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, post.getQId());
         intent.putExtra(QuestionDetailsActivity.IntentExtras.FORCE_REFRESH, true);
         intent.putExtra(QuestionDetailsActivity.IntentExtras.ENTRY_POSITION, entryPosition);
-        getParentFragment().startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
+        startActivityForResult(intent, ActivityHelper.QUESTION_DETAILS_REQUEST);
     }
 
     @Override
