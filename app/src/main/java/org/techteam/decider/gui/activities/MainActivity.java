@@ -306,6 +306,11 @@ public class MainActivity extends ToolbarActivity implements
         eventBus.unregister(this);
     }
 
+    public void onEvent(EditProfileActivity.ProfileEditedEvent event) {
+        new RetrieveUserTask().execute(false);
+        getUserInfo();
+    }
+
     public void onEvent(NetworkStateReceiver.NetworkIsUpEvent event) {
         Log.d(TAG, "Got NetworkIsUp event. Updating information...");
         getUserInfo();
@@ -552,10 +557,14 @@ public class MainActivity extends ToolbarActivity implements
         }
     }
 
-    class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {
+    class RetrieveUserTask extends AsyncTask<Boolean, Void, UserEntry> {
+        private boolean reloadCategories = true;
 
         @Override
-        protected UserEntry doInBackground(Void... params) {
+        protected UserEntry doInBackground(Boolean... params) {
+            if (params.length > 0) {
+                reloadCategories = params[0];
+            }
             String userId = ApiUI.getCurrentUserId(MainActivity.this);
             if (userId != null) {
                 return UserEntry.byUId(userId);
@@ -568,7 +577,9 @@ public class MainActivity extends ToolbarActivity implements
             if (entry == null) {
                 return;
             }
-            getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+            if (reloadCategories) {
+                getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+            }
             String username = entry.getUsername();
             if (username == null || username.isEmpty())
                 username = getString(R.string.no_nick);

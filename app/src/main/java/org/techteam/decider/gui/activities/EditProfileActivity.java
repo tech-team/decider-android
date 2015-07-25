@@ -45,6 +45,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 import static android.support.v7.app.AlertDialog.*;
 import static org.techteam.decider.content.entities.UserEntry.byUId;
 
@@ -82,6 +84,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
 
     private Date birthday;
     private String avatarUrl;
+
+    private EventBus eventBus = EventBus.getDefault();
 
     private boolean dataLooseWarnShowing = false;
     private boolean loadingDialogShowing = false;
@@ -208,6 +212,8 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                     intent.putExtras(getIntent().getBundleExtra(IntentExtras.REGISTRATION_DATA));
                 }
                 intent.putExtra(LoginRegisterExtras.USERNAME, username);
+
+                eventBus.post(new ProfileEditedEvent());
 
                 setResult(RESULT_OK, intent);
                 finish();
@@ -561,5 +567,9 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             dataLooseWarn.dismiss();
         }
         dataLooseWarn = null;
+    }
+
+    public static class ProfileEditedEvent {
+
     }
 }
