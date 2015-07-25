@@ -295,7 +295,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
                         .setMessage(R.string.end_registration_alert_message)
                         .setIcon(R.drawable.logo)
                         .setCancelable(false)
-                        .setNegativeButton(android.R.string.ok, new OnClickListener() {
+                        .setNegativeButton(R.string.ok, new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();

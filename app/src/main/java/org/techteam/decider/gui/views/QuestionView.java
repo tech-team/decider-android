@@ -176,7 +176,7 @@ public class QuestionView extends PostView {
                         .setMessage(R.string.anon_explanation)
                         .setIcon(R.drawable.logo)
                         .setCancelable(false)
-                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();

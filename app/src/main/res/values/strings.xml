@@ -135,5 +135,8 @@
     <string name="invalid_credentials">Invalid credentials</string>
     <string name="email_taken">This email is already taken</string>
     <string name="username_required">Username is required to finish registration</string>
+    <string name="loading_image">Loading image...</string>
+    <string name="loading_image_failed">Failed to load image.\nUnstable internet connection or lack of RAM.</string>
+    <string name="ok">OK</string>
 
 </resources>

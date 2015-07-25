@@ -128,4 +128,7 @@
     <string name="username_required">Username is required to finish registration</string>
     <string name="shared_by">Отправлено с помощью Decider</string>
     <string name="username_taken">Пользователь с никнеймом \'%s\' уже существует</string>
+    <string name="loading_image">Загрузка картинки...</string>
+    <string name="loading_image_failed">Не удалось загрузкить картинку.\nПлохое интернет-соединение, либо не зватает ОЗУ.</string>
+    <string name="ok">OK</string>
 </resources>
