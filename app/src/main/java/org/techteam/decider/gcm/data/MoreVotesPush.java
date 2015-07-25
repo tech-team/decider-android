@@ -10,13 +10,19 @@ import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 
 public class MoreVotesPush extends Push {
 
-    private int questionId;
-    private int count;
+    private int questionId = -1;
+    private int count = -1;
 
     public MoreVotesPush(Bundle data) {
         super(PushCode.MORE_VOTES);
-        questionId = Integer.parseInt(data.getString("question_id"));
-        count = Integer.parseInt(data.getString("count"));
+        String questionIdStr = data.getString("question_id");
+        String countStr = data.getString("count");
+        if (questionIdStr != null) {
+            questionId = Integer.parseInt(questionIdStr);
+        }
+        if (countStr != null) {
+            count = Integer.parseInt(countStr);
+        }
     }
 
     @Override
@@ -31,12 +37,15 @@ public class MoreVotesPush extends Push {
 
     @Override
     public PendingIntent buildContentIntent(Context context) {
-        Intent intent = new Intent(context, QuestionDetailsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, questionId);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-        return pendingIntent;
+        if (questionId != -1) {
+            Intent intent = new Intent(context, QuestionDetailsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, questionId);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+            return pendingIntent;
+        }
+        return null;
     }
 
     public int getQuestionId() {

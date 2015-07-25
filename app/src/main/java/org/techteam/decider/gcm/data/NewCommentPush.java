@@ -10,13 +10,19 @@ import org.techteam.decider.gui.activities.QuestionDetailsActivity;
 
 public class NewCommentPush extends Push {
 
-    private int questionId;
-    private int commentId;
+    private int questionId = -1;
+    private int commentId = -1;
 
     public NewCommentPush(Bundle data) {
         super(PushCode.NEW_COMMENT);
-        questionId = Integer.parseInt(data.getString("question_id"));
-        commentId = Integer.parseInt(data.getString("comment_id"));
+        String questionIdStr = data.getString("question_id");
+        String commentIdStr = data.getString("comment_id");
+        if (questionIdStr != null) {
+            questionId = Integer.parseInt(questionIdStr);
+        }
+        if (commentIdStr != null) {
+            commentId = Integer.parseInt(commentIdStr);
+        }
     }
 
     @Override
@@ -31,13 +37,19 @@ public class NewCommentPush extends Push {
 
     @Override
     public PendingIntent buildContentIntent(Context context) {
-        Intent intent = new Intent(context, QuestionDetailsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, questionId);
-        intent.putExtra(QuestionDetailsActivity.IntentExtras.COMMENT_ID, commentId);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-        return pendingIntent;
+        if (questionId != -1) {
+            Intent intent = new Intent(context, QuestionDetailsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra(QuestionDetailsActivity.IntentExtras.Q_ID, questionId);
+            if (commentId != -1) {
+                intent.putExtra(QuestionDetailsActivity.IntentExtras.COMMENT_ID, commentId);
+            }
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+            return pendingIntent;
+        } else {
+            return null;
+        }
     }
 
     public int getQuestionId() {
