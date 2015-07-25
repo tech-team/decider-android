@@ -5,11 +5,11 @@
         android:title="@string/pref_main"
         android:key="@string/pref_main_key">
 
-        <CheckBoxPreference
-            android:key="@string/pref_shorten_long_posts_key"
-            android:title="@string/pref_shorten_long_posts_title"
-            android:summary="@string/pref_shorten_long_posts_summ"
-            android:defaultValue="false" />
+        <!--<CheckBoxPreference-->
+            <!--android:key="@string/pref_shorten_long_posts_key"-->
+            <!--android:title="@string/pref_shorten_long_posts_title"-->
+            <!--android:summary="@string/pref_shorten_long_posts_summ"-->
+            <!--android:defaultValue="false" />-->
 
         <ListPreference
             android:key="@string/pref_text_size_key"

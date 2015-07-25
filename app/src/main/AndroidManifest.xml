@@ -80,6 +80,10 @@
             android:name=".gui.activities.PreviewImageActivity"
             android:label="@string/preview_toolbar_title">
         </activity>
+        <activity
+            android:name=".gui.activities.PreferencesActivity"
+            android:label="@string/preferences">
+        </activity>
 
         <!-- Declare the bundled CropImage Activity -->
         <activity android:name="com.android.camera.CropImage" />

@@ -133,4 +133,6 @@
     <string name="ok">OK</string>
     <string name="anon_profile">Анонимный профиль</string>
     <string name="anon_profile_entry">Автор данного сообщения пожелал остаться инкогнито.</string>
+    <string name="preferences">Настройки</string>
+    <string name="pref_main">Основные</string>
 </resources>
