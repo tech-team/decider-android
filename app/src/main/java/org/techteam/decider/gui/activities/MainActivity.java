@@ -372,6 +372,7 @@ public class MainActivity extends ToolbarActivity implements
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
+                        drawer.setSelection(-1, false);
                         switch (iDrawerItem.getIdentifier()) {
                             case PREFERENCES_ID:
                                 showPreferences();
