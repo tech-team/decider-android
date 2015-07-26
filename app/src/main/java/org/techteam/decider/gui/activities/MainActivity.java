@@ -37,8 +37,10 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
@@ -367,10 +369,12 @@ public class MainActivity extends ToolbarActivity implements
                         new CategoriesDrawerItem(categoriesListAdapter),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem()
+                                .withIcon(R.drawable.ic_settings_grey600_24dp)
                                 .withName(R.string.preferences)
                                 .withIdentifier(PREFERENCES_ID),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem()
+                                .withIcon(R.drawable.ic_exit_to_app_grey600_24dp)
                                 .withName(R.string.drawer_item_logout)
                                 .withIdentifier(LOGOUT_ID)
                 )
