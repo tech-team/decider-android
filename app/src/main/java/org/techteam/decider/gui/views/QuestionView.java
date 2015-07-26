@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
@@ -162,7 +163,8 @@ public class QuestionView extends PostView {
         likeButton.setText("+" + entry.getLikesCount());
         final int LEFT = 0;
         // Order: Left, top, right, and bottom
-        likeButton.getCompoundDrawables()[LEFT].setColorFilter(entry.isVoted() ? pressedStateFilter : null);
+        Drawable likeIcon = likeButton.getCompoundDrawables()[LEFT];
+        likeIcon.setColorFilter(entry.isVoted() ? pressedStateFilter : null);
 
         commentsButton.setText(Integer.toString(entry.getCommentsCount()));
 

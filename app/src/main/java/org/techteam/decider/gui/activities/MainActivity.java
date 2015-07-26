@@ -603,6 +603,8 @@ public class MainActivity extends ToolbarActivity implements
                     .withActivity(MainActivity.this)
                     .withHeaderBackground(R.drawable.header)
                     .addProfiles(profile)
+                    .withSelectionListEnabled(false)
+                    .withSelectionListEnabledForSingleProfile(false)
                     .withDrawer(drawer)
                     .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                         @Override
