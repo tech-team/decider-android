@@ -1,7 +1,5 @@
 package org.techteam.decider.gui.activities;
 
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
@@ -25,7 +23,6 @@ import android.widget.Spinner;
 import org.techteam.decider.R;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.question.ImageQuestionData;
-import org.techteam.decider.gui.activities.lib.AuthTokenGetter;
 import org.techteam.decider.gui.loaders.CategoriesLoader;
 import org.techteam.decider.gui.loaders.LoaderIds;
 import org.techteam.decider.rest.CallbacksKeeper;
@@ -67,11 +64,13 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
     private ProgressDialog waitDialog;
 
     private boolean dataLooseWarnShowing = false;
+    private boolean savingDialogShowing = false;
 
     private static final class BundleKeys {
         public static final String PENDING_OPERATIONS = "PENDING_OPERATIONS";
         public static final String QUESTION_DATA = "QUESTION_DATA";
         public static final String DATA_LOOSE_WARN = "DATA_LOOSE_WARN";
+        public static final String SAVING_DIALOG = "SAVING_DIALOG";
     }
 
     @Override
@@ -131,7 +130,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         callbacksKeeper.addCallback(TAG, OperationType.QUESTION_CREATE, new ServiceCallback() {
             @Override
             public void onSuccess(String operationId, Bundle data) {
-                waitDialog.dismiss();
+                hideSavingDialog();
                 Toaster.toast(AddQuestionActivity.this, R.string.question_created);
 
                 Intent result = new Intent();
@@ -144,7 +143,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
             @Override
             public void onError(String operationId, Bundle data, String message) {
-                waitDialog.dismiss();
+                hideSavingDialog();
                 int code = data.getInt(ErrorsExtras.GENERIC_ERROR_CODE);
                 switch (code) {
                     case ErrorsExtras.GenericErrors.INVALID_TOKEN:
@@ -168,6 +167,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         if (savedInstanceState != null) {
             currentQuestionData = savedInstanceState.getParcelable(BundleKeys.QUESTION_DATA);
             dataLooseWarnShowing = savedInstanceState.getBoolean(BundleKeys.DATA_LOOSE_WARN);
+            savingDialogShowing = savedInstanceState.getBoolean(BundleKeys.SAVING_DIALOG);
             serviceHelper.restoreOperationsState(savedInstanceState,
                     BundleKeys.PENDING_OPERATIONS,
                     callbacksKeeper, TAG);
@@ -177,6 +177,9 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         if (dataLooseWarnShowing) {
             showDataLooseWarning();
         }
+        if (savingDialogShowing) {
+            showSavingDialog();
+        }
     }
 
     @Override
@@ -185,6 +188,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         currentQuestionData = gatherQuestionData();
         outState.putParcelable(BundleKeys.QUESTION_DATA, currentQuestionData);
         outState.putBoolean(BundleKeys.DATA_LOOSE_WARN, dataLooseWarnShowing);
+        outState.putBoolean(BundleKeys.SAVING_DIALOG, savingDialogShowing);
         serviceHelper.saveOperationsState(outState, BundleKeys.PENDING_OPERATIONS);
     }
 
@@ -266,17 +270,29 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
             return false;
         }
 
+        showSavingDialog();
+        serviceHelper.createQuestion(TAG, currentQuestionData, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.QUESTION_CREATE));
+
+        return true;
+    }
+
+    private void showSavingDialog() {
+        savingDialogShowing = true;
         waitDialog = ProgressDialog.show(this, getString(R.string.creating_post), getString(R.string.please_wait),
                 true, true, new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
                         // question data is probably already on server so.. just close dialog
-                        dialog.dismiss();
+                        hideSavingDialog();
                     }
                 });
-        serviceHelper.createQuestion(TAG, currentQuestionData, CallbacksKeeper.getInstance().getCallback(TAG, OperationType.QUESTION_CREATE));
+    }
 
-        return true;
+    private void hideSavingDialog() {
+        if (waitDialog != null && waitDialog.isShowing()) {
+            waitDialog.dismiss();
+        }
+        savingDialogShowing = false;
     }
 
     @Override

@@ -267,14 +267,14 @@ public class MainActivity extends ToolbarActivity implements
         } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK && data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
             refreshPages();
         } else {
-            for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
-                if (weak != null) {
-                    Fragment f = weak.get();
-                    if (f != null) {
-                        f.onActivityResult(requestCode, resultCode, data);
-                    }
-                }
-            }
+//            for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+//                if (weak != null) {
+//                    Fragment f = weak.get();
+//                    if (f != null) {
+//                        f.onActivityResult(requestCode, resultCode, data);
+//                    }
+//                }
+//            }
         }
     }
 
@@ -304,6 +304,11 @@ public class MainActivity extends ToolbarActivity implements
     protected void onDestroy() {
         super.onDestroy();
         eventBus.unregister(this);
+    }
+
+    public void onEvent(EditProfileActivity.ProfileEditedEvent event) {
+        new RetrieveUserTask().execute(false);
+        getUserInfo();
     }
 
     public void onEvent(NetworkStateReceiver.NetworkIsUpEvent event) {
@@ -553,11 +558,19 @@ public class MainActivity extends ToolbarActivity implements
         }
     }
 
-    class RetrieveUserTask extends AsyncTask<Void, Void, UserEntry> {
+    class RetrieveUserTask extends AsyncTask<Boolean, Void, UserEntry> {
+        private boolean reloadCategories = true;
 
         @Override
-        protected UserEntry doInBackground(Void... params) {
-            return UserEntry.byUId(ApiUI.getCurrentUserId(MainActivity.this));
+        protected UserEntry doInBackground(Boolean... params) {
+            if (params.length > 0) {
+                reloadCategories = params[0];
+            }
+            String userId = ApiUI.getCurrentUserId(MainActivity.this);
+            if (userId != null) {
+                return UserEntry.byUId(userId);
+            }
+            return null;
         }
 
         @Override
@@ -565,7 +578,9 @@ public class MainActivity extends ToolbarActivity implements
             if (entry == null) {
                 return;
             }
-            getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+            if (reloadCategories) {
+                getSupportLoaderManager().restartLoader(LoaderIds.CATEGORIES_LOADER, null, categoriesLoaderCallbacks);
+            }
             String username = entry.getUsername();
             if (username == null || username.isEmpty())
                 username = getString(R.string.no_nick);
@@ -589,6 +604,8 @@ public class MainActivity extends ToolbarActivity implements
                     .withActivity(MainActivity.this)
                     .withHeaderBackground(R.drawable.header)
                     .addProfiles(profile)
+                    .withSelectionListEnabled(false)
+                    .withSelectionListEnabledForSingleProfile(false)
                     .withDrawer(drawer)
                     .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                         @Override

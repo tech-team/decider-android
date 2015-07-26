@@ -487,9 +487,8 @@ public class QuestionsListFragment
                     adapter.notifyItemChanged(position);
                 }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private class QuestionsLoaderCallbacksImpl implements LoaderManager.LoaderCallbacks<Cursor> {

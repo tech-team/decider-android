@@ -75,6 +75,17 @@ public class SocialLoginActivity extends ToolbarActivity {
                 Log.d(TAG, "Got url: " + url);
                 if (url.startsWith(SocialProviders.getSocialCompletePath())) {
                     Uri finalUri = Uri.parse(url);
+
+                    String canceledStr = finalUri.getQueryParameter("canceled");
+                    if (canceledStr != null) {
+                        int canceled = Integer.parseInt(canceledStr);
+                        if (canceled == 1) {
+                            setResult(Activity.RESULT_CANCELED);
+                            finish();
+                            return;
+                        }
+                    }
+
                     String accessToken = finalUri.getQueryParameter("access_token");
                     long expires = System.currentTimeMillis() + Long.parseLong(finalUri.getQueryParameter("expires")) * 1000;
                     String refreshToken = finalUri.getQueryParameter("refresh_token");
@@ -107,11 +118,11 @@ public class SocialLoginActivity extends ToolbarActivity {
             }
         });
 
-        webView.setWebChromeClient(new WebChromeClient(){
+        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 progressBar.setProgress(newProgress);
-                if(newProgress == 100) {
+                if (newProgress == 100) {
                     progressBar.setVisibility(View.GONE);
                 }
             }

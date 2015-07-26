@@ -183,6 +183,7 @@ public class ProfileActivity extends ToolbarActivity {
 
         @Override
         protected void onPostExecute(UserEntry entry) {
+            if (entry == null) return;
             String avatarUrl = entry.getAvatar();
             if (avatarUrl != null) {
                 imageLoader.displayImage(ApiUI.resolveUrl(avatarUrl), profileImage);
