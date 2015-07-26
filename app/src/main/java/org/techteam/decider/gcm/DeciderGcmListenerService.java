@@ -34,8 +34,10 @@ public class DeciderGcmListenerService extends GcmListenerService {
          */
 
         try {
-            Push push = PushParser.parse(data);
-            sendNotification(push);
+            Push push = PushParser.parse(getBaseContext(), data);
+            if (push != null) {
+                sendNotification(push);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

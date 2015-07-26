@@ -273,7 +273,6 @@ public class QuestionView extends PostView {
                         }
                     }
                 });
-
                 menu.show();
             }
         });
