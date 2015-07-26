@@ -37,8 +37,12 @@ import org.techteam.decider.rest.OperationType;
 import org.techteam.decider.rest.service_helper.ServiceCallback;
 import org.techteam.decider.util.Toaster;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.TimeZone;
 
 public class QuestionsListFragment
         extends Fragment
@@ -99,6 +103,8 @@ public class QuestionsListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_questions_list, container, false);
+
+
 
         emptyListView = (TextView) rootView.findViewById(R.id.empty_list);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.posts_recycler);
