@@ -37,6 +37,7 @@ public class CommentsListAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
+        public QuestionView questionView;
         public CommentView commentView;
 
         public ViewHolder(View v) {
@@ -45,7 +46,13 @@ public class CommentsListAdapter
 
         public ViewHolder(CommentView v) {
             super(v);
+            questionView = null;
             commentView = v;
+        }
+
+        public ViewHolder(View v, QuestionView questionView) {
+            super(v);
+            this.questionView = questionView;
         }
     }
 
@@ -79,28 +86,7 @@ public class CommentsListAdapter
                         .inflate(R.layout.fragment_question_card, parent, false);
 
                 QuestionView questionView = (QuestionView) v.findViewById(R.id.post_view);
-                questionView.reuse(questionEntry, new QuestionView.EventListener() {
-                    @Override
-                    public void onLikeClick(QuestionEntry post) {
-                        onQuestionEventCallback.onLikeClick(-1, post);
-                    }
-
-                    @Override
-                    public void onVoteClick(QuestionEntry post, int voteId) {
-                        onQuestionEventCallback.onVoteClick(-1, post, voteId);
-                    }
-
-                    @Override
-                    public void onCommentsClick(QuestionEntry post) {
-                        onQuestionEventCallback.onCommentsClick(-1, post);
-                    }
-
-                    @Override
-                    public void onReportSpamClick(QuestionEntry post) {
-                        onQuestionEventCallback.onReportSpam(-1, post);
-                    }
-                });
-                break;
+                return new ViewHolder(v, questionView);
             case VIEW_TYPE_MORE_COMMENTS_BUTTON:
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.more_comments_button, parent, false);
@@ -122,7 +108,8 @@ public class CommentsListAdapter
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor, final int position) {
-        if (getItemViewType(position) == VIEW_TYPE_COMMENT) {
+        int itemVIewType = getItemViewType(position);
+        if (itemVIewType == VIEW_TYPE_COMMENT) {
             cursor.moveToPosition(position - 2);
             CommentEntry entry = CommentEntry.fromCursor(cursor);
             holder.commentView.reuse(entry, new CommentView.EventListener() {
@@ -131,8 +118,30 @@ public class CommentsListAdapter
                     onCommentEventCallback.onReportSpam(-1, entry);
                 }
             });
-        } else if (getItemViewType(position) == VIEW_TYPE_MORE_COMMENTS_BUTTON) {
+        } else if (itemVIewType == VIEW_TYPE_MORE_COMMENTS_BUTTON) {
             updateLoadingEntry();
+        } else if (itemVIewType == VIEW_TYPE_QUESTION) {
+            holder.questionView.reuse(questionEntry, new QuestionView.EventListener() {
+                @Override
+                public void onLikeClick(QuestionEntry post) {
+                    onQuestionEventCallback.onLikeClick(-1, post);
+                }
+
+                @Override
+                public void onVoteClick(QuestionEntry post, int voteId) {
+                    onQuestionEventCallback.onVoteClick(-1, post, voteId);
+                }
+
+                @Override
+                public void onCommentsClick(QuestionEntry post) {
+                    onQuestionEventCallback.onCommentsClick(-1, post);
+                }
+
+                @Override
+                public void onReportSpamClick(QuestionEntry post) {
+                    onQuestionEventCallback.onReportSpam(-1, post);
+                }
+            });
         }
     }
 

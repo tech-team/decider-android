@@ -267,14 +267,14 @@ public class MainActivity extends ToolbarActivity implements
         } else if (requestCode == QUESTION_DETAILS && resultCode == Activity.RESULT_OK && data.getBooleanExtra(QuestionDetailsActivity.IntentExtras.AFTER_CREATE, false)) {
             refreshPages();
         } else {
-            for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
-                if (weak != null) {
-                    Fragment f = weak.get();
-                    if (f != null) {
-                        f.onActivityResult(requestCode, resultCode, data);
-                    }
-                }
-            }
+//            for (WeakReference<Fragment> weak : mSectionsPagerAdapter.getFragments().values()) {
+//                if (weak != null) {
+//                    Fragment f = weak.get();
+//                    if (f != null) {
+//                        f.onActivityResult(requestCode, resultCode, data);
+//                    }
+//                }
+//            }
         }
     }
 
