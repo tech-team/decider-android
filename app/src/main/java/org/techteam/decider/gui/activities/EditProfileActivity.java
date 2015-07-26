@@ -307,6 +307,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             } else {
                 getUserInfo();
             }
+            new RetrieveUserTask().execute();
         } else {
             serviceHelper.restoreOperationsState(savedInstanceState, BundleKeys.PENDING_OPERATIONS, CallbacksKeeper.getInstance(), TAG);
             UserData userData = savedInstanceState.getParcelable(BundleKeys.USER_DATA);
@@ -323,8 +324,6 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             loadingDialogShowing = savedInstanceState.getBoolean(BundleKeys.LOADING_DIALOG);
             savingDialogShowing = savedInstanceState.getBoolean(BundleKeys.SAVING_DIALOG);
         }
-
-        new RetrieveUserTask().execute();
 
         if (dataLooseWarnShowing) {
             showDataLooseWarning();
@@ -512,7 +511,7 @@ public class EditProfileActivity extends ToolbarActivity implements ActivityStar
             cityText.setText(entry.getCity());
             aboutText.setText(entry.getAbout());
 
-            Date birthday = entry.getBirthday();
+            birthday = entry.getBirthday();
             if (birthday != null) {
                 String date = DateFormat.getDateFormat(EditProfileActivity.this).format(entry.getBirthday());
                 birthdayText.setText(date);
