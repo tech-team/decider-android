@@ -9,11 +9,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.android.camera.CropImageIntentBuilder;
@@ -22,6 +25,7 @@ import org.techteam.decider.R;
 import org.techteam.decider.content.ImageData;
 import org.techteam.decider.gui.activities.AddQuestionActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -124,12 +128,39 @@ public class ImageSelector implements View.OnClickListener {
                     selectedImage = fixUri(data.getData());
                 }
 
-                imageHolder.setSource(selectedImage);
-
                 if (selectedImage == null) {
                     Log.e(TAG, "selectedImage is still null even after fixUri");
                     return;
                 }
+
+                WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+                Display display = wm.getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int deviceWidth = size.x;
+                int deviceHeight = size.y;
+
+                double ratio = (double) deviceHeight / (double) deviceWidth;
+
+                int desiredWidth = deviceWidth / 2;
+                int desiredHeight = (int) (deviceWidth * ratio);
+
+                Bitmap bitmap = null;
+                try {
+                    bitmap = BitmapUtils.prepareBitmap(context, selectedImage, desiredWidth, desiredHeight);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (bitmap == null) {
+                    Log.wtf(TAG, "prepared bitmap is null");
+                    return;
+                }
+
+                selectedImage = saveBitmap(bitmap, selectedImage);
+                imageHolder.setSource(selectedImage);
+
 
                 // generate cropped path
                 File cacheDir = context.getCacheDir();
@@ -145,11 +176,33 @@ public class ImageSelector implements View.OnClickListener {
         }
     }
 
+    private Uri saveBitmap(Bitmap bmp, Uri uri) {
+
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(uri.getPath());
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return uri;
+    }
+
     private void cropImage() {
         CropImageIntentBuilder cropBuilder = new CropImageIntentBuilder(
                 aspectWidth, aspectHeight,
                 previewWidth, previewHeight,
                 imageHolder.getPreview());
+        cropBuilder.setScaleUpIfNeeded(true);
+
         cropBuilder.setSourceImage(imageHolder.getSource());
 
         Intent intent = cropBuilder.getIntent(context);
@@ -167,12 +220,19 @@ public class ImageSelector implements View.OnClickListener {
     }
 
     public ImageData getImageData() {
+        if (imageHolder == null) {
+            return null;
+        }
+
         if (imageHolder.getSource() == null || imageHolder.getPreview() == null) {
             return null;
         }
 
         String original = uriToPath(imageHolder.getSource());
-        String preview = imageHolder.getPreview().getPath();
+        String preview = null;
+        if (imageHolder.getPreview() != null) {
+            preview = imageHolder.getPreview().getPath();
+        }
         ImageData image = new ImageData(original, preview);
         image.setOriginalUri(imageHolder.getSource());
         image.setPreviewUri(imageHolder.getPreview());
@@ -180,6 +240,9 @@ public class ImageSelector implements View.OnClickListener {
     }
 
     private String uriToPath(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
         if (!uri.getPath().startsWith("/media")) {
             return uri.getPath();
         }

@@ -223,7 +223,10 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
         postText.setText(currentQuestionData.getText());
 
         // restoring category
-        categoriesSpinner.setSelection(currentQuestionData.getCategoryEntrySpinnerId());
+        int entrySpinnerId = currentQuestionData.getCategoryEntrySpinnerId();
+        if (entrySpinnerId != -1) {
+            categoriesSpinner.setSelection(entrySpinnerId);
+        }
 
         // restoring images
         leftImageSelector.restoreFromImageData(currentQuestionData.getPicture1());
@@ -238,7 +241,7 @@ public class AddQuestionActivity extends ToolbarActivity implements ActivityStar
 
         Cursor categoryCursor = (Cursor) categoriesSpinner.getSelectedItem();
         CategoryEntry categoryEntry = CategoryEntry.fromCursor(categoryCursor);
-        int categoryUid = categoryEntry.getUid();
+        int categoryUid = categoryEntry != null ? categoryEntry.getUid() : -1;
 
         boolean anonymity = anonymityCheckBox.isChecked();
 

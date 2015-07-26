@@ -149,6 +149,6 @@
     <string name="pref_notification_votes_key" translatable="false">pref_notification_votes_key</string>
     <string name="pref_notification_comments_title">Notify about comments</string>
     <string name="pref_notification_votes_title">Notify about votes</string>
-    <string name="error_empty_comment">Unable to send empty comment</string>
+    <string name="error_empty_comment">Please write a comment first</string>
 
 </resources>

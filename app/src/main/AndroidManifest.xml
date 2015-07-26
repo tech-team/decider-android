@@ -20,7 +20,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:largeHeap="true">
         <meta-data
             android:name="AA_DB_NAME"
             android:value="Decider.db" />
@@ -58,6 +59,7 @@
         <activity
             android:name=".gui.activities.AddQuestionActivity"
             android:label="@string/add_post_toolbar_title"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
         <activity

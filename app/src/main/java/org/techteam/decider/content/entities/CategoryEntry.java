@@ -86,6 +86,9 @@ public class CategoryEntry extends Model {
     }
 
     public static CategoryEntry fromCursor(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
         CategoryEntry entry = new CategoryEntry();
         entry.loadFromCursor(cursor);
         return entry;
