@@ -382,6 +382,11 @@ public class QuestionDetailsActivity extends ToolbarActivity
 
     private void sendComment() {
         String text = commentEdit.getText().toString();
+        if (text.isEmpty()) {
+            Toaster.toast(this, R.string.error_empty_comment);
+            return;
+        }
+
         commentEdit.setText("");
 
         int questionId = getIntent().getIntExtra(IntentExtras.Q_ID, -1);
