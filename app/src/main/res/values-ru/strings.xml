@@ -125,7 +125,7 @@
     <string name="already_voted">Вы уже голосовали в этом вопросе</string>
     <string name="invalid_credentials">Неправильные email и/или пароль</string>
     <string name="email_taken">Этот email уже занят</string>
-    <string name="username_required">Username is required to finish registration</string>
+    <string name="username_required">Пожалуйста, укажите имя пользователя</string>
     <string name="shared_by">Отправлено с помощью Decider</string>
     <string name="username_taken">Пользователь с никнеймом \'%s\' уже существует</string>
     <string name="loading_image">Загрузка картинки...</string>
@@ -135,4 +135,8 @@
     <string name="anon_profile_entry">Автор данного сообщения пожелал остаться инкогнито.</string>
     <string name="preferences">Настройки</string>
     <string name="pref_main">Основные</string>
+    <string name="pref_ui">Интерфейс</string>
+    <string name="pref_notifications">Уведомления</string>
+    <string name="pref_notification_votes_title">Уведомлять о голосах</string>
+    <string name="pref_notification_comments_title">Уведомлять о комментариях</string>
 </resources>

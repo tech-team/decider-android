@@ -2,8 +2,8 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/pref_main"
-        android:key="@string/pref_main_key">
+        android:title="@string/pref_ui"
+        android:key="@string/pref_ui_key">
 
         <!--<CheckBoxPreference-->
             <!--android:key="@string/pref_shorten_long_posts_key"-->
@@ -20,4 +20,21 @@
             />
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_notifications"
+        android:key="@string/pref_notifications_key">
+
+        <CheckBoxPreference
+            android:key="@string/pref_notification_comments_key"
+            android:title="@string/pref_notification_comments_title"
+            android:defaultValue="false" />
+
+        <CheckBoxPreference
+            android:key="@string/pref_notification_votes_key"
+            android:title="@string/pref_notification_votes_title"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
