@@ -30,6 +30,11 @@ import org.techteam.decider.gui.activities.ProfileActivity;
 import org.techteam.decider.rest.api.ApiUI;
 import org.techteam.decider.util.ImageLoaderInitializer;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 
 public class QuestionView extends PostView {
 
@@ -156,6 +161,7 @@ public class QuestionView extends PostView {
             imageLoader.displayImage(ApiUI.resolveUrl(avatar), avatarImage);
         else
             avatarImage.setImageDrawable(context.getResources().getDrawable(R.drawable.profile));
+
 
         authorText.setText(entry.getAuthor().getUsername());
         dateText.setText(getDateString(entry.getCreationDate()));
