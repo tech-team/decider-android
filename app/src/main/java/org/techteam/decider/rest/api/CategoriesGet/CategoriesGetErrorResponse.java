@@ -1,7 +1,9 @@
-package org.techteam.decider.rest.api.responses;
+package org.techteam.decider.rest.api.CategoriesGet;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import org.techteam.decider.rest.api.responses.ApiErrorResponse;
 
 public class CategoriesGetErrorResponse extends ApiErrorResponse {
 
