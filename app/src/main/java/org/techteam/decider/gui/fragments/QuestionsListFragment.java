@@ -200,16 +200,17 @@ public class QuestionsListFragment
                 String msg;
                 if (isFeedFinished) {
                     msg = "No more posts";
+
                 } else {
                     msg = "Successfully fetched posts. " + currentSection.toString();
-                    if (isAdded()) {
-                        Bundle args = new Bundle();
-                        args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
-                        args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
-                        args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
-                        args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
-                        getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
-                    }
+                }
+                if (isAdded()) {
+                    Bundle args = new Bundle();
+                    args.putInt(QuestionsLoader.BundleKeys.INSERTED_COUNT, insertedCount);
+                    args.putInt(QuestionsLoader.BundleKeys.LOAD_INTENTION, loadIntention);
+                    args.putInt(QuestionsLoader.BundleKeys.SECTION, loadedSection);
+                    args.putBoolean(QuestionsLoader.BundleKeys.FEED_FINISHED, isFeedFinished);
+                    getLoaderManager().restartLoader(LoaderIds.QUESTIONS_LOADER, args, questionsLoaderCallbacks);
                 }
 
                 adapter.setFeedFinished(isFeedFinished);
