@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import org.techteam.decider.R;
 import org.techteam.decider.content.ContentSection;
+import org.techteam.decider.content.QuestionHelper;
 import org.techteam.decider.content.entities.CategoryEntry;
 import org.techteam.decider.content.entities.QuestionEntry;
 import org.techteam.decider.gui.CategoriesGetter;
@@ -377,6 +378,7 @@ public class QuestionsListFragment
         questionsOffset = 0;
         serviceHelperGetter.getServiceHelper().getQuestions(getServiceTag(),
                 currentSection,
+                -1,
                 QUESTIONS_LIMIT,
                 questionsOffset,
                 categoriesGetter.getSelectedCategories(),
@@ -401,8 +403,24 @@ public class QuestionsListFragment
                 intention = LoadIntention.APPEND;
             }
 
+            int firstQuestionId = -1;
+            if (currentSection != ContentSection.POPULAR) {
+                Cursor cursor = adapter.getCursor();
+                if (cursor != null && cursor.getCount() != 0) {
+                    int prevPos = cursor.getPosition();
+                    cursor.moveToFirst();
+                    QuestionEntry questionEntry = QuestionHelper.fromCursor(currentSection, cursor);
+                    if (questionEntry != null) {
+                        firstQuestionId = questionEntry.getQId();
+                    }
+                    cursor.moveToPosition(prevPos);
+                }
+            }
+
+
             serviceHelperGetter.getServiceHelper().getQuestions(getServiceTag(),
                     currentSection,
+                    firstQuestionId,
                     QUESTIONS_LIMIT,
                     questionsOffset,
                     categoriesGetter.getSelectedCategories(),

@@ -34,10 +34,11 @@ public final class ServiceIntentBuilder {
         return intent;
     }
 
-    public static Intent getQuestionsIntent(Context context, OperationType op, String requestId, ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention) {
+    public static Intent getQuestionsIntent(Context context, OperationType op, String requestId, ContentSection contentSection, int firstQuestionId, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention) {
         Intent intent = getBasicIntent(context, requestId, op);
 
         intent.putExtra(QuestionsGetRequest.IntentExtras.CONTENT_SECTION, contentSection.toInt());
+        intent.putExtra(QuestionsGetRequest.IntentExtras.FIRST_QUESTION_ID, firstQuestionId);
         intent.putExtra(QuestionsGetRequest.IntentExtras.LIMIT, limit);
         intent.putExtra(QuestionsGetRequest.IntentExtras.OFFSET, offset);
 

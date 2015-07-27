@@ -39,7 +39,7 @@ public class ServiceHelper {
         this.context = context;
     }
 
-    public void getQuestions(String tag, ContentSection contentSection, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
+    public void getQuestions(String tag, ContentSection contentSection, int firstQuestionId, int limit, int offset, Collection<CategoryEntry> categories, int loadIntention, ServiceCallback cb) {
         init();
 
         OperationType op = OperationType.QUESTIONS_GET;
@@ -56,7 +56,7 @@ public class ServiceHelper {
         CallbackHelper.AddStatus s = callbackHelper.addCallback(requestId, cb);
 
         if (s == CallbackHelper.AddStatus.NEW_CB) {
-            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, op, requestId, contentSection, limit, offset, categories, loadIntention);
+            Intent intent = ServiceIntentBuilder.getQuestionsIntent(context, op, requestId, contentSection, firstQuestionId, limit, offset, categories, loadIntention);
             context.startService(intent);
         }
 

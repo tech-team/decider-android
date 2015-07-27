@@ -92,6 +92,7 @@ public class ApiUI {
 
     public JSONObject getQuestions(QuestionsGetRequest request) throws IOException, JSONException, InvalidAccessTokenException, AuthenticatorException, OperationCanceledException, ServerErrorException {
         UrlParams params = new UrlParams();
+        params.add("first_question_id", request.getFirstQuestionId());
         params.add("limit", request.getLimit());
         params.add("offset", request.getOffset());
         params.add("tab", request.getContentSection().toString().toLowerCase());
